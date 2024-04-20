@@ -402,6 +402,12 @@ require('lazy').setup({
     end,
   },
 
+  {
+    "pmizio/typescript-tools.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    opts = {},
+  },
+
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -528,6 +534,9 @@ require('lazy').setup({
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
+      require('mason').setup()
+      local mason_registry = require('mason-registry')
+
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
       --
@@ -539,7 +548,7 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        -- gopls = {},
+        gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -548,8 +557,29 @@ require('lazy').setup({
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        -- tsserver = {},
-        --
+        tsserver = {
+          setup = {
+            init_options = {
+              plugins = {
+                {
+                  name = '@vue/typescript-plugin',
+                  location = mason_registry.get_package("vue-language-server"):get_install_path() ..
+                      '/node_modules/@vue/language-server',
+                  languages = { 'vue' },
+                },
+              },
+            },
+          },
+        },
+
+        volar = {
+          init_options = {
+            vue = {
+              hybridMode = false,
+            },
+          },
+        },
+
 
         lua_ls = {
           -- cmd = {...},
@@ -573,7 +603,6 @@ require('lazy').setup({
       --    :Mason
       --
       --  You can press `g?` for help in this menu.
-      require('mason').setup()
 
       -- You can add other tools here that you want Mason to install
       -- for you, so that they are available from within Neovim.

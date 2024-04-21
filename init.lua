@@ -154,6 +154,13 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
+-- Debloat nvim
+-- Disable netrw at the very start of init.lua
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+vim.keymap.set('n', '<leader>b', '<cmd>NvimTreeToggle<CR>',
+  { desc = 'Toggle Explorer' })
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -333,8 +340,28 @@ require('lazy').setup({
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
-      -- Useful for getting pretty icons, but requires a Nerd Font.
-      { 'nvim-tree/nvim-web-devicons',            enabled = vim.g.have_nerd_font },
+      { -- Adds a file tree to Neovim
+        "nvim-tree/nvim-tree.lua",
+        version = "*",
+        lazy = false,
+        dependencies = {
+          "nvim-tree/nvim-web-devicons",
+        },
+        config = function()
+          require("nvim-tree").setup {
+            sort = {
+              sorter = "case_sensitive",
+            },
+            view = {
+              width = 30,
+              side = "right",
+            },
+            renderer = {
+              group_empty = true,
+            },
+          }
+        end,
+      }
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that

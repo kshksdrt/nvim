@@ -190,6 +190,21 @@ vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right win
 vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
+-- Keybinds from ThePrimeagen. See https://github.com/ThePrimeagen/init.lua/blob/master/lua/theprimeagen/remap.lua
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selected lines down" })
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selected lines up" })
+vim.keymap.set("x", "<leader>p", [["_dP]],
+  { desc = "Paste over visually selected text without overwriting the register" })
+-- Quickfix list navigation
+vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz",
+  { desc = "Go to the next quickfix item (ghcopilot-suggested. Please verify)" })
+vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz",
+  { desc = "Go to the previous quickfix item (ghcopilot-suggested. Please verify)" })
+vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz",
+  { desc = "Go to the next location list item (ghcopilot-suggested. Please verify)" })
+vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz",
+  { desc = "Go to the previous location list item (ghcopilot-suggested. Please verify)" })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 

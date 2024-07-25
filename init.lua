@@ -212,6 +212,13 @@ vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz",
 vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz",
   { desc = "Go to the previous location list item (ghcopilot-suggested. Please verify)" })
 
+-- My custom text objects
+--  Gives you text objects for the contents of current buffer.
+vim.api.nvim_set_keymap('x', 'ie', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('o', 'ie', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('x', 'ae', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('o', 'ae', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 

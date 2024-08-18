@@ -645,6 +645,7 @@ require('lazy').setup({
                 },
               },
             },
+            filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
           },
         },
 
@@ -670,6 +671,10 @@ require('lazy').setup({
             },
           },
         },
+
+        csharp_ls = {},
+
+        csharpier = {},
       }
 
       -- Ensure the servers and tools above are installed

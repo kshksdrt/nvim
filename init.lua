@@ -370,7 +370,7 @@ require('lazy').setup({
               group_empty = true,
             },
             filters = {
-              dotfiles = true,
+              dotfiles = false,
             }
           }
 
@@ -415,6 +415,26 @@ require('lazy').setup({
         --  All the info you're looking for is in `:help telescope.setup()`
         --
         defaults = {
+          -- Ignore these files and folders
+          file_ignore_patterns = {
+            "node_modules",
+            "%.git/",
+            "%.DS_Store",
+            "dist",
+            "build"
+            -- Add any other patterns you want to ignore
+          },
+          vimgrep_arguments = {
+            "rg",
+            "--color=never",
+            "--no-heading",
+            "--with-filename",
+            "--line-number",
+            "--column",
+            "--smart-case",
+            "--hidden",
+            "--glob=!{.git/*,node_modules/*}"
+          },
           mappings = {
             i = {
               ['<c-enter>'] = 'to_fuzzy_refine', -- Starts a new search among the currently shown buffers.

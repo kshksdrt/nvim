@@ -393,11 +393,71 @@ require('lazy').setup({
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          mappings = {
+            i = {
+              ['<c-enter>'] = 'to_fuzzy_refine', -- Starts a new search among the currently shown buffers.
+            },
+            n = {
+              ['x'] = 'delete_buffer',
+              ["y"] =
+                  function(bufnr)
+                    -- Copies the file path
+                    local actions = require('telescope.actions')
+                    local action_state = require('telescope.actions.state')
+                    local selection = action_state.get_selected_entry()
+                    if selection then
+                      local file_path = selection.value
+                      if file_path == nil then
+                        file_path = selection.filename or selection.path
+                      end
+                      if file_path then
+                        vim.fn.setreg("+", file_path)
+                        actions.close(bufnr)
+                        vim.notify("Copied full path: " .. file_path, vim.log.levels.INFO)
+                      else
+                        vim.notify("No file path found for the selection", vim.log.levels.WARN)
+                      end
+                    end
+                  end,
+              ["t"] =
+                  function(bufnr)
+                    -- Copies the file as a typescript import.
+                    local actions = require('telescope.actions')
+                    local action_state = require('telescope.actions.state')
+                    local selection = action_state.get_selected_entry()
+                    if selection then
+                      local file_path = selection.value
+                      if file_path == nil then
+                        file_path = selection.filename or selection.path
+                      end
+                      if file_path then
+                        -- Extract the file name without any extensions
+                        local file_name = vim.fn.fnamemodify(file_path, ":t:r")
+
+                        -- Remove all extensions from the import path
+                        local import_path = file_path:gsub("%.%w+", "")
+
+                        -- If the file_name is empty (e.g., ".gitignore"), use the full name
+                        if file_name == "" then
+                          file_name = vim.fn.fnamemodify(file_path, ":t")
+                        end
+
+                        -- Create the import statement
+                        local import_statement = string.format("import %s from '%s';", file_name, import_path)
+
+                        vim.fn.setreg("+", import_statement)
+                        actions.close(bufnr)
+                        vim.notify("Copied as typescript import: " .. import_statement, vim.log.levels.INFO)
+                      else
+                        vim.notify("No file path found for the selection", vim.log.levels.WARN)
+                      end
+                    end
+                  end
+              ,
+            }
+          },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -987,7 +1047,7 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+  { import = 'custom.plugins' },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the

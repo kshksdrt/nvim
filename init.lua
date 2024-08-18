@@ -730,6 +730,8 @@ require('lazy').setup({
           },
         },
 
+        prettier = {},
+
         volar = {
           init_options = {
             vue = {
@@ -810,6 +812,7 @@ require('lazy').setup({
         -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
         return {
+          pattern = { "*.js", "*.ts", "*.jsx", "*.tsx", "*.css", "*.html", "*.json", "*.yaml", "*.md" },
           timeout_ms = 500,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
         }
@@ -821,7 +824,16 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        -- javascript = { { "prettierd", "prettier" } },
+        typesccript = { "prettierd", "prettier" },
+        javascript = { "prettierd", "prettier" },
+        tsx = { "prettierd", "prettier" },
+        jsx = { "prettierd", "prettier" },
+        vue = { "prettierd", "prettier" },
+        html = { "prettierd", "prettier" },
+        css = { "prettierd", "prettier" },
+        json = { "prettierd", "prettier" },
+        yaml = { "prettierd", "prettier" },
+        markdown = { "prettierd", "prettier" },
       },
     },
   },

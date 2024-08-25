@@ -90,8 +90,17 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
+-- Disable arrows, enter, backspace and delete keys in normal mode
+vim.keymap.set('n', '<Up>', '<Nop>', { noremap = true, silent = true })
+vim.keymap.set('n', '<Down>', '<Nop>', { noremap = true, silent = true })
+vim.keymap.set('n', '<Left>', '<Nop>', { noremap = true, silent = true })
+vim.keymap.set('n', '<Right>', '<Nop>', { noremap = true, silent = true })
+vim.keymap.set('n', '<CR>', '<Nop>', { noremap = true, silent = true })
+vim.keymap.set('n', '<BS>', '<Nop>', { noremap = true, silent = true })
+vim.keymap.set('n', '<Del>', '<Nop>', { noremap = true, silent = true })
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`

@@ -444,6 +444,15 @@ require('lazy').setup({
             "--hidden",
             "--glob=!{.git/*,node_modules/*}"
           },
+          layout_strategy = "vertical",
+          layout_config = {
+            vertical = {
+              preview_cutoff = 0,
+              prompt_position = "top",
+              mirror = true,
+            },
+          },
+          sorting_strategy = "ascending",
           mappings = {
             i = {
               ['<c-enter>'] = 'to_fuzzy_refine', -- Starts a new search among the currently shown buffers.

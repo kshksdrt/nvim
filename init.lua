@@ -518,6 +518,16 @@ require('lazy').setup({
           },
         },
         pickers = {
+          live_grep = {
+            -- Customizations for live_grep, if needed
+          },
+          buffers = {
+            -- Customizations for buffers, if needed
+          },
+          help_tags = {
+            -- Customizations for help_tags, if needed
+          },
+          -- Add more pickers as needed
           find_files = {
             hidden = true
           }

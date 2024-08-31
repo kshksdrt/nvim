@@ -99,6 +99,10 @@ vim.keymap.set('n', '<CR>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<BS>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<Del>', '<Nop>', { noremap = true, silent = true })
 
+-- Move to previous/next
+vim.keymap.set('n', '<C-h>', ':bprevious<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<C-l>', ':bnext<CR>', { noremap = true, silent = true })
+
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
@@ -201,10 +205,10 @@ vim.opt.shiftwidth = 4
 --  Use CTRL+<hjkl> to switch between windows
 --
 --  See `:help wincmd` for a list of all window commands
-vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- vim.keymap.set('n', '<C-h>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- Keybinds from ThePrimeagen. See https://github.com/ThePrimeagen/init.lua/blob/master/lua/theprimeagen/remap.lua
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { desc = 'Move selected lines down' })
@@ -267,7 +271,7 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  -- 'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -581,12 +585,6 @@ require('lazy').setup({
     end,
   },
 
-  {
-    'pmizio/typescript-tools.nvim',
-    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
-    opts = {},
-  },
-
   { -- LSP Configuration & Plugins
     'neovim/nvim-lspconfig',
     dependencies = {
@@ -876,8 +874,10 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        typesccript = { 'prettierd', 'prettier' },
+        typescript = { 'prettierd', 'prettier' },
         javascript = { 'prettierd', 'prettier' },
+        ts = { 'prettierd', 'prettier' },
+        js = { 'prettierd', 'prettier' },
         tsx = { 'prettierd', 'prettier' },
         jsx = { 'prettierd', 'prettier' },
         vue = { 'prettierd', 'prettier' },

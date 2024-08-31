@@ -167,8 +167,7 @@ vim.opt.scrolloff = 10
 -- Disable netrw at the very start of init.lua
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
-vim.keymap.set('n', '<leader>b', '<cmd>NvimTreeToggle<CR>',
-  { desc = 'Toggle Explorer' })
+vim.keymap.set('n', '<leader>b', '<cmd>NvimTreeToggle<CR>', { desc = 'Toggle Explorer' })
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -188,6 +187,10 @@ vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagn
 -- or just use <C-\><C-n> to exit terminal mode
 vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' })
 
+vim.opt.expandtab = false
+vim.opt.tabstop = 4
+vim.opt.shiftwidth = 4
+
 -- TIP: Disable arrow keys in normal mode
 -- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
 -- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
@@ -204,19 +207,14 @@ vim.keymap.set('n', '<C-j>', '<C-w><C-j>', { desc = 'Move focus to the lower win
 vim.keymap.set('n', '<C-k>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- Keybinds from ThePrimeagen. See https://github.com/ThePrimeagen/init.lua/blob/master/lua/theprimeagen/remap.lua
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selected lines down" })
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selected lines up" })
-vim.keymap.set("x", "<leader>p", [["_dP]],
-  { desc = "Paste over visually selected text without overwriting the register" })
+vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { desc = 'Move selected lines down' })
+vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv", { desc = 'Move selected lines up' })
+vim.keymap.set('x', '<leader>p', [["_dP]], { desc = 'Paste over visually selected text without overwriting the register' })
 -- Quickfix list navigation
-vim.keymap.set("n", "<C-k>", "<cmd>cnext<CR>zz",
-  { desc = "Go to the next quickfix item (ghcopilot-suggested. Please verify)" })
-vim.keymap.set("n", "<C-j>", "<cmd>cprev<CR>zz",
-  { desc = "Go to the previous quickfix item (ghcopilot-suggested. Please verify)" })
-vim.keymap.set("n", "<leader>k", "<cmd>lnext<CR>zz",
-  { desc = "Go to the next location list item (ghcopilot-suggested. Please verify)" })
-vim.keymap.set("n", "<leader>j", "<cmd>lprev<CR>zz",
-  { desc = "Go to the previous location list item (ghcopilot-suggested. Please verify)" })
+vim.keymap.set('n', '<C-k>', '<cmd>cnext<CR>zz', { desc = 'Go to the next quickfix item (ghcopilot-suggested. Please verify)' })
+vim.keymap.set('n', '<C-j>', '<cmd>cprev<CR>zz', { desc = 'Go to the previous quickfix item (ghcopilot-suggested. Please verify)' })
+vim.keymap.set('n', '<leader>k', '<cmd>lnext<CR>zz', { desc = 'Go to the next location list item (ghcopilot-suggested. Please verify)' })
+vim.keymap.set('n', '<leader>j', '<cmd>lprev<CR>zz', { desc = 'Go to the previous location list item (ghcopilot-suggested. Please verify)' })
 
 -- My custom text objects
 --  Gives you text objects for the contents of current buffer.
@@ -264,7 +262,7 @@ vim.opt.rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
+  -- 'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -306,7 +304,7 @@ require('lazy').setup({
   -- after the plugin has been loaded:
   --  config = function() ... end
 
-  {                     -- Useful plugin to show you pending keybinds.
+  { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
@@ -354,25 +352,25 @@ require('lazy').setup({
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
       { -- Adds a file tree to Neovim
-        "nvim-tree/nvim-tree.lua",
-        version = "*",
+        'nvim-tree/nvim-tree.lua',
+        version = '*',
         lazy = false,
         dependencies = {
-          "nvim-tree/nvim-web-devicons",
+          'nvim-tree/nvim-web-devicons',
         },
         config = function()
-          require("nvim-tree").setup {
+          require('nvim-tree').setup {
             actions = {
               open_file = {
                 quit_on_open = true,
               },
             },
             sort = {
-              sorter = "case_sensitive",
+              sorter = 'case_sensitive',
             },
             view = {
               width = 30,
-              side = "right",
+              side = 'right',
               relativenumber = true,
             },
             renderer = {
@@ -380,22 +378,21 @@ require('lazy').setup({
             },
             filters = {
               dotfiles = false,
-            }
+            },
           }
 
           -- Keybinding to open Nvim-tree and reveal current file
           vim.api.nvim_set_keymap('n', '<leader>f', ':NvimTreeFindFile<CR>', { noremap = true, silent = true })
 
           -- Keybinding to close Nvim-tree with Escape key
-          vim.api.nvim_create_autocmd("FileType", {
-            pattern = "NvimTree",
+          vim.api.nvim_create_autocmd('FileType', {
+            pattern = 'NvimTree',
             callback = function()
-              vim.api.nvim_buf_set_keymap(0, 'n', '<Esc>', ':lua require("nvim-tree.api").tree.close()<CR>',
-                { noremap = true, silent = true })
-            end
+              vim.api.nvim_buf_set_keymap(0, 'n', '<Esc>', ':lua require("nvim-tree.api").tree.close()<CR>', { noremap = true, silent = true })
+            end,
           })
         end,
-      }
+      },
     },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
@@ -426,95 +423,92 @@ require('lazy').setup({
         defaults = {
           -- Ignore these files and folders
           file_ignore_patterns = {
-            "node_modules",
-            "%.git/",
-            "%.DS_Store",
-            "dist",
-            "build"
+            'node_modules',
+            '%.git/',
+            '%.DS_Store',
+            'dist',
+            'build',
             -- Add any other patterns you want to ignore
           },
           vimgrep_arguments = {
-            "rg",
-            "--color=never",
-            "--no-heading",
-            "--with-filename",
-            "--line-number",
-            "--column",
-            "--smart-case",
-            "--hidden",
-            "--glob=!{.git/*,node_modules/*}"
+            'rg',
+            '--color=never',
+            '--no-heading',
+            '--with-filename',
+            '--line-number',
+            '--column',
+            '--smart-case',
+            '--hidden',
+            '--glob=!{.git/*,node_modules/*}',
           },
-          layout_strategy = "vertical",
+          layout_strategy = 'vertical',
           layout_config = {
             vertical = {
               preview_cutoff = 0,
-              prompt_position = "top",
+              prompt_position = 'top',
               mirror = true,
             },
           },
-          sorting_strategy = "ascending",
+          sorting_strategy = 'ascending',
           mappings = {
             i = {
               ['<c-enter>'] = 'to_fuzzy_refine', -- Starts a new search among the currently shown buffers.
             },
             n = {
               ['x'] = 'delete_buffer',
-              ["y"] =
-                  function(bufnr)
-                    -- Copies the file path
-                    local actions = require('telescope.actions')
-                    local action_state = require('telescope.actions.state')
-                    local selection = action_state.get_selected_entry()
-                    if selection then
-                      local file_path = selection.value
-                      if file_path == nil then
-                        file_path = selection.filename or selection.path
-                      end
-                      if file_path then
-                        vim.fn.setreg("+", file_path)
-                        actions.close(bufnr)
-                        vim.notify("Copied full path: " .. file_path, vim.log.levels.INFO)
-                      else
-                        vim.notify("No file path found for the selection", vim.log.levels.WARN)
-                      end
-                    end
-                  end,
-              ["t"] =
-                  function(bufnr)
-                    -- Copies the file as a typescript import.
-                    local actions = require('telescope.actions')
-                    local action_state = require('telescope.actions.state')
-                    local selection = action_state.get_selected_entry()
-                    if selection then
-                      local file_path = selection.value
-                      if file_path == nil then
-                        file_path = selection.filename or selection.path
-                      end
-                      if file_path then
-                        -- Extract the file name without any extensions
-                        local file_name = vim.fn.fnamemodify(file_path, ":t:r")
-
-                        -- Remove all extensions from the import path
-                        local import_path = file_path:gsub("%.%w+", "")
-
-                        -- If the file_name is empty (e.g., ".gitignore"), use the full name
-                        if file_name == "" then
-                          file_name = vim.fn.fnamemodify(file_path, ":t")
-                        end
-
-                        -- Create the import statement
-                        local import_statement = string.format("import %s from '%s';", file_name, import_path)
-
-                        vim.fn.setreg("+", import_statement)
-                        actions.close(bufnr)
-                        vim.notify("Copied as typescript import: " .. import_statement, vim.log.levels.INFO)
-                      else
-                        vim.notify("No file path found for the selection", vim.log.levels.WARN)
-                      end
-                    end
+              ['y'] = function(bufnr)
+                -- Copies the file path
+                local actions = require 'telescope.actions'
+                local action_state = require 'telescope.actions.state'
+                local selection = action_state.get_selected_entry()
+                if selection then
+                  local file_path = selection.value
+                  if file_path == nil then
+                    file_path = selection.filename or selection.path
                   end
-              ,
-            }
+                  if file_path then
+                    vim.fn.setreg('+', file_path)
+                    actions.close(bufnr)
+                    vim.notify('Copied full path: ' .. file_path, vim.log.levels.INFO)
+                  else
+                    vim.notify('No file path found for the selection', vim.log.levels.WARN)
+                  end
+                end
+              end,
+              ['t'] = function(bufnr)
+                -- Copies the file as a typescript import.
+                local actions = require 'telescope.actions'
+                local action_state = require 'telescope.actions.state'
+                local selection = action_state.get_selected_entry()
+                if selection then
+                  local file_path = selection.value
+                  if file_path == nil then
+                    file_path = selection.filename or selection.path
+                  end
+                  if file_path then
+                    -- Extract the file name without any extensions
+                    local file_name = vim.fn.fnamemodify(file_path, ':t:r')
+
+                    -- Remove all extensions from the import path
+                    local import_path = file_path:gsub('%.%w+', '')
+
+                    -- If the file_name is empty (e.g., ".gitignore"), use the full name
+                    if file_name == '' then
+                      file_name = vim.fn.fnamemodify(file_path, ':t')
+                    end
+
+                    -- Create the import statement
+                    local import_statement = string.format("import %s from '%s';", file_name, import_path)
+
+                    vim.fn.setreg('+', import_statement)
+                    actions.close(bufnr)
+                    vim.notify('Copied as typescript import: ' .. import_statement, vim.log.levels.INFO)
+                  else
+                    vim.notify('No file path found for the selection', vim.log.levels.WARN)
+                  end
+                end
+              end,
+            },
           },
         },
         pickers = {
@@ -529,8 +523,8 @@ require('lazy').setup({
           },
           -- Add more pickers as needed
           find_files = {
-            hidden = true
-          }
+            hidden = true,
+          },
         },
         extensions = {
           ['ui-select'] = {
@@ -582,8 +576,8 @@ require('lazy').setup({
   },
 
   {
-    "pmizio/typescript-tools.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    'pmizio/typescript-tools.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
     opts = {},
   },
 
@@ -597,7 +591,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim',       opts = {} },
+      { 'j-hui/fidget.nvim', opts = {} },
 
       -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
@@ -741,7 +735,7 @@ require('lazy').setup({
       capabilities = vim.tbl_deep_extend('force', capabilities, require('cmp_nvim_lsp').default_capabilities())
 
       require('mason').setup()
-      local mason_registry = require('mason-registry')
+      local mason_registry = require 'mason-registry'
 
       -- Enable the following language servers
       --  Feel free to add/remove any LSPs that you want here. They will automatically be installed.
@@ -758,7 +752,7 @@ require('lazy').setup({
         -- clangd = {},
 
         gopls = {
-          cmd = { "gopls" },
+          cmd = { 'gopls' },
         },
 
         -- pyright = {},
@@ -772,8 +766,7 @@ require('lazy').setup({
               plugins = {
                 {
                   name = '@vue/typescript-plugin',
-                  location = mason_registry.get_package("vue-language-server"):get_install_path() ..
-                      '/node_modules/@vue/language-server',
+                  location = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server',
                   languages = { 'vue' },
                 },
               },
@@ -864,7 +857,7 @@ require('lazy').setup({
         -- languages here or re-enable it for the disabled ones.
         local disable_filetypes = { c = true, cpp = true }
         return {
-          pattern = { "*.js", "*.ts", "*.jsx", "*.tsx", "*.css", "*.html", "*.json", "*.yaml", "*.md" },
+          pattern = { '*.js', '*.ts', '*.jsx', '*.tsx', '*.css', '*.html', '*.json', '*.yaml', '*.md' },
           timeout_ms = 500,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
         }
@@ -876,16 +869,16 @@ require('lazy').setup({
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        typesccript = { "prettierd", "prettier" },
-        javascript = { "prettierd", "prettier" },
-        tsx = { "prettierd", "prettier" },
-        jsx = { "prettierd", "prettier" },
-        vue = { "prettierd", "prettier" },
-        html = { "prettierd", "prettier" },
-        css = { "prettierd", "prettier" },
-        json = { "prettierd", "prettier" },
-        yaml = { "prettierd", "prettier" },
-        markdown = { "prettierd", "prettier" },
+        typesccript = { 'prettierd', 'prettier' },
+        javascript = { 'prettierd', 'prettier' },
+        tsx = { 'prettierd', 'prettier' },
+        jsx = { 'prettierd', 'prettier' },
+        vue = { 'prettierd', 'prettier' },
+        html = { 'prettierd', 'prettier' },
+        css = { 'prettierd', 'prettier' },
+        json = { 'prettierd', 'prettier' },
+        yaml = { 'prettierd', 'prettier' },
+        markdown = { 'prettierd', 'prettier' },
       },
     },
   },
@@ -1082,7 +1075,22 @@ require('lazy').setup({
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'markdown_inline', 'query', 'vim', 'vimdoc', 'typescript', 'javascript', 'vue' },
+      ensure_installed = {
+        'bash',
+        'c',
+        'diff',
+        'html',
+        'lua',
+        'luadoc',
+        'markdown',
+        'markdown_inline',
+        'query',
+        'vim',
+        'vimdoc',
+        'typescript',
+        'javascript',
+        'vue',
+      },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {

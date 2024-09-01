@@ -42,15 +42,6 @@ return {
         end
     },
     {
-        "karb94/neoscroll.nvim",
-        config = function()
-            require('neoscroll').setup({
-                easing = 'cubic',
-                hide_cursor = true,
-            })
-        end
-    },
-    {
         'akinsho/bufferline.nvim',
         version = "*",
         dependencies = 'nvim-tree/nvim-web-devicons',
@@ -87,7 +78,11 @@ return {
         "petertriho/nvim-scrollbar",
         version = "*",
         config = function()
-            require("scrollbar").setup()
+            require("scrollbar").setup({
+                handle = {
+                    blend = 100,
+                },
+            })
         end
     },
 }

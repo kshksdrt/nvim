@@ -1045,6 +1045,22 @@ require('lazy').setup({
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
 
+      require('mini.move').setup({
+        mappings = {
+          -- Move visual selection in Visual mode. Defaults are Alt (Meta) + hjkl.
+          up = '<Up>',
+          down = '<Down>',
+          left = '<Left>',
+          right = '<Right>',
+
+          -- Move current line in Normal mode
+          line_up = '<Up>',
+          line_down = '<Down>',
+          line_left = '<Left>',
+          line_right = '<Right>',
+        },
+      })
+
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin

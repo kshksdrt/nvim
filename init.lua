@@ -102,8 +102,8 @@ vim.keymap.set('n', '<PageUp>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<PageDown>', '<Nop>', { noremap = true, silent = true })
 
 -- Move to previous/next
-vim.keymap.set('n', '<C-S-Tab>', ':bprevious<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<C-Tab>', ':bnext<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<C-h>', ':bprevious<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<C-l>', ':bnext<CR>', { noremap = true, silent = true })
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true

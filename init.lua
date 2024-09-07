@@ -98,6 +98,8 @@ vim.keymap.set('n', '<Right>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<CR>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<BS>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<Del>', '<Nop>', { noremap = true, silent = true })
+vim.keymap.set('n', '<PageUp>', '<Nop>', { noremap = true, silent = true })
+vim.keymap.set('n', '<PageDown>', '<Nop>', { noremap = true, silent = true })
 
 -- Move to previous/next
 vim.keymap.set('n', '<C-S-Tab>', ':bprevious<CR>', { noremap = true, silent = true })
@@ -1107,6 +1109,17 @@ require('lazy').setup({
 
       -- Prefer git instead of curl in order to improve connectivity in some environments
       require('nvim-treesitter.install').prefer_git = true
+
+      opts.incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = "gnn",
+          node_incremental = "<PageUp>",
+          scope_incremental = "grc",
+          node_decremental = "<PageDown>",
+        },
+      }
+
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup(opts)
 

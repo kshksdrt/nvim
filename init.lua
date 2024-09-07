@@ -1165,3 +1165,11 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+-- Configures "indent_blankline" to not underline the start and end of a scope
+require('ibl').setup({
+  scope = {
+    show_start = false,
+    show_end = false,
+  },
+})

@@ -100,8 +100,8 @@ vim.keymap.set('n', '<BS>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<Del>', '<Nop>', { noremap = true, silent = true })
 
 -- Move to previous/next
-vim.keymap.set('n', '<C-h>', ':bprevious<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<C-l>', ':bnext<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<C-S-Tab>', ':bprevious<CR>', { noremap = true, silent = true })
+vim.keymap.set('n', '<C-Tab>', ':bnext<CR>', { noremap = true, silent = true })
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
@@ -947,11 +947,12 @@ require('lazy').setup({
         mapping = cmp.mapping.preset.insert {
           -- Select the [n]ext item
           ['<C-n>'] = cmp.mapping.select_next_item(),
+          ['<Tab>'] = cmp.mapping.select_next_item(),
+          ['<Down>'] = cmp.mapping.select_next_item(),
           -- Select the [p]revious item
           ['<C-p>'] = cmp.mapping.select_prev_item(),
-          -- Cycles through completions
-          ['<Tab>'] = cmp.mapping.select_next_item(),
           ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+          ['<Up>'] = cmp.mapping.select_prev_item(),
 
           -- Scroll the documentation window [b]ack / [f]orward
           ['<C-b>'] = cmp.mapping.scroll_docs(-4),
@@ -1050,22 +1051,6 @@ require('lazy').setup({
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
       require('mini.surround').setup()
-
-      require('mini.move').setup({
-        mappings = {
-          -- Move visual selection in Visual mode. Defaults are Alt (Meta) + hjkl.
-          up = '<Up>',
-          down = '<Down>',
-          left = '<Left>',
-          right = '<Right>',
-
-          -- Move current line in Normal mode
-          line_up = '<Up>',
-          line_down = '<Down>',
-          line_left = '<Left>',
-          line_right = '<Right>',
-        },
-      })
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,

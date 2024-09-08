@@ -467,7 +467,7 @@ require('lazy').setup({
               ['<c-enter>'] = 'to_fuzzy_refine', -- Starts a new search among the currently shown buffers.
             },
             n = {
-              ['x'] = 'delete_buffer',
+              ['d'] = 'delete_buffer',
               ['y'] = function(bufnr)
                 -- Copies the file path
                 local actions = require 'telescope.actions'

@@ -57,8 +57,10 @@ return {
         'ggandor/leap.nvim',
         version = "*",
         config = function()
-            vim.keymap.set({ 'n', 'x', 'o' }, '<S-Space>', '<Plug>(leap-forward-to)', { silent = true })
-            vim.keymap.set({ 'n', 'x', 'o' }, '<S-BS>', '<Plug>(leap-backward-to)', { silent = true })
+            vim.keymap.set({ 'n', 'x', 'o' }, '<leader>lj', '<Plug>(leap-forward-to)',
+                { noremap = true, silent = true, desc = "Leap forward" })
+            vim.keymap.set({ 'n', 'x', 'o' }, '<leader>lk', '<Plug>(leap-backward-to)',
+                { noremap = true, silent = true, desc = "Leap backward" })
         end
     },
     {

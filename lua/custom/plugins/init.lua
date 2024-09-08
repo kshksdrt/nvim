@@ -77,7 +77,9 @@ return {
         config = function()
             require("scrollbar").setup({
                 handle = {
-                    blend = 100,
+                    text = "  ",
+                    blend = 0,
+                    color = "#404040"
                 },
             })
         end

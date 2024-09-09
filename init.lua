@@ -229,6 +229,9 @@ vim.api.nvim_set_keymap('o', 'ie', ':<C-u>normal! ggVG<CR>', { noremap = true, s
 vim.api.nvim_set_keymap('x', 'ae', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('o', 'ae', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
 
+-- Teminal tools
+vim.keymap.set('n', '<leader>x', ':exe "!" . getline(".")<CR>', { noremap = true, silent = false, desc = 'Execute current line in shell' })
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 

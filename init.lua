@@ -215,17 +215,12 @@ vim.opt.shiftwidth = 4
 -- Keybinds from ThePrimeagen. See https://github.com/ThePrimeagen/init.lua/blob/master/lua/theprimeagen/remap.lua
 vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { desc = 'Move selected lines down' })
 vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv", { desc = 'Move selected lines up' })
-vim.keymap.set('x', '<leader>p', [["_dP]],
-  { desc = 'Paste over visually selected text without overwriting the register' })
+vim.keymap.set('x', '<leader>p', [["_dP]], { desc = 'Paste over visually selected text without overwriting the register' })
 -- Quickfix list navigation
-vim.keymap.set('n', '<C-k>', '<cmd>cnext<CR>zz',
-  { desc = 'Go to the next quickfix item (ghcopilot-suggested. Please verify)' })
-vim.keymap.set('n', '<C-j>', '<cmd>cprev<CR>zz',
-  { desc = 'Go to the previous quickfix item (ghcopilot-suggested. Please verify)' })
-vim.keymap.set('n', '<leader>k', '<cmd>lnext<CR>zz',
-  { desc = 'Go to the next location list item (ghcopilot-suggested. Please verify)' })
-vim.keymap.set('n', '<leader>j', '<cmd>lprev<CR>zz',
-  { desc = 'Go to the previous location list item (ghcopilot-suggested. Please verify)' })
+vim.keymap.set('n', '<C-k>', '<cmd>cnext<CR>zz', { desc = 'Go to the next quickfix item (ghcopilot-suggested. Please verify)' })
+vim.keymap.set('n', '<C-j>', '<cmd>cprev<CR>zz', { desc = 'Go to the previous quickfix item (ghcopilot-suggested. Please verify)' })
+vim.keymap.set('n', '<leader>k', '<cmd>lnext<CR>zz', { desc = 'Go to the next location list item (ghcopilot-suggested. Please verify)' })
+vim.keymap.set('n', '<leader>j', '<cmd>lprev<CR>zz', { desc = 'Go to the previous location list item (ghcopilot-suggested. Please verify)' })
 
 -- My custom text objects
 --  Gives you text objects for the contents of current buffer.
@@ -315,7 +310,7 @@ require('lazy').setup({
   -- after the plugin has been loaded:
   --  config = function() ... end
 
-  {                     -- Useful plugin to show you pending keybinds.
+  { -- Useful plugin to show you pending keybinds.
     'folke/which-key.nvim',
     event = 'VimEnter', -- Sets the loading event to 'VimEnter'
     config = function() -- This is the function that runs, AFTER loading
@@ -399,8 +394,7 @@ require('lazy').setup({
           vim.api.nvim_create_autocmd('FileType', {
             pattern = 'NvimTree',
             callback = function()
-              vim.api.nvim_buf_set_keymap(0, 'n', '<Esc>', ':lua require("nvim-tree.api").tree.close()<CR>',
-                { noremap = true, silent = true })
+              vim.api.nvim_buf_set_keymap(0, 'n', '<Esc>', ':lua require("nvim-tree.api").tree.close()<CR>', { noremap = true, silent = true })
             end,
           })
         end,
@@ -597,7 +591,7 @@ require('lazy').setup({
 
       -- Useful status updates for LSP.
       -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-      { 'j-hui/fidget.nvim',       opts = {} },
+      { 'j-hui/fidget.nvim', opts = {} },
 
       -- `lazydev` configures Lua LSP for your Neovim config, runtime and plugins
       -- used for completion, annotations and signatures of Neovim apis
@@ -774,8 +768,7 @@ require('lazy').setup({
               plugins = {
                 {
                   name = '@vue/typescript-plugin',
-                  location = mason_registry.get_package('vue-language-server'):get_install_path() ..
-                      '/node_modules/@vue/language-server',
+                  location = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server',
                   languages = { 'vue' },
                 },
               },
@@ -867,7 +860,7 @@ require('lazy').setup({
         local disable_filetypes = { c = true, cpp = true }
         return {
           pattern = { '*.js', '*.ts', '*.jsx', '*.tsx', '*.css', '*.html', '*.json', '*.yaml', '*.md' },
-          timeout_ms = 500,
+          timeout_ms = 5000,
           lsp_fallback = not disable_filetypes[vim.bo[bufnr].filetype],
         }
       end,
@@ -968,7 +961,7 @@ require('lazy').setup({
           ['<C-y>'] = cmp.mapping.confirm { select = true },
 
           -- Accepts the completion
-          ['<Enter>'] = cmp.mapping.confirm({ select = true }),
+          ['<Enter>'] = cmp.mapping.confirm { select = true },
 
           -- If you prefer more traditional completion keymaps,
           -- you can uncomment the following lines
@@ -1115,10 +1108,10 @@ require('lazy').setup({
       opts.incremental_selection = {
         enable = true,
         keymaps = {
-          init_selection = "gnn",
-          node_incremental = "<PageUp>",
-          scope_incremental = "grc",
-          node_decremental = "<PageDown>",
+          init_selection = 'gnn',
+          node_incremental = '<PageUp>',
+          scope_incremental = 'grc',
+          node_decremental = '<PageDown>',
         },
       }
 
@@ -1182,9 +1175,9 @@ require('lazy').setup({
 -- vim: ts=2 sts=2 sw=2 et
 
 -- Configures "indent_blankline" to not underline the start and end of a scope
-require('ibl').setup({
+require('ibl').setup {
   scope = {
     show_start = false,
     show_end = false,
   },
-})
+}

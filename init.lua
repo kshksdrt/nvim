@@ -846,7 +846,7 @@ require('lazy').setup({
     cmd = { 'ConformInfo' },
     keys = {
       {
-        '<leader>f',
+        '<leader>fo',
         function()
           require('conform').format { async = true, lsp_fallback = true }
         end,

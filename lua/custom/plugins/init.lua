@@ -39,7 +39,7 @@ return {
         lazygit:toggle()
       end
 
-      vim.api.nvim_set_keymap('n', '<leader>g', '<cmd>lua Lazygit_toggle()<CR>', { noremap = true, silent = true })
+      vim.api.nvim_set_keymap('n', '<leader>g', '<cmd>lua Lazygit_toggle()<CR>', { noremap = true, silent = true, desc = 'Open LazyGit' })
 
       -- Setup additional terminals
       local term1 = Terminal:new {
@@ -63,8 +63,8 @@ return {
         term2:toggle()
       end
 
-      vim.api.nvim_set_keymap('n', '<leader>t1', '<cmd>lua _G.term1_toggle()<CR>', { noremap = true, silent = true })
-      vim.api.nvim_set_keymap('n', '<leader>t2', '<cmd>lua _G.term2_toggle()<CR>', { noremap = true, silent = true })
+      vim.api.nvim_set_keymap('n', '<leader>t1', '<cmd>lua _G.term1_toggle()<CR>', { noremap = true, silent = true, desc = 'Open Terminal 1' })
+      vim.api.nvim_set_keymap('n', '<leader>t2', '<cmd>lua _G.term2_toggle()<CR>', { noremap = true, silent = true, desc = 'Open Terminal 2' })
     end,
   },
   {

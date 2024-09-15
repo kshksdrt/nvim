@@ -411,6 +411,7 @@ require('lazy').setup({
               width = 30,
               side = 'right',
               relativenumber = true,
+              adaptive_size = true,
             },
             renderer = {
               group_empty = true,

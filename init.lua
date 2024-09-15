@@ -1214,14 +1214,6 @@ require('lazy').setup({
   },
 })
 
--- Setup toggleterm.nvim
-require('toggleterm').setup {
-  -- size can be a number or function which is passed the current terminal
-  size = 20,
-  direction = 'float',
-  open_mapping = [[<c-`>]],
-}
-
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 

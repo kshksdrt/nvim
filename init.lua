@@ -212,8 +212,8 @@ vim.opt.shiftwidth = 4
 vim.keymap.set('x', '<leader>p', [["_dP]], { desc = 'Paste over visually selected text without overwriting the register' })
 
 -- Quickfix list navigation
-vim.keymap.set('n', '<C-k>', '<cmd>cnext<CR>zz', { desc = 'Go to the next quickfix item (ghcopilot-suggested. Please verify)' })
-vim.keymap.set('n', '<C-j>', '<cmd>cprev<CR>zz', { desc = 'Go to the previous quickfix item (ghcopilot-suggested. Please verify)' })
+vim.keymap.set('n', '<C-j>', '<cmd>cnext<CR>zz', { desc = 'Go to the next quickfix item (ghcopilot-suggested. Please verify)' })
+vim.keymap.set('n', '<C-k>', '<cmd>cprev<CR>zz', { desc = 'Go to the previous quickfix item (ghcopilot-suggested. Please verify)' })
 vim.keymap.set('n', '<leader>k', '<cmd>lnext<CR>zz', { desc = 'Go to the next location list item (ghcopilot-suggested. Please verify)' })
 vim.keymap.set('n', '<leader>j', '<cmd>lprev<CR>zz', { desc = 'Go to the previous location list item (ghcopilot-suggested. Please verify)' })
 

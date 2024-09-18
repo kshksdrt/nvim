@@ -3,6 +3,7 @@
 --
 -- See the kickstart.nvim README for more information
 return {
+  -- Adds quick terminals
   {
     'akinsho/toggleterm.nvim',
     version = '*',
@@ -67,6 +68,7 @@ return {
       vim.api.nvim_set_keymap('n', '<leader>t2', '<cmd>lua _G.term2_toggle()<CR>', { noremap = true, silent = true, desc = 'Open Terminal 2' })
     end,
   },
+  -- Adds VS code's color scheme
   {
     'Mofiqul/vscode.nvim',
     config = function()
@@ -100,6 +102,7 @@ return {
       vim.cmd.colorscheme 'vscode'
     end,
   },
+  -- To display buffers like tabs with indicators for unsaved changes
   {
     'akinsho/bufferline.nvim',
     version = '*',
@@ -117,6 +120,7 @@ return {
       }
     end,
   },
+  -- To enable fast vertical motions
   {
     'ggandor/leap.nvim',
     version = '*',
@@ -125,6 +129,7 @@ return {
       vim.keymap.set({ 'n', 'x', 'o' }, '<leader>lk', '<Plug>(leap-backward-to)', { noremap = true, silent = true, desc = 'Leap backward' })
     end,
   },
+  -- To operate on surrounding characters
   {
     'kylechui/nvim-surround',
     version = '*', -- Use for stability; omit to use `main` branch for the latest features
@@ -133,6 +138,7 @@ return {
       require('nvim-surround').setup()
     end,
   },
+  -- Scrollbar for all buffers
   {
     'petertriho/nvim-scrollbar',
     version = '*',
@@ -150,6 +156,7 @@ return {
     'tpope/vim-fugitive',
     version = '*',
   },
+  -- Confirmation for quiting
   {
     'yutkat/confirm-quit.nvim',
     event = 'CmdlineEnter',

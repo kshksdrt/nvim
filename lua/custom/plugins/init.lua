@@ -44,13 +44,11 @@ return {
 
       -- Setup additional terminals
       local term1 = Terminal:new {
-        cmd = 'bash',
         direction = 'float',
         count = 1,
       }
 
       local term2 = Terminal:new {
-        cmd = 'bash',
         direction = 'vertical',
         size = 40,
         count = 2,

@@ -150,9 +150,19 @@ return {
       }
     end,
   },
+  -- Auto-close html tags
   {
-    'tpope/vim-fugitive',
+    'windwp/nvim-ts-autotag',
     version = '*',
+    config = function()
+      require('nvim-ts-autotag').setup {
+        opts = {
+          enable_close = false,
+          enable_rename = false,
+          enable_close_on_slash = true,
+        },
+      }
+    end,
   },
   -- Confirmation for quiting
   {

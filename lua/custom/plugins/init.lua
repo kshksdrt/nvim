@@ -3,6 +3,12 @@
 --
 -- See the kickstart.nvim README for more information
 return {
+  -- Practice best practices
+  {
+    'm4xshen/hardtime.nvim',
+    dependencies = { 'MunifTanjim/nui.nvim', 'nvim-lua/plenary.nvim' },
+    opts = {},
+  },
   -- Adds quick terminals
   {
     'akinsho/toggleterm.nvim',
@@ -100,6 +106,20 @@ return {
       vim.cmd.colorscheme 'vscode'
     end,
   },
+  -- To switch between buffers easily
+  {
+    'leath-dub/snipe.nvim',
+    keys = {
+      {
+        'gb',
+        function()
+          require('snipe').open_buffer_menu()
+        end,
+        desc = 'Open Snipe buffer menu',
+      },
+    },
+    opts = {},
+  },
   -- To display buffers like tabs with indicators for unsaved changes
   {
     'akinsho/bufferline.nvim',
@@ -170,6 +190,55 @@ return {
     event = 'CmdlineEnter',
     opts = {},
   },
+  -- To easily add annotations in one command
+  {
+    'danymat/neogen',
+    config = true,
+    version = '*',
+  },
+  -- Improve markdown rendering
+  {
+    'MeanderingProgrammer/render-markdown.nvim',
+    opts = {},
+    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
+  },
+  -- BROKEN: Improve diagnostics rendering. Not working. Try to fix.
+  -- {
+  --   'folke/trouble.nvim',
+  --   cmd = 'Trouble',
+  --   keys = {
+  --     {
+  --       '<leader>xx',
+  --       '<cmd>Trouble diagnostics toggle<cr>',
+  --       desc = 'Diagnostics (Trouble)',
+  --     },
+  --     {
+  --       '<leader>xX',
+  --       '<cmd>Trouble diagnostics toggle filter.buf=0<cr>',
+  --       desc = 'Buffer Diagnostics (Trouble)',
+  --     },
+  --     {
+  --       '<leader>cs',
+  --       '<cmd>Trouble symbols toggle focus=false<cr>',
+  --       desc = 'Symbols (Trouble)',
+  --     },
+  --     {
+  --       '<leader>cl',
+  --       '<cmd>Trouble lsp toggle focus=false win.position=right<cr>',
+  --       desc = 'LSP Definitions / references / ... (Trouble)',
+  --     },
+  --     {
+  --       '<leader>xL',
+  --       '<cmd>Trouble loclist toggle<cr>',
+  --       desc = 'Location List (Trouble)',
+  --     },
+  --     {
+  --       '<leader>xQ',
+  --       '<cmd>Trouble qflist toggle<cr>',
+  --       desc = 'Quickfix List (Trouble)',
+  --     },
+  --   },
+  -- },
   -- Context-aware commenting/uncommenting
   {
     'JoosepAlviste/nvim-ts-context-commentstring',
@@ -184,4 +253,20 @@ return {
       }
     end,
   },
+  -- BROKEN: Additional text objects. Not working. Try to fix.
+  -- {
+  --   'chrisgrieser/nvim-various-textobjs',
+  --   lazy = true,
+  --   config = function()
+  --     require('various-textobjs').setup { useDefaultKeymaps = false }
+  --
+  --     -- Load only the htmlAttribute text object
+  --     vim.keymap.set({ 'o', 'x' }, 'ah', function()
+  --       require('various-textobjs').htmlAttribute 'outer'
+  --     end)
+  --     vim.keymap.set({ 'o', 'x' }, 'ih', function()
+  --       require('various-textobjs').htmlAttribute 'inner'
+  --     end)
+  --   end,
+  -- },
 }

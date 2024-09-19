@@ -454,6 +454,36 @@ require('lazy').setup({
       -- Telescope picker. This is really useful to discover what Telescope can
       -- do as well as how to actually do it!
 
+      local actions = require 'telescope.actions'
+      local action_state = require 'telescope.actions.state'
+
+      local custom_actions = {}
+
+      custom_actions.send_to_qflist = function(prompt_bufnr)
+        local picker = action_state.get_current_picker(prompt_bufnr)
+        local manager = picker.manager
+
+        -- Get all entries
+        local results = {}
+        for entry in manager:iter() do
+          table.insert(results, {
+            filename = entry.filename,
+            lnum = entry.lnum,
+            col = entry.col,
+            text = entry.text,
+          })
+        end
+
+        -- Close Telescope
+        actions.close(prompt_bufnr)
+
+        -- Set quickfix list
+        vim.fn.setqflist(results)
+
+        -- Open quickfix list
+        vim.cmd 'copen'
+      end
+
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
@@ -461,6 +491,11 @@ require('lazy').setup({
         --  All the info you're looking for is in `:help telescope.setup()`
         --
         defaults = {
+          borderchars = {
+            prompt = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+            results = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+            preview = { '─', '│', '─', '│', '┌', '┐', '┘', '└' },
+          },
           -- Ignore these files and folders
           file_ignore_patterns = {
             'node_modules',
@@ -493,8 +528,10 @@ require('lazy').setup({
           mappings = {
             i = {
               ['<c-enter>'] = 'to_fuzzy_refine', -- Starts a new search among the currently shown buffers.
+              ['<c-q>'] = custom_actions.send_to_qflist,
             },
             n = {
+              ['<c-q>'] = custom_actions.send_to_qflist,
               ['d'] = 'delete_buffer',
               ['y'] = function(bufnr)
                 -- Copies the file path
@@ -554,6 +591,7 @@ require('lazy').setup({
         pickers = {
           live_grep = {
             -- Customizations for live_grep, if needed
+            debounce = 1000,
           },
           buffers = {
             -- Customizations for buffers, if needed
@@ -564,6 +602,7 @@ require('lazy').setup({
           -- Add more pickers as needed
           find_files = {
             hidden = true,
+            debounce = 300,
           },
         },
         extensions = {

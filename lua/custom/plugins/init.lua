@@ -119,7 +119,7 @@ return {
     'leath-dub/snipe.nvim',
     keys = {
       {
-        'gb',
+        'gh',
         function()
           require('snipe').open_buffer_menu()
         end,

@@ -3,6 +3,11 @@
 --
 -- See the kickstart.nvim README for more information
 return {
+  -- Make some UI stuff pretty
+  {
+    'stevearc/dressing.nvim',
+    opts = {},
+  },
   -- Claims to be lighter-weight and improve how fzf performance
   {
     'ibhagwan/fzf-lua',

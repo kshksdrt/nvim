@@ -3,6 +3,14 @@
 --
 -- See the kickstart.nvim README for more information
 return {
+  -- Claims to be lighter-weight and improve how fzf performance
+  {
+    'ibhagwan/fzf-lua',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('fzf-lua').setup {}
+    end,
+  },
   -- Practice best practices
   {
     'm4xshen/hardtime.nvim',

@@ -397,50 +397,6 @@ require('lazy').setup({
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
 
-      { -- Adds a file tree to Neovim
-        'nvim-tree/nvim-tree.lua',
-        version = '*',
-        lazy = false,
-        dependencies = {
-          'nvim-tree/nvim-web-devicons',
-        },
-        config = function()
-          require('nvim-tree').setup {
-            actions = {
-              open_file = {
-                quit_on_open = true,
-              },
-            },
-            sort = {
-              sorter = 'case_sensitive',
-            },
-            view = {
-              width = 30,
-              side = 'right',
-              relativenumber = true,
-              adaptive_size = true,
-            },
-            renderer = {
-              group_empty = true,
-            },
-            filters = {
-              dotfiles = false,
-            },
-          }
-
-          -- Keybinding to open Nvim-tree and reveal current file
-          vim.api.nvim_set_keymap('n', '<leader>f', ':NvimTreeFindFile<CR>', { noremap = true, silent = true })
-
-          -- Keybinding to close Nvim-tree with Escape key
-          vim.api.nvim_create_autocmd('FileType', {
-            pattern = 'NvimTree',
-            callback = function()
-              vim.api.nvim_buf_set_keymap(0, 'n', '<Esc>', ':lua require("nvim-tree.api").tree.close()<CR>', { noremap = true, silent = true })
-            end,
-          })
-        end,
-      },
-    },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
       -- it can fuzzy find! It's more than just a "file finder", it can search
@@ -1238,8 +1194,8 @@ require('lazy').setup({
   require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.

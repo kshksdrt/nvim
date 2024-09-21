@@ -29,8 +29,8 @@ return {
           },
           position = 'right',
           mappings = {
-            ['<esc>'] = 'close_window', -- Close the tree with Escape key
-            ['\\'] = 'close_window',
+            ['<esc>'] = 'close_window',
+            ['<leader>f'] = 'close_window',
           },
         },
       },

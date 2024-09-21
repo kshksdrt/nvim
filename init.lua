@@ -229,7 +229,7 @@ vim.api.nvim_set_keymap('o', 'ae', ':<C-u>normal! ggVG<CR>', { noremap = true, s
 
 -- Teminal tools
 vim.keymap.set('n', '<leader>x', ':exe "!" . getline(".")<CR>', { noremap = true, silent = false, desc = 'Execute current line in shell' })
-vim.keymap.set('n', '<leader>ca', function()
+vim.keymap.set('n', '<leader>cd', function()
   vim.fn.setreg('+', vim.fn.getcwd())
   print 'Current directory copied to clipboard'
 end, { noremap = true, silent = true, desc = 'Copy workspace directory' })

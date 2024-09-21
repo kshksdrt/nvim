@@ -179,7 +179,6 @@ vim.opt.scrolloff = 10
 -- Disable netrw at the very start of init.lua
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
-vim.keymap.set('n', '<leader>b', '<cmd>NvimTreeToggle<CR>', { desc = 'Toggle Explorer' })
 
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
@@ -396,7 +395,7 @@ require('lazy').setup({
         end,
       },
       { 'nvim-telescope/telescope-ui-select.nvim' },
-
+    },
     config = function()
       -- Telescope is a fuzzy finder that comes with a lot of different things that
       -- it can fuzzy find! It's more than just a "file finder", it can search
@@ -1235,3 +1234,31 @@ require('ibl').setup {
     show_end = false,
   },
 }
+
+-- Configures an NVIM_SPLASH_PATH
+local should_open_splash_screen = false
+
+local function open_splash_file()
+  local splash_path = os.getenv 'NVIM_SPLASH_PATH'
+  if splash_path and vim.fn.filereadable(splash_path) == 1 then
+    -- Open the splash file in the current buffer
+    vim.cmd('edit ' .. vim.fn.fnameescape(splash_path))
+
+    -- Set some buffer-local options
+    vim.bo.buflisted = false
+    vim.bo.bufhidden = 'hide'
+    vim.bo.swapfile = false
+  end
+end
+
+vim.api.nvim_create_autocmd('VimEnter', {
+  callback = function()
+    if should_open_splash_screen and vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1 then
+      -- Only show splash when opening a directory
+      open_splash_file()
+    end
+  end,
+})
+
+-- Optional: Add a command to manually open the splash file
+vim.api.nvim_create_user_command('OpenSplash', open_splash_file, {})

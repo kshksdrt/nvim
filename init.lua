@@ -864,11 +864,11 @@ require('lazy').setup({
         prettier = {},
 
         volar = {
-          init_options = {
-            vue = {
-              hybridMode = false,
-            },
-          },
+          -- init_options = {
+          --   vue = {
+          --     hybridMode = false,
+          --   },
+          -- },
         },
 
         lua_ls = {

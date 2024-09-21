@@ -180,6 +180,15 @@ vim.opt.scrolloff = 10
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
+-- Disable built-in directory browser
+vim.api.nvim_create_autocmd('VimEnter', {
+  callback = function()
+    if vim.fn.isdirectory(vim.fn.expand '%') == 1 then
+      vim.cmd 'bd'
+    end
+  end,
+})
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -378,6 +387,7 @@ require('lazy').setup({
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
+    lazy = false,
     branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
@@ -564,7 +574,7 @@ require('lazy').setup({
           -- Add more pickers as needed
           find_files = {
             hidden = true,
-            debounce = 300,
+            debounce = 350,
           },
         },
         extensions = {
@@ -580,6 +590,14 @@ require('lazy').setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
+
+      -- Open telescope on launch
+      vim.api.nvim_create_autocmd('VimEnter', {
+        callback = function()
+          vim.cmd 'Telescope find_files'
+        end,
+      })
+
       vim.keymap.set('n', '<leader>sh', builtin.help_tags, { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', builtin.keymaps, { desc = '[S]earch [K]eymaps' })
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
@@ -1234,31 +1252,3 @@ require('ibl').setup {
     show_end = false,
   },
 }
-
--- Configures an NVIM_SPLASH_PATH
-local should_open_splash_screen = false
-
-local function open_splash_file()
-  local splash_path = os.getenv 'NVIM_SPLASH_PATH'
-  if splash_path and vim.fn.filereadable(splash_path) == 1 then
-    -- Open the splash file in the current buffer
-    vim.cmd('edit ' .. vim.fn.fnameescape(splash_path))
-
-    -- Set some buffer-local options
-    vim.bo.buflisted = false
-    vim.bo.bufhidden = 'hide'
-    vim.bo.swapfile = false
-  end
-end
-
-vim.api.nvim_create_autocmd('VimEnter', {
-  callback = function()
-    if should_open_splash_screen and vim.fn.argc() == 1 and vim.fn.isdirectory(vim.fn.argv(0)) == 1 then
-      -- Only show splash when opening a directory
-      open_splash_file()
-    end
-  end,
-})
-
--- Optional: Add a command to manually open the splash file
-vim.api.nvim_create_user_command('OpenSplash', open_splash_file, {})

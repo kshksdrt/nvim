@@ -975,7 +975,8 @@ require('lazy').setup({
   },
 
   { -- Autocompletion
-    'hrsh7th/nvim-cmp',
+    'yioneko/nvim-cmp', -- Switch to `hrsh7th/nvim-cmp` after https://github.com/hrsh7th/nvim-cmp/pull/1980 is merged.
+    branch = 'perf-up', -- Remove after switching back to `hrsh7th/nvim-cmp`
     event = 'InsertEnter',
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source
@@ -1017,6 +1018,14 @@ require('lazy').setup({
       luasnip.config.setup {}
 
       cmp.setup {
+        performance = {
+          confirm_resolve_timeout = 80,
+          async_budget = 1,
+          max_view_entries = 200,
+          fetching_timeout = 1000,
+          debounce = 500,
+          throttle = 200,
+        },
         snippet = {
           expand = function(args)
             luasnip.lsp_expand(args.body)

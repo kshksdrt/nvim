@@ -154,13 +154,13 @@ return {
       }
     end,
   },
-  -- To enable fast vertical motions
+  -- Fast slanting motions
   {
     'ggandor/leap.nvim',
     version = '*',
     config = function()
-      vim.keymap.set({ 'n', 'x', 'o' }, '<leader>lj', '<Plug>(leap-forward-to)', { noremap = true, silent = true, desc = 'Leap forward' })
-      vim.keymap.set({ 'n', 'x', 'o' }, '<leader>lk', '<Plug>(leap-backward-to)', { noremap = true, silent = true, desc = 'Leap backward' })
+      vim.keymap.set({ 'n', 'x', 'o' }, '<leader>j', '<Plug>(leap-forward-to)', { noremap = true, silent = true, desc = 'Leap forward' })
+      vim.keymap.set({ 'n', 'x', 'o' }, '<leader>k', '<Plug>(leap-backward-to)', { noremap = true, silent = true, desc = 'Leap backward' })
     end,
   },
   -- To operate on surrounding characters

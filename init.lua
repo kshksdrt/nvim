@@ -225,8 +225,6 @@ vim.keymap.set('x', '<leader>p', [["_dP]], { desc = 'Paste over visually selecte
 -- Quickfix list navigation
 vim.keymap.set('n', '<C-j>', '<cmd>cnext<CR>zz', { desc = 'Go to the next quickfix item' })
 vim.keymap.set('n', '<C-k>', '<cmd>cprev<CR>zz', { desc = 'Go to the previous quickfix item' })
-vim.keymap.set('n', '<leader>k', '<cmd>lnext<CR>zz', { desc = 'Go to the next location list item' })
-vim.keymap.set('n', '<leader>j', '<cmd>lprev<CR>zz', { desc = 'Go to the previous location list item' })
 
 -- My custom text objects
 --  Gives you text objects for the contents of current buffer.
@@ -241,6 +239,26 @@ vim.keymap.set('n', '<leader>cd', function()
   vim.fn.setreg('+', vim.fn.getcwd())
   print 'Current directory copied to clipboard'
 end, { noremap = true, silent = true, desc = 'Copy workspace directory' })
+vim.keymap.set('v', '<leader>y', function()
+  local start_line, end_line = vim.fn.line "'<", vim.fn.line "'>"
+  local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+  vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, {})
+  local executed, errors = 0, 0
+
+  for i, line in ipairs(lines) do
+    if line:match '%S' then -- Check if line is not just whitespace
+      local success, error_msg = pcall(vim.cmd, line)
+      if success then
+        executed = executed + 1
+      else
+        errors = errors + 1
+        print(string.format('Error on line %d: %s', start_line + i - 1, error_msg))
+      end
+    end
+  end
+
+  print(string.format('Executed %d command(s), encountered %d error(s)', executed, errors))
+end, { noremap = true, silent = true, desc = 'Execute selected lines as commands' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`

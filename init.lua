@@ -837,11 +837,11 @@ require('lazy').setup({
         prettier = {},
 
         volar = {
-          -- init_options = {
-          --   vue = {
-          --     hybridMode = false,
-          --   },
-          -- },
+          init_options = {
+            vue = {
+              hybridMode = false,
+            },
+          },
         },
 
         lua_ls = {
@@ -876,6 +876,9 @@ require('lazy').setup({
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
+        'vue-language-server',
+        'prettierd',
+        'prettier',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 

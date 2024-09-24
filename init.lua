@@ -189,6 +189,9 @@ vim.api.nvim_create_autocmd('VimEnter', {
   end,
 })
 
+-- Theme gui
+vim.opt.guifont = 'Iosevka NF:h10:w400:n'
+
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -581,16 +584,22 @@ require('lazy').setup({
         pickers = {
           live_grep = {
             -- Customizations for live_grep, if needed
+            theme = 'ivy',
             debounce = 1000,
           },
+          git_files = {
+            theme = 'ivy',
+          },
           buffers = {
-            -- Customizations for buffers, if needed
+            theme = 'ivy',
           },
           help_tags = {
+            theme = 'ivy',
             -- Customizations for help_tags, if needed
           },
           -- Add more pickers as needed
           find_files = {
+            theme = 'ivy',
             hidden = true,
             debounce = 350,
           },

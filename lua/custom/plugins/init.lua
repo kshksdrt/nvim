@@ -100,7 +100,7 @@ return {
       -- vim.o.background = 'light'
 
       require('vscode').setup {
-        transparent = true,
+        transparent = false,
         italic_comments = false,
 
         -- Underline `@markup.link.*` variants

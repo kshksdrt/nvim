@@ -20,12 +20,6 @@ return {
       require('fzf-lua').setup {}
     end,
   },
-  -- Practice best practices
-  {
-    'm4xshen/hardtime.nvim',
-    dependencies = { 'MunifTanjim/nui.nvim', 'nvim-lua/plenary.nvim' },
-    opts = {},
-  },
   -- Adds quick terminals
   {
     'akinsho/toggleterm.nvim',

@@ -408,7 +408,7 @@ require('lazy').setup({
   { -- Fuzzy Finder (files, lsp, etc)
     'nvim-telescope/telescope.nvim',
     event = 'VimEnter',
-    lazy = false,
+    lazy = true,
     branch = '0.1.x',
     dependencies = {
       'nvim-lua/plenary.nvim',
@@ -608,11 +608,6 @@ require('lazy').setup({
 
       -- See `:help telescope.builtin`
       local builtin = require 'telescope.builtin'
-
-      -- Open telescope on launch
-      vim.api.nvim_create_autocmd('VimEnter', {
-        callback = theme_wrapper(builtin.find_files),
-      })
 
       vim.keymap.set('n', '<leader>sh', theme_wrapper(builtin.help_tags), { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', theme_wrapper(builtin.keymaps), { desc = '[S]earch [K]eymaps' })

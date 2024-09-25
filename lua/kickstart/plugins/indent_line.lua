@@ -6,18 +6,16 @@ return {
     main = 'ibl',
     opts = {},
     config = function()
-      local highlight = {
-        "Gray",
+      require('ibl').setup {
+        indent = {
+          char = '·',
+        },
+        scope = {
+          -- Configures "indent_blankline" to not underline the start and end of a scope
+          show_start = false,
+          show_end = false,
+        },
       }
-
-      local hooks = require "ibl.hooks"
-      -- create the highlight groups in the highlight setup hook, so they are reset
-      -- every time the colorscheme changes
-      hooks.register(hooks.type.HIGHLIGHT_SETUP, function()
-        vim.api.nvim_set_hl(0, "Gray", { fg = "#2e2e2e" })
-      end)
-
-      require("ibl").setup { indent = { highlight = highlight } }
-    end
+    end,
   },
 }

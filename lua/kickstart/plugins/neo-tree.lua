@@ -30,7 +30,7 @@ return {
       },
     }
     -- Keybinding to open Nvim-tree and reveal current file
-    vim.api.nvim_set_keymap('n', '<leader>f', ':NvimTreeFindFile<CR>', { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', '\\', ':NvimTreeFindFile<CR>', { noremap = true, silent = true })
     -- Keybinding to close Nvim-tree with Escape key
     vim.api.nvim_create_autocmd('FileType', {
       pattern = 'NvimTree',

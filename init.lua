@@ -987,6 +987,12 @@ require('lazy').setup({
           --     require('luasnip.loaders.from_vscode').lazy_load()
           --   end,
           -- },
+          {
+            'honza/vim-snippets',
+            config = function()
+              require('luasnip.loaders.from_snipmate').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -1002,6 +1008,14 @@ require('lazy').setup({
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       luasnip.config.setup {}
+
+      -- Set up keymaps for snippets
+      vim.keymap.set({ 'i', 's' }, '<Tab>', function()
+        luasnip.jump(1)
+      end, { silent = true })
+      vim.keymap.set({ 'i', 's' }, '<S-Tab>', function()
+        luasnip.jump(-1)
+      end, { silent = true })
 
       cmp.setup {
         performance = {

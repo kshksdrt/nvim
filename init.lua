@@ -949,8 +949,7 @@ require('lazy').setup({
   },
 
   { -- Autocompletion
-    'yioneko/nvim-cmp', -- Switch to `hrsh7th/nvim-cmp` after https://github.com/hrsh7th/nvim-cmp/pull/1980 is merged.
-    branch = 'perf-up', -- Remove after switching back to `hrsh7th/nvim-cmp`
+    'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source

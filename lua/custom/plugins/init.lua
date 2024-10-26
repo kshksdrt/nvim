@@ -189,4 +189,19 @@ return {
       vim.keymap.set('n', '<leader>sj', require('treesj').toggle, { desc = '[S]plit or [J]oin code-block' })
     end,
   },
+  -- For viewing heirarchy
+  {
+    'stevearc/aerial.nvim',
+    opts = {},
+    -- Optional dependencies
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-tree/nvim-web-devicons',
+    },
+  },
+  -- Bookmarks
+  {
+    'MattesGroeger/vim-bookmarks',
+    config = function() end,
+  },
 }

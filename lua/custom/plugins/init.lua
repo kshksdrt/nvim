@@ -60,7 +60,9 @@ return {
       {
         'gh',
         function()
-          require('snipe').open_buffer_menu()
+          local snipe = require 'snipe'
+          snipe.config.ui.position = 'center'
+          snipe.open_buffer_menu()
         end,
         desc = 'Open Snipe buffer menu',
       },
@@ -113,6 +115,14 @@ return {
           text = '  ',
           blend = 0,
           color = '#404040',
+        },
+        handlers = {
+          cursor = false,
+          diagnostic = true,
+          gitsigns = true, -- Requires gitsigns
+          handle = true,
+          search = false, -- Requires hlslens
+          ale = false, -- Requires ALE
         },
       }
     end,

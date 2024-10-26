@@ -44,7 +44,9 @@ return {
         group_overrides = {
           -- this supports the same val table as vim.api.nvim_set_hl
           -- use colors from this colorscheme by requiring vscode.colors!
-          CursorLine = { bg = '#303030' },
+          CursorLine = {
+            bg = '#303030',
+          },
         },
       }
       require('vscode').load()
@@ -171,6 +173,20 @@ return {
           end,
         },
       }
+    end,
+  },
+  -- For splitting/joining blocks of code
+  {
+    'Wansmer/treesj',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+    }, -- if you install parsers with `nvim-treesitter`
+    config = function()
+      local treesj = require 'treesj'
+      treesj.setup {
+        use_default_keymaps = false,
+      }
+      vim.keymap.set('n', '<leader>sj', require('treesj').toggle, { desc = '[S]plit or [J]oin code-block' })
     end,
   },
 }

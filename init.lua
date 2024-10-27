@@ -586,14 +586,13 @@ require('lazy').setup({
 
       vim.keymap.set('n', '<leader>sh', theme_wrapper(builtin.help_tags), { desc = '[S]earch [H]elp' })
       vim.keymap.set('n', '<leader>sk', theme_wrapper(builtin.keymaps), { desc = '[S]earch [K]eymaps' })
-      vim.keymap.set('n', '<leader>sf', theme_wrapper(builtin.find_files), { desc = '[S]earch [F]iles' })
+      vim.keymap.set('n', '<leader>sf', theme_wrapper(telescope.extensions.smart_open.smart_open), { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', theme_wrapper(builtin.builtin), { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', theme_wrapper(builtin.grep_string), { desc = '[S]earch current [W]ord' })
       vim.keymap.set('n', '<leader>sg', theme_wrapper(builtin.live_grep), { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', theme_wrapper(builtin.diagnostics), { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', theme_wrapper(builtin.resume), { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', theme_wrapper(builtin.oldfiles), { desc = '[S]earch Recent Files ("." for repeat)' })
-      vim.keymap.set('n', '<leader><leader>', theme_wrapper(telescope.extensions.smart_open.smart_open), { desc = '[ ] Find existing buffers' })
       vim.keymap.set('n', '<leader>/', theme_wrapper(builtin.current_buffer_fuzzy_find), { desc = '[/] Fuzzily search in current buffer' })
 
       -- It's also possible to pass additional configuration options.
@@ -991,6 +990,7 @@ require('lazy').setup({
       --  into multiple repos for maintenance purposes.
       'hrsh7th/cmp-nvim-lsp',
       'hrsh7th/cmp-path',
+      'hrsh7th/cmp-cmdline',
     },
     config = function()
       -- See `:help cmp`
@@ -1092,6 +1092,20 @@ require('lazy').setup({
           { name = 'path' },
         },
       }
+
+      cmp.setup.cmdline(':', {
+        enabled = true,
+        sources = cmp.config.sources({
+          { name = 'path' },
+        }, {
+          {
+            name = 'cmdline',
+            option = {
+              ignore_cmds = { 'Man', '!' },
+            },
+          },
+        }),
+      })
     end,
   },
 

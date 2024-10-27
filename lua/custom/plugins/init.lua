@@ -219,4 +219,12 @@ return {
       { 'nvim-telescope/telescope-fzy-native.nvim' },
     },
   },
+  -- Adds a better quickfix list UI
+  {
+    'kevinhwang91/nvim-bqf',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+    },
+    config = function() end,
+  },
 }

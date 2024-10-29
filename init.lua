@@ -176,13 +176,19 @@ vim.opt.inccommand = 'split'
 -- Show which line your cursor is on
 vim.opt.cursorline = true
 
--- Minimal number of screen lines to keep above and below the cursor.
-vim.opt.scrolloff = 10
-
 -- Debloat nvim
 -- Disable netrw at the very start of init.lua
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
+
+-- Improve diagnostics rendering
+vim.diagnostic.config {
+  update_in_insert = false,
+  virtual_text = false,
+  signs = true,
+  underline = false,
+  severity_sort = true,
+}
 
 -- Disable built-in directory browser
 vim.api.nvim_create_autocmd('VimEnter', {
@@ -1222,3 +1228,5 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+vim.opt.lazyredraw = true

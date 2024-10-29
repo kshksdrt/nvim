@@ -150,7 +150,7 @@ vim.opt.smartcase = true
 vim.opt.signcolumn = 'yes'
 
 -- Decrease update time
-vim.opt.updatetime = 250
+vim.opt.updatetime = 1000
 
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
@@ -195,7 +195,6 @@ vim.diagnostic.config {
 
 -- Global performance tweaks
 vim.opt.foldmethod = 'manual'
-vim.opt.updatetime = 1000
 
 -- Disable built-in directory browser
 vim.api.nvim_create_autocmd('VimEnter', {

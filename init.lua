@@ -190,6 +190,10 @@ vim.diagnostic.config {
   severity_sort = true,
 }
 
+-- Global performance tweaks
+vim.opt.foldmethod = 'manual'
+vim.opt.updatetime = 1000
+
 -- Disable built-in directory browser
 vim.api.nvim_create_autocmd('VimEnter', {
   callback = function()

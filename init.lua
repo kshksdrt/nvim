@@ -457,36 +457,6 @@ require('lazy').setup({
         end
       end
 
-      local actions = require 'telescope.actions'
-      local action_state = require 'telescope.actions.state'
-
-      local custom_actions = {}
-
-      custom_actions.send_to_qflist = function(prompt_bufnr)
-        local picker = action_state.get_current_picker(prompt_bufnr)
-        local manager = picker.manager
-
-        -- Get all entries
-        local results = {}
-        for entry in manager:iter() do
-          table.insert(results, {
-            filename = entry.filename,
-            lnum = entry.lnum,
-            col = entry.col,
-            text = entry.text,
-          })
-        end
-
-        -- Close Telescope
-        actions.close(prompt_bufnr)
-
-        -- Set quickfix list
-        vim.fn.setqflist(results)
-
-        -- Open quickfix list
-        vim.cmd 'copen'
-      end
-
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
@@ -518,25 +488,16 @@ require('lazy').setup({
             '--hidden',
             '--glob=!{.git/*,node_modules/*}',
           },
-          layout_strategy = 'vertical',
-          layout_config = {
-            vertical = {
-              preview_cutoff = 0,
-              prompt_position = 'top',
-              mirror = true,
-            },
-          },
-          sorting_strategy = 'ascending',
           mappings = {
             i = {
               ['<c-enter>'] = 'to_fuzzy_refine', -- Starts a new search among the currently shown buffers.
-              ['<c-q>'] = custom_actions.send_to_qflist,
             },
             n = {
-              ['<c-q>'] = custom_actions.send_to_qflist,
               ['d'] = 'delete_buffer',
+              -- Copies the file path
               ['y'] = function(bufnr)
-                -- Copies the file path
+                local actions = require 'telescope.actions'
+                local action_state = require 'telescope.actions.state'
                 local selection = action_state.get_selected_entry()
                 if selection then
                   local file_path = selection.value
@@ -594,6 +555,7 @@ require('lazy').setup({
       vim.keymap.set('n', '<leader>sr', theme_wrapper(builtin.resume), { desc = '[S]earch [R]esume' })
       vim.keymap.set('n', '<leader>s.', theme_wrapper(builtin.oldfiles), { desc = '[S]earch Recent Files ("." for repeat)' })
       vim.keymap.set('n', '<leader>/', theme_wrapper(builtin.current_buffer_fuzzy_find), { desc = '[/] Fuzzily search in current buffer' })
+      vim.keymap.set('n', 'gh', theme_wrapper(builtin.buffers), { desc = 'Search buffers' })
 
       -- It's also possible to pass additional configuration options.
       --  See `:help telescope.builtin.live_grep()` for information about particular keys
@@ -1092,20 +1054,6 @@ require('lazy').setup({
           { name = 'path' },
         },
       }
-
-      cmp.setup.cmdline(':', {
-        enabled = true,
-        sources = cmp.config.sources({
-          { name = 'path' },
-        }, {
-          {
-            name = 'cmdline',
-            option = {
-              ignore_cmds = { 'Man', '!' },
-            },
-          },
-        }),
-      })
     end,
   },
 

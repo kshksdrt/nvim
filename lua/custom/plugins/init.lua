@@ -55,22 +55,6 @@ return {
       vim.cmd.colorscheme 'vscode'
     end,
   },
-  -- To switch between buffers easily
-  {
-    'leath-dub/snipe.nvim',
-    keys = {
-      {
-        'gh',
-        function()
-          local snipe = require 'snipe'
-          snipe.config.ui.position = 'center'
-          snipe.open_buffer_menu()
-        end,
-        desc = 'Open Snipe buffer menu',
-      },
-    },
-    opts = {},
-  },
   -- To display buffers like tabs with indicators for unsaved changes
   {
     'akinsho/bufferline.nvim',

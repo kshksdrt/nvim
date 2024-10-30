@@ -1113,7 +1113,53 @@ require('lazy').setup({
       --  and try some other statusline plugin
       local statusline = require 'mini.statusline'
       -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+      statusline.setup {
+        use_icons = vim.g.have_nerd_font,
+        content = {
+          active = function()
+            local function get_mode()
+              local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
+              return string.upper(mode), mode_hl
+            end
+            local mode, mode_hl = get_mode()
+
+            local git = MiniStatusline.section_git { trunc_width = 75, bold = false }
+
+            -- Custom filename section to show path first
+            local filename = function()
+              local path = vim.fn.expand '%:p:h:t' -- Get parent directory name
+              local name = vim.fn.expand '%:t' -- Get file name
+              if name == '' then
+                return '[No Name]'
+              end
+              return string.format(' %s    %s/%s', name, path, name)
+            end
+            local location = MiniStatusline.section_location { trunc_width = 75 }
+
+            -- Set highlighting for mode background
+            vim.api.nvim_set_hl(0, 'MiniStatuslineModeInactive', { bg = '#858585' })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineModeNormal', { bg = '#858585', fg = '#000000' })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineModeInsert', { bg = '#858585', fg = '#000000' })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineModeVisual', { bg = '#858585', fg = '#000000' })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineModeReplace', { bg = '#858585', fg = '#000000' })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineModeCommand', { bg = '#858585', fg = '#000000' })
+
+            -- Git and other section colors
+            vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = '#6e6e6e', fg = '#000000', bold = false })
+
+            -- Removed fileinfo section which contains the file size
+            local location = MiniStatusline.section_location { trunc_width = 75 }
+
+            return MiniStatusline.combine_groups {
+              { hl = mode_hl, strings = { mode } },
+              { hl = 'MiniStatuslineDevinfo', strings = { git } },
+              { hl = 'MiniStatuslineFilename', strings = { filename() } },
+              '%=',
+              { hl = 'MiniStatuslineLocation', strings = { location } },
+            }
+          end,
+        },
+      }
 
       -- You can configure sections in the statusline by overriding their
       -- default behavior. For example, here we set the section for

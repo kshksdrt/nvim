@@ -122,6 +122,11 @@ vim.opt.relativenumber = true
 -- Disable line wrap
 vim.opt.wrap = false
 
+-- Line visibility
+-- Map gz to toggle line wrap
+vim.keymap.set('n', 'gz', ':set wrap!<CR>', { noremap = true, silent = true, desc = 'Toggle line wrapping' })
+vim.opt.scrolloff = 10
+
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.opt.mouse = 'a'
 
@@ -187,7 +192,7 @@ vim.g.loaded_netrwPlugin = 1
 -- Improve diagnostics rendering
 vim.diagnostic.config {
   update_in_insert = false,
-  virtual_text = false,
+  virtual_text = true,
   signs = true,
   underline = false,
   severity_sort = true,

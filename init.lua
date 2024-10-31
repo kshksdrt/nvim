@@ -541,6 +541,9 @@ require('lazy').setup({
             hidden = true,
             debounce = 350,
           },
+          buffers = {
+            initial_mode = 'normal',
+          },
           -- Add more pickers as needed
         },
         extensions = {

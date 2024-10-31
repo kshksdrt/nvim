@@ -196,4 +196,8 @@ return {
     },
     config = function() end,
   },
+  -- Ability to swap delimited items such as function parameters
+  {
+    'machakann/vim-swap',
+  },
 }

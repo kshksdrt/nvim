@@ -1244,6 +1244,7 @@ require('lazy').setup({
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
+
       local statusline = require 'mini.statusline'
       -- set use_icons to true if you have a Nerd Font
       statusline.setup {
@@ -1254,10 +1255,20 @@ require('lazy').setup({
               local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
               return string.upper(mode), mode_hl
             end
+
+            -- Function to count unsaved buffers
+            local function get_unsaved_buffers()
+              local count = 0
+              for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+                if vim.api.nvim_buf_get_option(buf, 'modified') then
+                  count = count + 1
+                end
+              end
+              return count
+            end
+
             local mode, mode_hl = get_mode()
-
             local git = MiniStatusline.section_git { trunc_width = 75, bold = false }
-
             -- Custom filename section to show path first
             local filename = function()
               local path = vim.fn.expand '%:p:h:t' -- Get parent directory name
@@ -1276,20 +1287,30 @@ require('lazy').setup({
             vim.api.nvim_set_hl(0, 'MiniStatuslineModeVisual', { bg = '#858585', fg = '#000000' })
             vim.api.nvim_set_hl(0, 'MiniStatuslineModeReplace', { bg = '#858585', fg = '#000000' })
             vim.api.nvim_set_hl(0, 'MiniStatuslineModeCommand', { bg = '#858585', fg = '#000000' })
-
             -- Git and other section colors
             vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = '#6e6e6e', fg = '#000000', bold = false })
+            -- Add highlight group for unsaved buffers section
+            vim.api.nvim_set_hl(0, 'MiniStatuslineUnsaved', { bg = '#d6bd7c', fg = '#000000' })
 
             -- Removed fileinfo section which contains the file size
             local location = MiniStatusline.section_location { trunc_width = 75 }
+            local unsaved = get_unsaved_buffers()
 
-            return MiniStatusline.combine_groups {
+            -- Create groups array with main components
+            local groups = {
               { hl = mode_hl, strings = { mode } },
               { hl = 'MiniStatuslineDevinfo', strings = { git } },
               { hl = 'MiniStatuslineFilename', strings = { filename() } },
               '%=',
               { hl = 'MiniStatuslineLocation', strings = { location } },
             }
+
+            -- Only add unsaved buffers section if count is greater than 0
+            if unsaved > 0 then
+              table.insert(groups, { hl = 'MiniStatuslineUnsaved', strings = { string.format(' Unsaved: %d ', unsaved) } })
+            end
+
+            return MiniStatusline.combine_groups(groups)
           end,
         },
       }

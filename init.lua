@@ -963,7 +963,29 @@ require('lazy').setup({
           {
             'honza/vim-snippets',
             config = function()
-              require('luasnip.loaders.from_snipmate').lazy_load()
+              require('luasnip.loaders.from_snipmate').load {
+                include = {
+                  -- General-purpose
+                  'go',
+                  'cs',
+                  'lua',
+                  'typescript',
+                  'javascript',
+                  'sql',
+
+                  -- Writing
+                  'markdown',
+
+                  -- Frontend web
+                  'typescriptreact',
+                  'vue',
+                  'javascriptreact',
+                  'scss',
+
+                  -- Shell scripting
+                  'sh',
+                },
+              }
             end,
           },
         },
@@ -991,14 +1013,110 @@ require('lazy').setup({
         luasnip.jump(-1)
       end, { silent = true })
 
+      -- Define icons based on whether nerd fonts are available
+      local kind_icons = {}
+
+      if vim.g.have_nerd_font then
+        kind_icons = {
+          Text = '󰉿',
+          Method = '󰆧',
+          Function = '󰊕',
+          Constructor = '',
+          Field = '󰜢',
+          Variable = '󰆦',
+          Class = '󰠱',
+          Interface = '',
+          Module = '',
+          Property = '󰜢',
+          Unit = '󰑭',
+          Value = '󰎠',
+          Enum = '',
+          Keyword = '󰌋',
+          Snippet = '',
+          Color = '󰏘',
+          File = '󰈙',
+          Reference = '󰈇',
+          Folder = '󰉋',
+          EnumMember = '',
+          Constant = '󰏿',
+          Struct = '󰙅',
+          Event = '',
+          Operator = '󰆕',
+          TypeParameter = '',
+        }
+      else
+        -- Fallback to simple ASCII icons
+        kind_icons = {
+          Text = 'x',
+          Method = 'm',
+          Function = 'f',
+          Constructor = 'c',
+          Field = '.',
+          Variable = 'v',
+          Class = 'C',
+          Interface = 'I',
+          Module = 'M',
+          Property = 'p',
+          Unit = 'U',
+          Value = '=',
+          Enum = 'E',
+          Keyword = 'k',
+          Snippet = 'S',
+          Color = 'c',
+          File = 'F',
+          Reference = 'r',
+          Folder = 'd',
+          EnumMember = 'e',
+          Constant = 'K',
+          Struct = 'S',
+          Event = '!',
+          Operator = 'o',
+          TypeParameter = 'T',
+        }
+      end
+
       cmp.setup {
         performance = {
           confirm_resolve_timeout = 80,
           async_budget = 1,
           max_view_entries = 200,
           fetching_timeout = 1000,
-          debounce = 500,
+          debounce = 200,
           throttle = 200,
+        },
+        window = {
+          completion = cmp.config.window.bordered {
+            border = 'single',
+            winhighlight = 'Normal:Normal,FloatBorder:NvimCmpBorder,CursorLine:Visual,Search:None',
+          },
+          documentation = cmp.config.window.bordered {
+            border = 'single',
+            winhighlight = 'Normal:Normal,FloatBorder:NvimCmpBorder,CursorLine:Visual,Search:None',
+          },
+        },
+        formatting = {
+          format = function(entry, vim_item)
+            -- Format: icon name [source] kind
+            local icon = kind_icons[vim_item.kind]
+            local kind = vim_item.kind
+            local source = ({
+              buffer = 'Buffer',
+              nvim_lsp = 'LSP',
+              luasnip = 'Snippet',
+              nvim_lua = 'Lua',
+              latex_symbols = 'LaTeX',
+            })[entry.source.name]
+
+            -- Store the original completion text
+            local completion_text = vim_item.abbr
+
+            -- Add some padding for better spacing
+            vim_item.abbr = string.format('%s %s', icon, completion_text)
+            vim_item.kind = kind
+            vim_item.menu = string.format(' [%s]', source)
+
+            return vim_item
+          end,
         },
         snippet = {
           expand = function(args)
@@ -1077,6 +1195,7 @@ require('lazy').setup({
           { name = 'path' },
         },
       }
+      vim.api.nvim_set_hl(0, 'NvimCmpBorder', { fg = '#404040' })
     end,
   },
 

@@ -55,24 +55,24 @@ return {
       vim.cmd.colorscheme 'vscode'
     end,
   },
-  -- To display buffers like tabs with indicators for unsaved changes
-  {
-    'akinsho/bufferline.nvim',
-    version = '*',
-    dependencies = 'nvim-tree/nvim-web-devicons',
-    config = function()
-      local bufferline = require 'bufferline'
-      bufferline.setup {
-        options = {
-          style_preset = bufferline.style_preset.no_italic,
-          indicator = {
-            style = 'none',
-          },
-          separator_style = {},
-        },
-      }
-    end,
-  },
+  -- To display buffers like vscode tabs with indicators for unsaved changes
+  -- {
+  --   'akinsho/bufferline.nvim',
+  --   version = '*',
+  --   dependencies = 'nvim-tree/nvim-web-devicons',
+  --   config = function()
+  --     local bufferline = require 'bufferline'
+  --     bufferline.setup {
+  --       options = {
+  --         style_preset = bufferline.style_preset.no_italic,
+  --         indicator = {
+  --           style = 'none',
+  --         },
+  --         separator_style = {},
+  --       },
+  --     }
+  --   end,
+  -- },
   -- Fast slanting motions
   {
     'ggandor/leap.nvim',
@@ -194,6 +194,38 @@ return {
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
     },
-    config = function() end,
+    config = function()
+      require('bqf').setup {
+        preview = {
+          auto_preview = false,
+          auto_enable = true,
+          auto_resize_height = true, -- highly recommended enable
+          preview = {
+            win_height = 12,
+            win_vheight = 12,
+            delay_syntax = 80,
+            border = { '┏', '━', '┓', '┃', '┛', '━', '┗', '┃' },
+            show_title = false,
+            should_preview_cb = function(bufnr)
+              local ret = true
+              local bufname = vim.api.nvim_buf_get_name(bufnr)
+              local fsize = vim.fn.getfsize(bufname)
+              if fsize > 100 * 1024 then
+                -- skip file size greater than 100k
+                ret = false
+              elseif bufname:match '^fugitive://' then
+                -- skip fugitive buffer
+                ret = false
+              end
+              return ret
+            end,
+          },
+        },
+      }
+    end,
+  },
+  -- Ability to swap delimited items such as function parameters
+  {
+    'machakann/vim-swap',
   },
 }

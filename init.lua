@@ -490,6 +490,7 @@ require('lazy').setup({
           file_ignore_patterns = {
             'node_modules',
             '%.git/',
+            '%.yarn/',
             '%.DS_Store',
             'dist',
             'build',
@@ -543,6 +544,9 @@ require('lazy').setup({
           find_files = {
             hidden = true,
             debounce = 350,
+          },
+          buffers = {
+            initial_mode = 'normal',
           },
           -- Add more pickers as needed
         },
@@ -754,6 +758,15 @@ require('lazy').setup({
         end,
       })
 
+      -- Change diagnostic symbols in the sign column (gutter)
+      if vim.g.have_nerd_font then
+        local signs = { Error = '', Warn = '', Hint = '', Info = '' }
+        for type, icon in pairs(signs) do
+          local hl = 'DiagnosticSign' .. type
+          vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+        end
+      end
+
       -- LSP servers and clients are able to communicate to each other what features they support.
       --  By default, Neovim doesn't support everything that is in the LSP specification.
       --  When you add nvim-cmp, luasnip, etc. Neovim now has *more* capabilities.
@@ -957,7 +970,29 @@ require('lazy').setup({
           {
             'honza/vim-snippets',
             config = function()
-              require('luasnip.loaders.from_snipmate').lazy_load()
+              require('luasnip.loaders.from_snipmate').load {
+                include = {
+                  -- General-purpose
+                  'go',
+                  'cs',
+                  'lua',
+                  'typescript',
+                  'javascript',
+                  'sql',
+
+                  -- Writing
+                  'markdown',
+
+                  -- Frontend web
+                  'typescriptreact',
+                  'vue',
+                  'javascriptreact',
+                  'scss',
+
+                  -- Shell scripting
+                  'sh',
+                },
+              }
             end,
           },
         },
@@ -985,14 +1020,110 @@ require('lazy').setup({
         luasnip.jump(-1)
       end, { silent = true })
 
+      -- Define icons based on whether nerd fonts are available
+      local kind_icons = {}
+
+      if vim.g.have_nerd_font then
+        kind_icons = {
+          Text = '󰉿',
+          Method = '󰆧',
+          Function = '󰊕',
+          Constructor = '',
+          Field = '󰜢',
+          Variable = '󰆦',
+          Class = '󰠱',
+          Interface = '',
+          Module = '',
+          Property = '󰜢',
+          Unit = '󰑭',
+          Value = '󰎠',
+          Enum = '',
+          Keyword = '󰌋',
+          Snippet = '',
+          Color = '󰏘',
+          File = '󰈙',
+          Reference = '󰈇',
+          Folder = '󰉋',
+          EnumMember = '',
+          Constant = '󰏿',
+          Struct = '󰙅',
+          Event = '',
+          Operator = '󰆕',
+          TypeParameter = '',
+        }
+      else
+        -- Fallback to simple ASCII icons
+        kind_icons = {
+          Text = 'x',
+          Method = 'm',
+          Function = 'f',
+          Constructor = 'c',
+          Field = '.',
+          Variable = 'v',
+          Class = 'C',
+          Interface = 'I',
+          Module = 'M',
+          Property = 'p',
+          Unit = 'U',
+          Value = '=',
+          Enum = 'E',
+          Keyword = 'k',
+          Snippet = 'S',
+          Color = 'c',
+          File = 'F',
+          Reference = 'r',
+          Folder = 'd',
+          EnumMember = 'e',
+          Constant = 'K',
+          Struct = 'S',
+          Event = '!',
+          Operator = 'o',
+          TypeParameter = 'T',
+        }
+      end
+
       cmp.setup {
         performance = {
           confirm_resolve_timeout = 80,
           async_budget = 1,
           max_view_entries = 200,
           fetching_timeout = 1000,
-          debounce = 500,
+          debounce = 200,
           throttle = 200,
+        },
+        window = {
+          completion = cmp.config.window.bordered {
+            border = 'single',
+            winhighlight = 'Normal:Normal,FloatBorder:NvimCmpBorder,CursorLine:Visual,Search:None',
+          },
+          documentation = cmp.config.window.bordered {
+            border = 'single',
+            winhighlight = 'Normal:Normal,FloatBorder:NvimCmpBorder,CursorLine:Visual,Search:None',
+          },
+        },
+        formatting = {
+          format = function(entry, vim_item)
+            -- Format: icon name [source] kind
+            local icon = kind_icons[vim_item.kind]
+            local kind = vim_item.kind
+            local source = ({
+              buffer = 'Buffer',
+              nvim_lsp = 'LSP',
+              luasnip = 'Snippet',
+              nvim_lua = 'Lua',
+              latex_symbols = 'LaTeX',
+            })[entry.source.name]
+
+            -- Store the original completion text
+            local completion_text = vim_item.abbr
+
+            -- Add some padding for better spacing
+            vim_item.abbr = string.format('%s %s', icon, completion_text)
+            vim_item.kind = kind
+            vim_item.menu = string.format(' [%s]', source)
+
+            return vim_item
+          end,
         },
         snippet = {
           expand = function(args)
@@ -1071,6 +1202,7 @@ require('lazy').setup({
           { name = 'path' },
         },
       }
+      vim.api.nvim_set_hl(0, 'NvimCmpBorder', { fg = '#404040' })
     end,
   },
 
@@ -1116,6 +1248,7 @@ require('lazy').setup({
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
       --  and try some other statusline plugin
+
       local statusline = require 'mini.statusline'
       -- set use_icons to true if you have a Nerd Font
       statusline.setup {
@@ -1126,10 +1259,20 @@ require('lazy').setup({
               local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
               return string.upper(mode), mode_hl
             end
+
+            -- Function to count unsaved buffers
+            local function get_unsaved_buffers()
+              local count = 0
+              for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+                if vim.api.nvim_buf_get_option(buf, 'modified') then
+                  count = count + 1
+                end
+              end
+              return count
+            end
+
             local mode, mode_hl = get_mode()
-
             local git = MiniStatusline.section_git { trunc_width = 75, bold = false }
-
             -- Custom filename section to show path first
             local filename = function()
               local path = vim.fn.expand '%:p:h:t' -- Get parent directory name
@@ -1148,20 +1291,30 @@ require('lazy').setup({
             vim.api.nvim_set_hl(0, 'MiniStatuslineModeVisual', { bg = '#858585', fg = '#000000' })
             vim.api.nvim_set_hl(0, 'MiniStatuslineModeReplace', { bg = '#858585', fg = '#000000' })
             vim.api.nvim_set_hl(0, 'MiniStatuslineModeCommand', { bg = '#858585', fg = '#000000' })
-
             -- Git and other section colors
             vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = '#6e6e6e', fg = '#000000', bold = false })
+            -- Add highlight group for unsaved buffers section
+            vim.api.nvim_set_hl(0, 'MiniStatuslineUnsaved', { bg = '#d6bd7c', fg = '#000000' })
 
             -- Removed fileinfo section which contains the file size
             local location = MiniStatusline.section_location { trunc_width = 75 }
+            local unsaved = get_unsaved_buffers()
 
-            return MiniStatusline.combine_groups {
+            -- Create groups array with main components
+            local groups = {
               { hl = mode_hl, strings = { mode } },
               { hl = 'MiniStatuslineDevinfo', strings = { git } },
               { hl = 'MiniStatuslineFilename', strings = { filename() } },
               '%=',
               { hl = 'MiniStatuslineLocation', strings = { location } },
             }
+
+            -- Only add unsaved buffers section if count is greater than 0
+            if unsaved > 0 then
+              table.insert(groups, { hl = 'MiniStatuslineUnsaved', strings = { string.format(' Unsaved: %d ', unsaved) } })
+            end
+
+            return MiniStatusline.combine_groups(groups)
           end,
         },
       }
@@ -1257,10 +1410,13 @@ require('lazy').setup({
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
-  --
-  --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   { import = 'custom.plugins' },
+
+  -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
+  -- Or use telescope!
+  -- In normal mode type `<space>sh` then write `lazy.nvim-plugin`
+  -- you can continue same window with `<space>sr` which resumes last telescope search
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the

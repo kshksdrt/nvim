@@ -189,15 +189,6 @@ vim.opt.cursorline = true
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
 
--- Improve diagnostics rendering
-vim.diagnostic.config {
-  update_in_insert = false,
-  virtual_text = true,
-  signs = true,
-  underline = false,
-  severity_sort = true,
-}
-
 -- Disable built-in directory browser
 vim.api.nvim_create_autocmd('VimEnter', {
   callback = function()
@@ -753,6 +744,43 @@ require('lazy').setup({
             end, '[T]oggle Inlay [H]ints')
           end
         end,
+      })
+
+      -- Define a highlight group for the border color
+      vim.api.nvim_set_hl(0, 'FloatBorderCustom', { fg = '#404040' })
+
+      local border = {
+        { '┌', 'FloatBorderCustom' },
+        { '─', 'FloatBorderCustom' },
+        { '┐', 'FloatBorderCustom' },
+        { '│', 'FloatBorderCustom' },
+        { '┘', 'FloatBorderCustom' },
+        { '─', 'FloatBorderCustom' },
+        { '└', 'FloatBorderCustom' },
+        { '│', 'FloatBorderCustom' },
+      }
+
+      -- General diagnostic config
+      vim.diagnostic.config {
+        update_in_insert = false,
+        virtual_text = true,
+        signs = true,
+        underline = false,
+        severity_sort = true,
+        float = {
+          border = border,
+          style = 'minimal',
+          source = 'always',
+        },
+      }
+
+      -- LSP hover and floating window config
+      vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
+        border = border,
+      })
+
+      vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, {
+        border = border,
       })
 
       -- Change diagnostic symbols in the sign column (gutter)

@@ -182,6 +182,15 @@ return {
       'nvim-treesitter/nvim-treesitter',
       'nvim-tree/nvim-web-devicons',
     },
+    config = function()
+      require('aerial').setup {
+        layout = {
+          default_direction = 'prefer_left',
+          placement = 'window',
+        },
+      }
+      vim.keymap.set('n', '<leader>o', '<cmd>AerialToggle!<CR>', { desc = 'Open [O]utline' })
+    end,
   },
   -- Bookmarks
   {
@@ -227,5 +236,16 @@ return {
   -- Ability to swap delimited items such as function parameters
   {
     'machakann/vim-swap',
+  },
+  -- Interactive
+  {
+    'gcmt/vessel.nvim',
+    version = '*',
+    config = function()
+      local vessel = require 'vessel'
+      vessel.setup()
+      vim.keymap.set('n', 'gm', '<plug>(VesselViewLocalMarks)', { desc = '[G]o to [M]arks' })
+      vim.keymap.set('n', 'gj', '<plug>(VesselViewLocalJumps)', { desc = '[G]o to [J]umps' })
+    end,
   },
 }

@@ -525,16 +525,16 @@ require('lazy').setup({
         pickers = {
           grep_string = {
             debounce = 1000,
+            hidden = true,
           },
           live_grep = {
             debounce = 1000,
+            hidden = true,
           },
           find_files = {
-            hidden = true,
+            find_command = { 'rg', '--files', '--color', 'never', '--hidden', '--glob=!{.git/*,node_modules/*}' },
             debounce = 350,
-          },
-          buffers = {
-            initial_mode = 'normal',
+            hidden = true,
           },
           -- Add more pickers as needed
         },

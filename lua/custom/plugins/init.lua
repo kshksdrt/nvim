@@ -185,7 +185,6 @@ return {
     config = function()
       require('aerial').setup {
         layout = {
-          default_direction = 'prefer_left',
           placement = 'window',
         },
       }

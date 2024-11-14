@@ -526,15 +526,32 @@ require('lazy').setup({
           grep_string = {
             debounce = 1000,
             hidden = true,
+            prompt_prefix = ' ',
+            disable_coordinates = true,
           },
           live_grep = {
             debounce = 1000,
             hidden = true,
+            prompt_prefix = ' ',
+            disable_coordinates = true,
           },
           find_files = {
-            find_command = { 'rg', '--files', '--color', 'never', '--hidden', '--glob=!{.git/*,node_modules/*}' },
+            find_command = {
+              'rg',
+              '--files',
+              '--color',
+              'never',
+              '--hidden',
+              '--follow',
+              '--sortr=modified',
+              '--glob=!{.git/*,node_modules/*}',
+            },
             debounce = 350,
             hidden = true,
+            prompt_prefix = ' ',
+            follow = true,
+            path_display = { 'filename_first' },
+            previewer = false,
           },
           -- Add more pickers as needed
         },

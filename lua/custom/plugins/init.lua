@@ -91,28 +91,6 @@ return {
       require('nvim-surround').setup()
     end,
   },
-  -- Scrollbar for all buffers
-  {
-    'petertriho/nvim-scrollbar',
-    version = '*',
-    config = function()
-      require('scrollbar').setup {
-        handle = {
-          text = '  ',
-          blend = 0,
-          color = '#404040',
-        },
-        handlers = {
-          cursor = false,
-          diagnostic = true,
-          gitsigns = true, -- Requires gitsigns
-          handle = true,
-          search = false, -- Requires hlslens
-          ale = false, -- Requires ALE
-        },
-      }
-    end,
-  },
   -- Auto-close html tags
   {
     'windwp/nvim-ts-autotag',
@@ -252,7 +230,7 @@ return {
     'ray-x/lsp_signature.nvim',
     event = 'VeryLazy',
     opts = {
-      hint_enable = true,
+      hint_enable = false,
       handler_opts = {
         border = 'none', -- double, rounded, single, shadow, none, or a table of borders
       },

@@ -13,7 +13,7 @@ return {
         diagnostic = true,
         gitsigns = true, -- Requires gitsigns
         handle = true,
-        search = true, -- Requires hlslens
+        search = false, -- Requires hlslens
         ale = false, -- Requires ALE
       },
       marks = {

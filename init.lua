@@ -552,7 +552,6 @@ require('lazy').setup({
               'never',
               '--hidden',
               '--follow',
-              '--sortr=modified',
               '--glob=!{.git/*,node_modules/*}',
             },
             debounce = 350,

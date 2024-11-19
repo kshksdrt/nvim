@@ -662,7 +662,6 @@ require('lazy').setup({
           -- your own keymap.
           keymap = {
             preset = 'default',
-            ['<Enter>'] = { 'select_and_accept' },
           },
 
           highlight = {

@@ -151,24 +151,6 @@ return {
       vim.keymap.set('n', '<leader>sj', require('treesj').toggle, { desc = '[S]plit or [J]oin code-block' })
     end,
   },
-  -- For viewing heirarchy
-  {
-    'stevearc/aerial.nvim',
-    opts = {},
-    -- Optional dependencies
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter',
-      'nvim-tree/nvim-web-devicons',
-    },
-    config = function()
-      require('aerial').setup {
-        layout = {
-          placement = 'window',
-        },
-      }
-      vim.keymap.set('n', '<leader>o', '<cmd>AerialToggle!<CR>', { desc = 'Open [O]utline' })
-    end,
-  },
   -- Bookmarks
   {
     'MattesGroeger/vim-bookmarks',

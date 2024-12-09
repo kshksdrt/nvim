@@ -1520,3 +1520,19 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+-- [[ My keymaps (kshksdrt) ]]
+-- Current date
+vim.keymap.set('i', '<c-d>', function()
+  return os.date '%Y-%m-%d %H:%M:%S'
+end, {
+  expr = true,
+  desc = 'Write [D]ate and [T]ime',
+})
+
+-- gets the git history of the visual selection
+vim.keymap.set('v', '<leader>l', ":<c-u>exe ':term git log -L' line(\"'<\").','.line(\"'>\").':'.expand('%')<CR>", { noremap = true })
+
+-- From the Vim wiki: https://bit.ly/4eLAARp
+-- Search and replace word under the cursor
+vim.keymap.set('n', '<Leader>r', [[:%s/\<<C-r><C-w>\>//g<Left><Left>]])

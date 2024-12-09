@@ -1521,3 +1521,12 @@ require('lazy').setup({
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
+
+-- [[ My keymaps (kshksdrt) ]]
+-- Current date
+vim.keymap.set('i', '<c-d>', function()
+  return os.date '%Y-%m-%d %H:%M:%S'
+end, {
+  expr = true,
+  desc = 'Write [D]ate and [T]ime',
+})

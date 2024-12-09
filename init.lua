@@ -800,6 +800,9 @@ require('lazy').setup({
         end,
       })
 
+      -- Signature
+      vim.keymap.set('i', '<C-s>', vim.lsp.buf.signature_help, { desc = 'Show signature help' })
+
       -- Define a highlight group for the border color
       vim.api.nvim_set_hl(0, 'FloatBorderCustom', { fg = '#404040' })
 

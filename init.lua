@@ -644,15 +644,11 @@ require('lazy').setup({
             preset = 'default',
           },
 
-          highlight = {
-            -- sets the fallback highlight groups to nvim-cmp's highlight groups
-            -- useful for when your theme doesn't support blink.cmp
-            -- will be removed in a future release, assuming themes add support
-            use_nvim_cmp_as_default = true,
+          appearance = {
+            -- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+            -- adjusts spacing to ensure icons are aligned
+            nerd_font_variant = 'mono',
           },
-          -- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-          -- adjusts spacing to ensure icons are aligned
-          nerd_font_variant = 'mono',
 
           -- experimental auto-brackets support
           -- accept = { auto_brackets = { enabled = true } }
@@ -1540,4 +1536,4 @@ vim.keymap.set('v', '<leader>l', ":<c-u>exe ':term git log -L' line(\"'<\").','.
 
 -- From the Vim wiki: https://bit.ly/4eLAARp
 -- Search and replace word under the cursor
-vim.keymap.set('n', '<Leader>rw', [[:%s/\<<C-r><C-w>\>//g<Left><Left>]], { desc = "[R]eplace [W]ord" })
+vim.keymap.set('n', '<Leader>rw', [[:%s/\<<C-r><C-w>\>//g<Left><Left>]], { desc = '[R]eplace [W]ord' })

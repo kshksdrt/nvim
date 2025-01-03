@@ -158,6 +158,47 @@ return {
   },
   -- Adds a better quickfix list UI
   {
+    'stevearc/quicker.nvim',
+    event = 'FileType qf',
+    ---@module "quicker"
+    ---@type quicker.SetupOptions
+    opts = {},
+    config = function()
+      local quicker = require 'quicker'
+
+      vim.keymap.set('n', '<leader>q', function()
+        quicker.toggle()
+      end, {
+        desc = 'Toggle quickfix',
+      })
+
+      vim.keymap.set('n', '<leader>l', function()
+        quicker.toggle { loclist = true }
+      end, {
+        desc = 'Toggle loclist',
+      })
+
+      quicker.setup {
+        keys = {
+          {
+            '>',
+            function()
+              quicker.expand { before = 2, after = 2, add_to_existing = true }
+            end,
+            desc = 'Expand quickfix context',
+          },
+          {
+            '<',
+            function()
+              quicker.collapse()
+            end,
+            desc = 'Collapse quickfix context',
+          },
+        },
+      }
+    end,
+  },
+  {
     'kevinhwang91/nvim-bqf',
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
@@ -192,6 +233,15 @@ return {
       }
     end,
   },
+  -- Enhances inline diagnostics
+  {
+    'rachartier/tiny-inline-diagnostic.nvim',
+    event = 'VeryLazy', -- Or `LspAttach`
+    priority = 1000, -- needs to be loaded in first
+    config = function()
+      require('tiny-inline-diagnostic').setup()
+    end,
+  },
   -- Ability to swap delimited items such as function parameters
   {
     'machakann/vim-swap',
@@ -206,5 +256,29 @@ return {
       vim.keymap.set('n', 'gm', '<plug>(VesselViewLocalMarks)', { desc = '[G]o to [M]arks' })
       vim.keymap.set('n', 'gj', '<plug>(VesselViewLocalJumps)', { desc = '[G]o to [J]umps' })
     end,
+  },
+  -- Persist sessions
+  {
+    'rmagatti/auto-session',
+    lazy = false,
+    ---@module "auto-session"
+    ---@type AutoSession.Config
+    opts = {
+      suppressed_dirs = { '/' },
+      auto_restore_last_session = true,
+      -- log_level = 'debug',
+    },
+  },
+  -- Enhance and improve styles of help files text rendering
+  {
+    'OXY2DEV/helpview.nvim',
+    lazy = false, -- Recommended
+
+    -- In case you still want to lazy load
+    -- ft = "help",
+
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+    },
   },
 }

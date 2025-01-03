@@ -192,6 +192,15 @@ return {
       }
     end,
   },
+  -- Enhances inline diagnostics
+  {
+    'rachartier/tiny-inline-diagnostic.nvim',
+    event = 'VeryLazy', -- Or `LspAttach`
+    priority = 1000, -- needs to be loaded in first
+    config = function()
+      require('tiny-inline-diagnostic').setup()
+    end,
+  },
   -- Ability to swap delimited items such as function parameters
   {
     'machakann/vim-swap',

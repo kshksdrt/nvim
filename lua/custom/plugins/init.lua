@@ -257,4 +257,16 @@ return {
       vim.keymap.set('n', 'gj', '<plug>(VesselViewLocalJumps)', { desc = '[G]o to [J]umps' })
     end,
   },
+  -- Persist sessions
+  {
+    'rmagatti/auto-session',
+    lazy = false,
+    ---@module "auto-session"
+    ---@type AutoSession.Config
+    opts = {
+      suppressed_dirs = { '/' },
+      auto_restore_last_session = true,
+      -- log_level = 'debug',
+    },
+  },
 }

@@ -265,7 +265,6 @@ return {
     ---@type AutoSession.Config
     opts = {
       suppressed_dirs = { '/' },
-      auto_restore_last_session = true,
       -- log_level = 'debug',
     },
   },

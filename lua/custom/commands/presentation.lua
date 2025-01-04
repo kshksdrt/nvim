@@ -1,37 +1,11 @@
 local snacks = require 'snacks'
 
--- Configure snacks.scroll
-local scrolling_configured = false
-local function configure_snacks_scroll()
-  ---@type snacks.Config
-  local opts = {
-    scroll = {
-      animate = {
-        duration = { step = 15, total = 250 },
-        easing = 'inCubic',
-        fps = 60,
-      },
-      spamming = 10, -- threshold for spamming detection
-      -- what buffers to animate
-      filter = function(buf)
-        return vim.g.snacks_scroll ~= false and vim.b[buf].snacks_scroll ~= false and vim.bo[buf].buftype ~= 'terminal'
-      end,
-    },
-  }
-
-  snacks.setup(opts)
-end
-
 -- Configure tab transitions
 local tab_transition_enabled = false
 
 -- Commands implementations
 local function presentation_mode_on()
   -- Enable scroll animations for presentations
-  if scrolling_configured == false then
-    configure_snacks_scroll()
-    scrolling_configured = true
-  end
   if snacks.scroll.enabled == false then
     snacks.scroll.enable()
   end

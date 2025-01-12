@@ -207,7 +207,7 @@ vim.opt.guifont = 'Iosevka NF:h10:w400:n'
 vim.keymap.set('n', '<Esc>', '<cmd>nohlsearch<CR>')
 
 -- Diagnostic keymaps
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
+vim.keymap.set('n', '<leader>dq', vim.diagnostic.setloclist, { desc = 'Open [D]iagnostic [Q]uickfix list' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -1542,3 +1542,4 @@ vim.keymap.set('v', '<leader>l', ":<c-u>exe ':term git log -L' line(\"'<\").','.
 vim.keymap.set('n', '<Leader>rw', [[:%s/\<<C-r><C-w>\>//g<Left><Left>]], { desc = '[R]eplace [W]ord' })
 
 require 'custom.commands.presentation'
+require 'custom.commands.fix_quickfix'

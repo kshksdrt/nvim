@@ -107,6 +107,16 @@ vim.keymap.set('n', '<C-l>', ':bnext<CR>', { noremap = true, silent = true })
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+if vim.g.neovide then
+  vim.g.neovide_refresh_rate = 60
+
+  vim.g.neovide_cursor_antialiasing = false
+  vim.g.neovide_cursor_animate_command_line = false
+  vim.g.neovide_cursor_animate_in_insert_mode = false
+
+  vim.g.neovide_hide_mouse_when_typing = true
+end
+
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!
@@ -705,38 +715,30 @@ require('lazy').setup({
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
 
-          local function theme_wrapper(telescope_command)
-            return function()
-              telescope_command(require('telescope.themes').get_ivy())
-            end
-          end
-
-          local builtin = require 'telescope.builtin'
-
           -- Jump to the definition of the word under your cursor.
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-t>.
-          map('gd', theme_wrapper(builtin.lsp_definitions), '[G]oto [D]efinition')
+          map('gd', Snacks.picker.lsp_definitions, '[G]oto [D]efinition')
 
           -- Find references for the word under your cursor.
-          map('gr', theme_wrapper(builtin.lsp_references), '[G]oto [R]eferences')
+          map('gr', Snacks.picker.lsp_references, '[G]oto [R]eferences')
 
           -- Jump to the implementation of the word under your cursor.
           --  Useful when your language has ways of declaring types without an actual implementation.
-          map('gI', theme_wrapper(builtin.lsp_implementations), '[G]oto [I]mplementation')
+          map('gI', Snacks.picker.lsp_implementations, '[G]oto [I]mplementation')
 
           -- Jump to the type of the word under your cursor.
           --  Useful when you're not sure what type a variable is and you want to see
           --  the definition of its *type*, not where it was *defined*.
-          map('<leader>D', theme_wrapper(builtin.lsp_type_definitions), 'Type [D]efinition')
+          map('<leader>D', Snacks.picker.lsp_type_definitions, 'Type [D]efinition')
 
           -- Fuzzy find all the symbols in your current document.
           --  Symbols are things like variables, functions, types, etc.
-          map('<leader>ds', theme_wrapper(builtin.lsp_document_symbols), '[D]ocument [S]ymbols')
+          map('<leader>ds', Snacks.picker.lsp_symbols, '[D]ocument [S]ymbols')
 
           -- Fuzzy find all the symbols in your current workspace.
           --  Similar to document symbols, except searches over your entire project.
-          map('<leader>#', theme_wrapper(builtin.lsp_dynamic_workspace_symbols), '[W]orkspace [S]ymbols')
+          map('<leader>#', Snacks.picker.lsp_symbols, '[W]orkspace [S]ymbols')
 
           -- Rename the variable under your cursor.
           --  Most Language Servers support renaming across files, etc.

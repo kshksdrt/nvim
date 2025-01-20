@@ -107,6 +107,16 @@ vim.keymap.set('n', '<C-l>', ':bnext<CR>', { noremap = true, silent = true })
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+if vim.g.neovide then
+  vim.g.neovide_refresh_rate = 60
+
+  vim.g.neovide_cursor_antialiasing = false
+  vim.g.neovide_cursor_animate_command_line = false
+  vim.g.neovide_cursor_animate_in_insert_mode = false
+
+  vim.g.neovide_hide_mouse_when_typing = true
+end
+
 -- [[ Setting options ]]
 -- See `:help vim.opt`
 -- NOTE: You can change these options as you wish!

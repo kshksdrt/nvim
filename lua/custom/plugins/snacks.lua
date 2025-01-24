@@ -81,7 +81,7 @@ return {
       desc = 'Goto Type Definition',
     },
     {
-      '<leader>ss',
+      '<leader>#',
       function()
         require('snacks').picker.lsp_symbols()
       end,
@@ -113,11 +113,18 @@ return {
 
     -- Advanced searches
     {
-      '<leader>sr',
+      '<leader>s.',
       function()
         require('snacks').picker.recent()
       end,
       desc = 'Recent Files',
+    },
+    {
+      '<leader>sr',
+      function()
+        Snacks.picker.resume()
+      end,
+      desc = 'Resume',
     },
     {
       '<leader>sk',

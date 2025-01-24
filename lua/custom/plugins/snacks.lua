@@ -5,19 +5,6 @@ return {
   ---@type snacks.Config
   opts = {
     picker = {},
-    scroll = {
-      enabled = false,
-      animate = {
-        duration = { step = 15, total = 250 },
-        easing = 'inCubic',
-        fps = 60,
-      },
-      spamming = 10, -- threshold for spamming detection
-      -- what buffers to animate
-      filter = function(buf)
-        return vim.g.snacks_scroll ~= false and vim.b[buf].snacks_scroll ~= false and vim.bo[buf].buftype ~= 'terminal'
-      end,
-    },
   },
   keys = {
     -- Main pickers
@@ -94,7 +81,7 @@ return {
       desc = 'Goto Type Definition',
     },
     {
-      '<leader>ss',
+      '<leader>#',
       function()
         require('snacks').picker.lsp_symbols()
       end,
@@ -126,11 +113,18 @@ return {
 
     -- Advanced searches
     {
-      '<leader>sr',
+      '<leader>s.',
       function()
         require('snacks').picker.recent()
       end,
       desc = 'Recent Files',
+    },
+    {
+      '<leader>sr',
+      function()
+        Snacks.picker.resume()
+      end,
+      desc = 'Resume',
     },
     {
       '<leader>sk',

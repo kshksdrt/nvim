@@ -1,15 +1,8 @@
-local snacks = require 'snacks'
-
 -- Configure tab transitions
 local tab_transition_enabled = false
 
 -- Commands implementations
 local function presentation_mode_on()
-  -- Enable scroll animations for presentations
-  if snacks.scroll.enabled == false then
-    snacks.scroll.enable()
-  end
-
   -- Communicate tab switching by full fade transition using vimade.
   if tab_transition_enabled == false then
     -- TODO: Enable tab transitions
@@ -18,11 +11,6 @@ local function presentation_mode_on()
 end
 
 local function presentation_mode_off()
-  -- Disable scroll animations for presentations
-  if snacks.scroll.enabled == true then
-    snacks.scroll.disable()
-  end
-
   -- Communicate tab switching by full fade transition using vimade.
   if tab_transition_enabled == true then
     -- TODO: Disable tab transitions

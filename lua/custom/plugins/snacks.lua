@@ -4,7 +4,13 @@ return {
   priority = 1000,
   ---@type snacks.Config
   opts = {
-    picker = {},
+    picker = {
+      config = function()
+        vim.api.nvim_set_hl(0, 'NonText', {
+          fg = '#8F9491',
+        })
+      end,
+    },
   },
   keys = {
     -- Main pickers
@@ -37,6 +43,13 @@ return {
       desc = 'Search Buffers',
     },
     {
+      '<leader>sH',
+      function()
+        require('snacks').picker.highlights()
+      end,
+      desc = 'Search Highlight',
+    },
+    {
       '<leader>sh',
       function()
         require('snacks').picker.help()
@@ -57,60 +70,71 @@ return {
       function()
         require('snacks').picker.lsp_references()
       end,
-      desc = 'Search References',
+      desc = '[G]oto [R]eferences',
     },
     {
       'gd',
       function()
         require('snacks').picker.lsp_definitions()
       end,
-      desc = 'Goto Definition',
+      desc = '[G]oto [D]efinitions',
     },
     {
       'gI',
       function()
         require('snacks').picker.lsp_implementations()
       end,
-      desc = 'Goto Implementation',
+      desc = '[G]oto [I]mplementations',
     },
     {
       'gy',
       function()
         require('snacks').picker.lsp_type_definitions()
       end,
-      desc = 'Goto Type Definition',
+      desc = '[G]oto Type Definition',
+    },
+    {
+      '<leader>ds',
+      function()
+        require('snacks').picker.lsp_symbols()
+      end,
+      desc = '[Document] [S]ymbols',
     },
     {
       '<leader>#',
       function()
-        require('snacks').picker.lsp_symbols()
+        require('snacks').picker.lsp_workspace_symbols()
       end,
-      desc = 'Search Symbols',
+      desc = 'Workspace Symbols',
     },
-
-    -- Git pickers
-    -- {
-    --   '<leader>gc',
-    --   function()
-    --     require('snacks').picker.git_commits()
-    --   end,
-    --   desc = 'Git Commits',
-    -- },
-    -- {
-    --   '<leader>gs',
-    --   function()
-    --     require('snacks').picker.git_status()
-    --   end,
-    --   desc = 'Git Status',
-    -- },
-    -- {
-    --   '<leader>gb',
-    --   function()
-    --     require('snacks').picker.git_branches()
-    --   end,
-    --   desc = 'Git Branches',
-    -- },
-
+    {
+      'gh',
+      function()
+        require('snacks').picker.git_diff()
+      end,
+      desc = 'Git diff',
+    },
+    {
+      'gm',
+      function()
+        require('snacks').picker.marks()
+      end,
+      desc = '[G]oto [M]arks',
+    },
+    {
+      'gj',
+      function()
+        require('snacks').picker.jumps()
+      end,
+      desc = '[G]oto [J]umps',
+    },
+    {
+      'gu',
+      function()
+        require('snacks').picker.undo()
+      end,
+      desc = '[G]oto [U]ndo browser',
+    },
     -- Advanced searches
     {
       '<leader>s.',

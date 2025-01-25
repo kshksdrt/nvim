@@ -151,11 +151,6 @@ return {
       vim.keymap.set('n', '<leader>sj', require('treesj').toggle, { desc = '[S]plit or [J]oin code-block' })
     end,
   },
-  -- Bookmarks
-  {
-    'MattesGroeger/vim-bookmarks',
-    config = function() end,
-  },
   -- Adds a better quickfix list UI
   {
     'kevinhwang91/nvim-bqf',
@@ -204,17 +199,6 @@ return {
   -- Ability to swap delimited items such as function parameters
   {
     'machakann/vim-swap',
-  },
-  -- Interactive marks and jumps
-  {
-    'gcmt/vessel.nvim',
-    version = '*',
-    config = function()
-      local vessel = require 'vessel'
-      vessel.setup()
-      vim.keymap.set('n', 'gm', '<plug>(VesselViewLocalMarks)', { desc = '[G]o to [M]arks' })
-      vim.keymap.set('n', 'gj', '<plug>(VesselViewLocalJumps)', { desc = '[G]o to [J]umps' })
-    end,
   },
   -- Persist sessions
   {

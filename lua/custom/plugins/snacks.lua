@@ -63,8 +63,6 @@ return {
       end,
       desc = 'Search Diagnostics',
     },
-
-    -- LSP-related searches
     {
       'gr',
       function()
@@ -178,7 +176,6 @@ return {
       end,
       desc = 'Command History',
     },
-
     -- Project navigation
     {
       '<leader>sp',

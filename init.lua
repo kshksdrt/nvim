@@ -627,7 +627,10 @@ require('lazy').setup({
         'saghen/blink.cmp',
         lazy = false, -- lazy loading handled internally
         -- optional: provides snippets for the snippet source
-        dependencies = 'rafamadriz/friendly-snippets',
+        dependencies = {
+          'rafamadriz/friendly-snippets',
+          'xzbdmw/colorful-menu.nvim',
+        },
 
         -- use a release tag to download pre-built binaries
         version = 'v0.*',
@@ -646,6 +649,26 @@ require('lazy').setup({
           -- your own keymap.
           keymap = {
             preset = 'default',
+          },
+
+          completion = {
+            menu = {
+              draw = {
+                -- We don't need label_description now because label and label_description are already
+                -- combined together in label by colorful-menu.nvim.
+                columns = { { 'kind_icon' }, { 'label', gap = 1 } },
+                components = {
+                  label = {
+                    text = function(ctx)
+                      return require('colorful-menu').blink_components_text(ctx)
+                    end,
+                    highlight = function(ctx)
+                      return require('colorful-menu').blink_components_highlight(ctx)
+                    end,
+                  },
+                },
+              },
+            },
           },
 
           appearance = {

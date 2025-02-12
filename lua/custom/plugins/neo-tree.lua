@@ -15,7 +15,7 @@ return {
   },
   config = function()
     vim.cmd [[highlight NeoTreeIndentMarker guifg=#3f3f3f]]
-    vim.cmd [[highlight NeoTreeCursorLine guifg=#ffffff guibg=#073974]]
+    vim.cmd [[highlight NeoTreeCursorLine guifg=#ffffff guibg=#082f5d]]
     require('neo-tree').setup {
       close_if_last_window = true,
       default_component_configs = {

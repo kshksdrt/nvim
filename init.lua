@@ -131,6 +131,7 @@ if vim.g.neovide then
 
   vim.g.neovide_refresh_rate = 60
 
+  vim.g.neovide_cursor_animate_command_line = false
   vim.g.neovide_cursor_antialiasing = false
   vim.g.neovide_cursor_animate_command_line = false
   vim.g.neovide_cursor_animate_in_insert_mode = false

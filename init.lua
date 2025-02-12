@@ -100,9 +100,15 @@ vim.keymap.set('n', '<Del>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<PageUp>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<PageDown>', '<Nop>', { noremap = true, silent = true })
 
--- Move to previous/next
-vim.keymap.set('n', '<C-h>', ':bprevious<CR>', { noremap = true, silent = true })
-vim.keymap.set('n', '<C-l>', ':bnext<CR>', { noremap = true, silent = true })
+-- Move to previous/next buffer
+vim.keymap.set('n', '<C-h>', function()
+  local count = vim.v.count1
+  vim.cmd(count .. 'bprevious')
+end, { noremap = true, silent = true })
+vim.keymap.set('n', '<C-l>', function()
+  local count = vim.v.count1
+  vim.cmd(count .. 'bnext')
+end, { noremap = true, silent = true })
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true

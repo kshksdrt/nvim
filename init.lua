@@ -114,20 +114,8 @@ end, { noremap = true, silent = true })
 vim.g.have_nerd_font = true
 
 if vim.g.neovide then
-  vim.api.nvim_create_autocmd('BufLeave', {
-    callback = function()
-      vim.g.neovide_scroll_animation_length = 0
-      vim.g.neovide_cursor_animation_length = 0
-    end,
-  })
-  vim.api.nvim_create_autocmd('BufEnter', {
-    callback = function()
-      vim.fn.timer_start(200, function()
-        vim.g.neovide_scroll_animation_length = 0.3
-        vim.g.neovide_cursor_animation_length = 0.08
-      end)
-    end,
-  })
+  vim.g.neovide_scroll_animation_length = 0
+  vim.g.neovide_cursor_animation_length = 0
 
   vim.g.neovide_refresh_rate = 60
 
@@ -1506,7 +1494,6 @@ require('lazy').setup({
   require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
-  require 'kickstart.plugins.neo-tree',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`

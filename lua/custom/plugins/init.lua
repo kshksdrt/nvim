@@ -8,6 +8,18 @@ return {
     'stevearc/dressing.nvim',
     opts = {},
   },
+  {
+    'folke/noice.nvim',
+    event = 'VeryLazy',
+    opts = {
+      cmdline = {
+        enabled = true,
+      },
+    },
+    dependencies = {
+      'MunifTanjim/nui.nvim',
+    },
+  },
   -- Git wrapper
   {
     'tpope/vim-fugitive',
@@ -55,24 +67,24 @@ return {
       vim.cmd.colorscheme 'vscode'
     end,
   },
-  -- To display buffers like vscode tabs with indicators for unsaved changes
-  {
-    'akinsho/bufferline.nvim',
-    version = '*',
-    dependencies = 'nvim-tree/nvim-web-devicons',
-    config = function()
-      local bufferline = require 'bufferline'
-      bufferline.setup {
-        options = {
-          style_preset = bufferline.style_preset.no_italic,
-          indicator = {
-            style = 'none',
-          },
-          separator_style = {},
-        },
-      }
-    end,
-  },
+  -- -- To display buffers like vscode tabs with indicators for unsaved changes
+  -- {
+  --   'akinsho/bufferline.nvim',
+  --   version = '*',
+  --   dependencies = 'nvim-tree/nvim-web-devicons',
+  --   config = function()
+  --     local bufferline = require 'bufferline'
+  --     bufferline.setup {
+  --       options = {
+  --         style_preset = bufferline.style_preset.no_italic,
+  --         indicator = {
+  --           style = 'none',
+  --         },
+  --         separator_style = {},
+  --       },
+  --     }
+  --   end,
+  -- },
   -- Fast slanting motions
   {
     'ggandor/leap.nvim',

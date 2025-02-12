@@ -106,14 +106,19 @@ vim.keymap.set('o', 'S', 'gg', { noremap = true, silent = true })
 vim.keymap.set('v', 'S', 'gg', { noremap = true, silent = true })
 
 -- Move to previous/next buffer
-vim.keymap.set('n', '<C-h>', function()
+local execute_bprevious = function()
   local count = vim.v.count1
   vim.cmd(count .. 'bprevious')
-end, { noremap = true, silent = true })
-vim.keymap.set('n', '<C-l>', function()
+end
+local execute_bnext = function()
   local count = vim.v.count1
   vim.cmd(count .. 'bnext')
-end, { noremap = true, silent = true })
+end
+vim.keymap.set('n', '<C-h>', execute_bprevious, { noremap = true, silent = true })
+vim.keymap.set('n', '<C-l>', execute_bnext, { noremap = true, silent = true })
+
+vim.keymap.set('n', '<C-M>', execute_bnext, { noremap = true, silent = true })
+vim.keymap.set('n', '<C-,>', execute_bprevious, { noremap = true, silent = true })
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true

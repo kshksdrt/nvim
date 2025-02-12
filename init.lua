@@ -100,6 +100,11 @@ vim.keymap.set('n', '<Del>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<PageUp>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<PageDown>', '<Nop>', { noremap = true, silent = true })
 
+-- A replacement for gg
+vim.keymap.set('n', 'S', 'gg', { noremap = true, silent = true })
+vim.keymap.set('o', 'S', 'gg', { noremap = true, silent = true })
+vim.keymap.set('v', 'S', 'gg', { noremap = true, silent = true })
+
 -- Move to previous/next buffer
 vim.keymap.set('n', '<C-h>', function()
   local count = vim.v.count1

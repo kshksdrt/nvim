@@ -1554,5 +1554,8 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
+-- Call :bd easily
+vim.keymap.set('n', '<Leader>bd', ':bd<CR>', { desc = '[D]elete [B]uffer' })
+
 require 'custom.commands.presentation'
 require 'custom.commands.fix_quickfix'

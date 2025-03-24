@@ -1559,3 +1559,5 @@ vim.keymap.set('n', '<Leader>bd', ':bd<CR>', { desc = '[D]elete [B]uffer' })
 
 require 'custom.commands.presentation'
 require 'custom.commands.fix_quickfix'
+local stickies = require 'custom.commands.sticky_notes_float'
+stickies.setup()

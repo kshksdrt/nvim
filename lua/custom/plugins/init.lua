@@ -122,6 +122,29 @@ return {
     'MeanderingProgrammer/render-markdown.nvim',
     opts = {},
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
+    config = function()
+      local md = require 'render-markdown'
+      md.setup {
+        bullet = {
+          enabled = false,
+        },
+        heading = {
+          enabled = false,
+        },
+        pipe_table = {
+          style = 'normal',
+        },
+
+        completions = {
+          blink = {
+            enabled = true,
+          },
+          lsp = {
+            enabled = true,
+          },
+        },
+      }
+    end,
   },
   -- Context-aware commenting/uncommenting
   {

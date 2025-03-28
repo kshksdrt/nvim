@@ -945,6 +945,8 @@ require('lazy').setup({
         csharp_ls = {},
 
         csharpier = {},
+
+        markdown_oxide = {},
       }
 
       -- Ensure the servers and tools above are installed

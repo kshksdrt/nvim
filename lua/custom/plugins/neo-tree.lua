@@ -11,7 +11,7 @@ return {
   },
   cmd = 'Neotree buffers',
   keys = {
-    { '-', ':Neotree buffers<CR>', desc = '[T]oggle [B]uffer list', silent = true },
+    { '_', ':Neotree buffers<CR>', desc = '[T]oggle [B]uffer list', silent = true },
   },
   config = function()
     vim.cmd [[highlight NeoTreeIndentMarker guifg=#3f3f3f]]
@@ -58,9 +58,6 @@ return {
           enabled = false,
         },
       },
-      window = {
-        width = 30,
-      },
       buffers = {
         enabled = true,
         use_linenumbers = true,
@@ -74,12 +71,9 @@ return {
             hide_gitignored = false,
             visible = true,
           },
-          follow_current_file = {
-            enabled = true,
-          },
-          position = 'right',
+          position = 'float',
           mappings = {
-            ['-'] = 'close_window',
+            ['_'] = 'close_window',
           },
         },
       },

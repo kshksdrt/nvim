@@ -56,23 +56,23 @@ return {
     end,
   },
   -- -- To display buffers like vscode tabs with indicators for unsaved changes
-  -- {
-  --   'akinsho/bufferline.nvim',
-  --   version = '*',
-  --   dependencies = 'nvim-tree/nvim-web-devicons',
-  --   config = function()
-  --     local bufferline = require 'bufferline'
-  --     bufferline.setup {
-  --       options = {
-  --         style_preset = bufferline.style_preset.no_italic,
-  --         indicator = {
-  --           style = 'none',
-  --         },
-  --         separator_style = {},
-  --       },
-  --     }
-  --   end,
-  -- },
+  {
+    'akinsho/bufferline.nvim',
+    version = '*',
+    dependencies = 'nvim-tree/nvim-web-devicons',
+    config = function()
+      local bufferline = require 'bufferline'
+      bufferline.setup {
+        options = {
+          style_preset = bufferline.style_preset.no_italic,
+          indicator = {
+            style = 'none',
+          },
+          separator_style = {},
+        },
+      }
+    end,
+  },
   -- Fast slanting motions
   {
     'ggandor/leap.nvim',
@@ -122,6 +122,29 @@ return {
     'MeanderingProgrammer/render-markdown.nvim',
     opts = {},
     dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
+    config = function()
+      local md = require 'render-markdown'
+      md.setup {
+        bullet = {
+          enabled = false,
+        },
+        heading = {
+          enabled = false,
+        },
+        pipe_table = {
+          style = 'normal',
+        },
+
+        completions = {
+          blink = {
+            enabled = true,
+          },
+          lsp = {
+            enabled = true,
+          },
+        },
+      }
+    end,
   },
   -- Context-aware commenting/uncommenting
   {

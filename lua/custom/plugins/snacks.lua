@@ -43,6 +43,13 @@ return {
       desc = 'Search Buffers',
     },
     {
+      '-',
+      function()
+        require('snacks').picker.buffers()
+      end,
+      desc = 'Search Buffers',
+    },
+    {
       '<leader>sH',
       function()
         require('snacks').picker.highlights()

@@ -992,6 +992,8 @@ require('lazy').setup({
         csharpier = {},
 
         markdown_oxide = {},
+
+        rust_analyzer = {},
       }
 
       -- Ensure the servers and tools above are installed

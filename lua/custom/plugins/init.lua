@@ -64,11 +64,12 @@ return {
       local bufferline = require 'bufferline'
       bufferline.setup {
         options = {
+          show_buffer_close_icons = false,
           style_preset = bufferline.style_preset.no_italic,
           indicator = {
             style = 'none',
           },
-          separator_style = {},
+          separator_style = ' ',
         },
       }
     end,

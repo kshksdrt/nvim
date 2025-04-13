@@ -69,7 +69,7 @@ return {
           indicator = {
             style = 'none',
           },
-          separator_style = '',
+          separator_style = ' ',
         },
       }
     end,

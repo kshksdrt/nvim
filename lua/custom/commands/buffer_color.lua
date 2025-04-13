@@ -12,13 +12,6 @@ function M.setup()
       -- Get the filename part of the current buffer
       local buffer_name = vim.fn.expand '%:t'
 
-      -- Don't proceed if the buffer is unnamed (e.g., a new buffer)
-      -- if buffer_name == nil or buffer_name == '' then
-      -- Optional: You could set a default color here if needed
-      -- pcall(vim.api.nvim_set_hl, 0, "BufferLineBuffer", { fg = "#cccccc" })
-      -- return
-      -- end
-
       -- Check if the external command exists and is executable
       if vim.fn.executable 'string_utils' == 0 then
         vim.notify('string_utils command not found in your PATH.', vim.log.levels.ERROR)
@@ -37,7 +30,6 @@ function M.setup()
       end
 
       -- Run the command and capture output
-      -- { text = true } ensures stdout/stderr are strings
       local hex_color = trim(vim.fn.system(command))
 
       -- Basic validation: Check if it looks like a hex color code
@@ -49,10 +41,22 @@ function M.setup()
       -- Set the highlight using the Neovim API
       -- `0` is the global namespace ID
       -- Use pcall (protected call) for safety in case nvim_set_hl fails
-      pcall(vim.api.nvim_set_hl, 0, 'BufferLineBackground', {
+      local success, err = pcall(vim.api.nvim_set_hl, 0, 'BufferLineSeparator', {
+        fg = '#5b5b5b',
+        bg = 'NONE',
+      })
+      if not success then
+        vim.notify('Failed to set BufferLineSeparator highlight: ' .. tostring(err), vim.log.levels.ERROR)
+      end
+      local success1, err1 = pcall(vim.api.nvim_set_hl, 0, 'BufferLineBackground', {
         fg = '#5b5b5b',
       })
-      local success2, err2 = pcall(vim.api.nvim_set_hl, 0, 'BufferLineBufferSelected', { fg = hex_color })
+      if not success1 then
+        vim.notify('Failed to set BufferLineBackground highlight: ' .. tostring(err1), vim.log.levels.ERROR)
+      end
+      local success2, err2 = pcall(vim.api.nvim_set_hl, 0, 'BufferLineBufferSelected', {
+        fg = hex_color,
+      })
       if not success2 then
         vim.notify('Failed to set BufferLineBuffer highlight: ' .. tostring(err2), vim.log.levels.ERROR)
       end

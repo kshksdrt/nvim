@@ -38,28 +38,35 @@ function M.setup()
       --   return
       -- end
 
-      -- Set the highlight using the Neovim API
+      pcall(vim.api.nvim_set_hl, 0, 'MiniTabLineCurrent', {
+        fg = 'black',
+        bg = hex_color,
+      })
+
+      -- For `bufferline.nvim`
       -- `0` is the global namespace ID
       -- Use pcall (protected call) for safety in case nvim_set_hl fails
-      local success, err = pcall(vim.api.nvim_set_hl, 0, 'BufferLineSeparator', {
-        fg = '#5b5b5b',
-        bg = 'NONE',
-      })
-      if not success then
-        vim.notify('Failed to set BufferLineSeparator highlight: ' .. tostring(err), vim.log.levels.ERROR)
-      end
-      local success1, err1 = pcall(vim.api.nvim_set_hl, 0, 'BufferLineBackground', {
-        fg = '#5b5b5b',
-      })
-      if not success1 then
-        vim.notify('Failed to set BufferLineBackground highlight: ' .. tostring(err1), vim.log.levels.ERROR)
-      end
-      local success2, err2 = pcall(vim.api.nvim_set_hl, 0, 'BufferLineBufferSelected', {
-        fg = hex_color,
-      })
-      if not success2 then
-        vim.notify('Failed to set BufferLineBuffer highlight: ' .. tostring(err2), vim.log.levels.ERROR)
-      end
+      -- local success, err = pcall(vim.api.nvim_set_hl, 0, 'BufferLineSeparator', {
+      --   fg = '#5b5b5b',
+      --   bg = 'NONE',
+      -- })
+      -- if not success then
+      --   vim.notify('Failed to set BufferLineSeparator highlight: ' .. tostring(err), vim.log.levels.ERROR)
+      -- end
+      -- local success1, err1 = pcall(vim.api.nvim_set_hl, 0, 'BufferLineBackground', {
+      --   fg = '#5b5b5b',
+      -- })
+      -- if not success1 then
+      --   vim.notify('Failed to set BufferLineBackground highlight: ' .. tostring(err1), vim.log.levels.ERROR)
+      -- end
+      -- local success2, err2 = pcall(vim.api.nvim_set_hl, 0, 'BufferLineBufferSelected', {
+      --   bg = hex_color,
+      --   bold = true,
+      --   fg = 'black',
+      -- })
+      -- if not success2 then
+      --   vim.notify('Failed to set BufferLineBuffer highlight: ' .. tostring(err2), vim.log.levels.ERROR)
+      -- end
     end,
   })
 

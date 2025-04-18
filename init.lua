@@ -1418,28 +1418,11 @@ require('lazy').setup({
               return count
             end
 
-            local mode, mode_hl = get_mode()
             local git = MiniStatusline.section_git { trunc_width = 75, bold = false }
-            -- Custom filename section to show path first
-            local filename = function()
-              local path = vim.fn.expand '%:p:h:t' -- Get parent directory name
-              local name = vim.fn.expand '%:t' -- Get file name
-              if name == '' then
-                return '[No Name]'
-              end
-              return string.format(' %s    %s/%s', name, path, name)
-            end
-            local location = MiniStatusline.section_location { trunc_width = 75 }
 
-            -- Set highlighting for mode background
-            vim.api.nvim_set_hl(0, 'MiniStatuslineModeInactive', { bg = '#858585' })
-            vim.api.nvim_set_hl(0, 'MiniStatuslineModeNormal', { bg = '#858585', fg = '#000000' })
-            vim.api.nvim_set_hl(0, 'MiniStatuslineModeInsert', { bg = '#858585', fg = '#000000' })
-            vim.api.nvim_set_hl(0, 'MiniStatuslineModeVisual', { bg = '#858585', fg = '#000000' })
-            vim.api.nvim_set_hl(0, 'MiniStatuslineModeReplace', { bg = '#858585', fg = '#000000' })
-            vim.api.nvim_set_hl(0, 'MiniStatuslineModeCommand', { bg = '#858585', fg = '#000000' })
-            -- Git and other section colors
-            vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = '#6e6e6e', fg = '#000000', bold = false })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = '#858585', fg = '#000000' })
+            vim.api.nvim_set_hl(0, 'MiniStatuslineBody', { bg = '#444444', fg = '#ffffff' })
+
             -- Add highlight group for unsaved buffers section
             vim.api.nvim_set_hl(0, 'MiniStatuslineUnsaved', { bg = '#d6bd7c', fg = '#000000' })
 
@@ -1447,11 +1430,14 @@ require('lazy').setup({
             local location = MiniStatusline.section_location { trunc_width = 75 }
             local unsaved = get_unsaved_buffers()
 
+            -- vim.api.nvim_buf_get_name(0) gets the full path of the current buffer (0 means current)
+            -- vim.fn.fnamemodify(..., ':t') extracts the filename (tail) from the path
+            local current_filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':t')
+
             -- Create groups array with main components
             local groups = {
-              { hl = mode_hl, strings = { mode } },
               { hl = 'MiniStatuslineDevinfo', strings = { git } },
-              { hl = 'MiniStatuslineFilename', strings = { filename() } },
+              { hl = 'MiniStatuslineBody', strings = { ' ' .. current_filename .. ' ' } },
               '%=',
               { hl = 'MiniStatuslineLocation', strings = { location } },
             }
@@ -1474,8 +1460,23 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
+      local MiniTabLine = require 'mini.tabline'
+      local helper = MiniTabLine.helper
+
+      MiniTabLine.config = {
+        format = function(buf_id, label)
+          local tabname = ''
+          local separator = '|'
+          if helper.get_icon == nil then
+            tabname = string.format(' %s ', label)
+          else
+            tabname = string.format(' %s %s ', helper.get_icon(vim.api.nvim_buf_get_name(buf_id)), label)
+          end
+          return tabname .. separator
+        end,
+      }
+
+      MiniTabLine.setup()
     end,
   },
   { -- Highlight, edit, and navigate code

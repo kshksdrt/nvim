@@ -1430,10 +1430,14 @@ require('lazy').setup({
             local location = MiniStatusline.section_location { trunc_width = 75 }
             local unsaved = get_unsaved_buffers()
 
+            -- vim.api.nvim_buf_get_name(0) gets the full path of the current buffer (0 means current)
+            -- vim.fn.fnamemodify(..., ':t') extracts the filename (tail) from the path
+            local current_filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':t')
+
             -- Create groups array with main components
             local groups = {
               { hl = 'MiniStatuslineDevinfo', strings = { git } },
-              { hl = 'MiniStatuslineBody', strings = {} },
+              { hl = 'MiniStatuslineBody', strings = { ' ' .. current_filename .. ' ' } },
               '%=',
               { hl = 'MiniStatuslineLocation', strings = { location } },
             }

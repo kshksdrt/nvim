@@ -56,24 +56,25 @@ return {
     end,
   },
   -- -- To display buffers like vscode tabs with indicators for unsaved changes
-  {
-    'akinsho/bufferline.nvim',
-    version = '*',
-    dependencies = 'nvim-tree/nvim-web-devicons',
-    config = function()
-      local bufferline = require 'bufferline'
-      bufferline.setup {
-        options = {
-          show_buffer_close_icons = false,
-          style_preset = bufferline.style_preset.no_italic,
-          indicator = {
-            style = 'none',
-          },
-          separator_style = ' ',
-        },
-      }
-    end,
-  },
+  -- {
+  --   'akinsho/bufferline.nvim',
+  --   version = '*',
+  --   dependencies = 'nvim-tree/nvim-web-devicons',
+  --   config = function()
+  --     local bufferline = require 'bufferline'
+  --     bufferline.setup {
+  --       options = {
+  --         color_icons = false,
+  --         show_buffer_close_icons = false,
+  --         style_preset = bufferline.style_preset.no_italic,
+  --         indicator = {
+  --           style = 'none',
+  --         },
+  --         separator_style = ' ',
+  --       },
+  --     }
+  --   end,
+  -- },
   -- Fast slanting motions
   {
     'ggandor/leap.nvim',

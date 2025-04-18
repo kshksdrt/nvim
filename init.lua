@@ -1460,8 +1460,23 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
+      local MiniTabLine = require 'mini.tabline'
+      local helper = MiniTabLine.helper
+
+      MiniTabLine.config = {
+        format = function(buf_id, label)
+          local tabname = ''
+          local separator = '|'
+          if helper.get_icon == nil then
+            tabname = string.format(' %s ', label)
+          else
+            tabname = string.format(' %s %s ', helper.get_icon(vim.api.nvim_buf_get_name(buf_id)), label)
+          end
+          return tabname .. separator
+        end,
+      }
+
+      MiniTabLine.setup()
     end,
   },
   { -- Highlight, edit, and navigate code

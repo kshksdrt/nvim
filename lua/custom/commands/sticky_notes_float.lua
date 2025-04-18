@@ -29,7 +29,16 @@ end
 local function open_floating_file(filepath)
   local function expand_path(path)
     if path:sub(1, 1) == '~' then
-      return os.getenv 'HOME' .. path:sub(2)
+      -- Check if it is windows.
+      local is_windows = vim.fn.has 'win32' == 1 or vim.fn.has 'win64' == 1
+      -- An alternative that used to work.
+      -- if vim.loop.os_uname().sysname == 'Windows_NT' then
+
+      if is_windows then
+        return os.getenv 'USERPROFILE' .. path:sub(2)
+      else
+        return os.getenv 'HOME' .. path:sub(2)
+      end
     end
     return path
   end

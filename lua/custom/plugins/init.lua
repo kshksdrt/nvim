@@ -126,6 +126,10 @@ return {
     config = function()
       local md = require 'render-markdown'
       md.setup {
+        code = {
+          border = 'thin',
+          inline_pad = 1,
+        },
         bullet = {
           enabled = false,
         },

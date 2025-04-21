@@ -38,6 +38,10 @@ function M.setup()
       --   return
       -- end
 
+      pcall(vim.api.nvim_set_hl, 0, 'MiniTabLineModifiedCurrent', {
+        fg = 'black',
+        bg = hex_color,
+      })
       pcall(vim.api.nvim_set_hl, 0, 'MiniTabLineCurrent', {
         fg = 'black',
         bg = hex_color,

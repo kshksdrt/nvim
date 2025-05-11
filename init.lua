@@ -89,37 +89,6 @@ P.S. You can delete this when you're done too. It's your config now! :)
 vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
--- Disable arrows, enter, backspace and delete keys in normal mode
-vim.keymap.set('n', '<Up>', '<Nop>', { noremap = true, silent = true })
-vim.keymap.set('n', '<Down>', '<Nop>', { noremap = true, silent = true })
-vim.keymap.set('n', '<Left>', '<Nop>', { noremap = true, silent = true })
-vim.keymap.set('n', '<Right>', '<Nop>', { noremap = true, silent = true })
-vim.keymap.set('n', '<CR>', '<Nop>', { noremap = true, silent = true })
-vim.keymap.set('n', '<BS>', '<Nop>', { noremap = true, silent = true })
-vim.keymap.set('n', '<Del>', '<Nop>', { noremap = true, silent = true })
-vim.keymap.set('n', '<PageUp>', '<Nop>', { noremap = true, silent = true })
-vim.keymap.set('n', '<PageDown>', '<Nop>', { noremap = true, silent = true })
-
--- A replacement for gg
-vim.keymap.set('n', 'S', 'gg', { noremap = true, silent = true })
-vim.keymap.set('o', 'S', 'gg', { noremap = true, silent = true })
-vim.keymap.set('v', 'S', 'gg', { noremap = true, silent = true })
-
--- Move to previous/next buffer
-local execute_bprevious = function()
-  local count = vim.v.count1
-  vim.cmd(count .. 'bprevious')
-end
-local execute_bnext = function()
-  local count = vim.v.count1
-  vim.cmd(count .. 'bnext')
-end
-vim.keymap.set('n', '<C-h>', execute_bprevious, { noremap = true, silent = true })
-vim.keymap.set('n', '<C-l>', execute_bnext, { noremap = true, silent = true })
-
-vim.keymap.set('n', '<C-M>', execute_bnext, { noremap = true, silent = true })
-vim.keymap.set('n', '<C-,>', execute_bprevious, { noremap = true, silent = true })
-
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
@@ -255,27 +224,9 @@ vim.opt.expandtab = false
 vim.opt.tabstop = 4
 vim.opt.shiftwidth = 4
 
--- TIP: Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
-
--- Keybinds from ThePrimeagen. See https://github.com/ThePrimeagen/init.lua/blob/master/lua/theprimeagen/remap.lua
--- vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { desc = 'Move selected lines down' })
--- vim.keymap.set('v', 'K', ":m '<-2<CR>gv=gv", { desc = 'Move selected lines up' })
-vim.keymap.set('x', '<leader>p', [["_dP]], { desc = 'Paste over visually selected text without overwriting the register' })
-
 -- Quickfix list navigation
 vim.keymap.set('n', '<C-j>', '<cmd>cnext<CR>zz', { desc = 'Go to the next quickfix item' })
 vim.keymap.set('n', '<C-k>', '<cmd>cprev<CR>zz', { desc = 'Go to the previous quickfix item' })
-
--- My custom text objects
---  Gives you text objects for the contents of current buffer.
-vim.api.nvim_set_keymap('x', 'ie', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('o', 'ie', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('x', 'ae', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('o', 'ae', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
 
 -- Teminal tools
 vim.keymap.set('n', '<leader>x', ':exe "!" . getline(".")<CR>', { noremap = true, silent = false, desc = 'Execute current line in shell' })
@@ -1707,12 +1658,7 @@ require('lazy').setup({
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 
--- gets the git history of the visual selection
-vim.keymap.set('v', '<leader>l', ":<c-u>exe ':term git log -L' line(\"'<\").','.line(\"'>\").':'.expand('%')<CR>", { noremap = true })
-
--- From the Vim wiki: https://bit.ly/4eLAARp
--- Search and replace word under the cursor
-vim.keymap.set('n', '<Leader>rw', [[:%s/\<<C-r><C-w>\>//g<Left><Left>]], { desc = '[R]eplace [W]ord' })
+require 'custom.keybinds.init'
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'qf',
@@ -1721,11 +1667,9 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
--- Call :bd easily
-vim.keymap.set('n', '<Leader>bd', ':bd<CR>', { desc = '[D]elete [B]uffer' })
-
 require 'custom.commands.presentation'
 require 'custom.commands.fix_quickfix'
+
 local buffer_coloring = require 'custom.commands.buffer_color'
 buffer_coloring.setup()
 local stickies = require 'custom.commands.sticky_notes_float'

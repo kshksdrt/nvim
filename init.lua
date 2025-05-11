@@ -949,18 +949,31 @@ require('lazy').setup({
               plugins = {
                 {
                   name = '@vue/typescript-plugin',
-                  location = mason_registry.get_package('vue-language-server'):get_install_path() .. '/node_modules/@vue/language-server',
+                  location = vim.fn.expand '$MASON/packages' .. '/vue-language-server' .. '/node_modules/@vue/language-server',
                   languages = { 'vue' },
                 },
               },
             },
-            filetypes = { 'typescript', 'javascript', 'javascriptreact', 'typescriptreact', 'vue' },
+            filetypes = {
+              'typescript',
+              'javascript',
+              'javascriptreact',
+              'typescriptreact',
+              'vue',
+            },
           },
         },
 
         prettier = {},
 
         volar = {
+          filetypes = {
+            'typescript',
+            'javascript',
+            'javascriptreact',
+            'typescriptreact',
+            'vue',
+          },
           init_options = {
             vue = {
               hybridMode = false,

@@ -864,7 +864,6 @@ require('lazy').setup({
       -- General diagnostic config
       vim.diagnostic.config {
         update_in_insert = false,
-        virtual_text = true,
         signs = true,
         virtual_text = {
           source = 'if_many',

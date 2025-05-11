@@ -222,7 +222,17 @@ return {
     event = 'VeryLazy', -- Or `LspAttach`
     priority = 1000, -- needs to be loaded in first
     config = function()
-      require('tiny-inline-diagnostic').setup()
+      require('tiny-inline-diagnostic').setup {
+        preset = 'modern',
+        options = {
+          multilines = {
+            enabled = true,
+            always_show = true,
+          },
+          softwrap = 60,
+          use_icons_from_diagnostic = true,
+        },
+      }
     end,
   },
   -- Ability to swap delimited items such as function parameters

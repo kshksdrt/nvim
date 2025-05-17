@@ -230,7 +230,6 @@ return {
             always_show = true,
           },
           softwrap = 60,
-          use_icons_from_diagnostic = true,
         },
       }
     end,

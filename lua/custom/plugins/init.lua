@@ -205,17 +205,6 @@ return {
   {
     'machakann/vim-swap',
   },
-  -- Persist sessions
-  {
-    'rmagatti/auto-session',
-    lazy = false,
-    ---@module "auto-session"
-    ---@type AutoSession.Config
-    opts = {
-      suppressed_dirs = { '/' },
-      -- log_level = 'debug',
-    },
-  },
   -- Enhance and improve styles of help files text rendering
   {
     'OXY2DEV/helpview.nvim',
@@ -227,5 +216,16 @@ return {
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
     },
+  },
+  {
+    'niba/continue.nvim',
+    -- remember to set lazy as false
+    lazy = false,
+    -- call setup method or set config = true
+    config = true,
+
+    ---@module "continue"
+    ---@type Continue.Config
+    opts = {},
   },
 }

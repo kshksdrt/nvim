@@ -15,6 +15,20 @@ return {
   keys = {
     -- Main pickers
     {
+      '<leader>.',
+      function()
+        require('snacks').scratch()
+      end,
+      desc = 'Open scratch buffer',
+    },
+    {
+      '<leader>ss',
+      function()
+        require('snacks').scratch.select()
+      end,
+      desc = 'Select scratch',
+    },
+    {
       '<leader>sf',
       function()
         require('snacks').picker.files()
@@ -34,13 +48,6 @@ return {
         require('snacks').picker.grep_word()
       end,
       desc = 'Search Word',
-    },
-    {
-      '<leader>sb',
-      function()
-        require('snacks').picker.buffers()
-      end,
-      desc = 'Search Buffers',
     },
     {
       '-',

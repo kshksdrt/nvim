@@ -119,39 +119,6 @@ return {
     config = true,
     version = '*',
   },
-  -- Improve markdown rendering
-  {
-    'MeanderingProgrammer/render-markdown.nvim',
-    opts = {},
-    dependencies = { 'nvim-treesitter/nvim-treesitter', 'echasnovski/mini.nvim' },
-    config = function()
-      local md = require 'render-markdown'
-      md.setup {
-        code = {
-          border = 'thin',
-          inline_pad = 1,
-        },
-        bullet = {
-          enabled = false,
-        },
-        heading = {
-          enabled = false,
-        },
-        pipe_table = {
-          style = 'normal',
-        },
-
-        completions = {
-          blink = {
-            enabled = true,
-          },
-          lsp = {
-            enabled = true,
-          },
-        },
-      }
-    end,
-  },
   -- Context-aware commenting/uncommenting
   {
     'JoosepAlviste/nvim-ts-context-commentstring',
@@ -238,17 +205,6 @@ return {
   {
     'machakann/vim-swap',
   },
-  -- Persist sessions
-  {
-    'rmagatti/auto-session',
-    lazy = false,
-    ---@module "auto-session"
-    ---@type AutoSession.Config
-    opts = {
-      suppressed_dirs = { '/' },
-      -- log_level = 'debug',
-    },
-  },
   -- Enhance and improve styles of help files text rendering
   {
     'OXY2DEV/helpview.nvim',
@@ -260,5 +216,16 @@ return {
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
     },
+  },
+  {
+    'niba/continue.nvim',
+    -- remember to set lazy as false
+    lazy = false,
+    -- call setup method or set config = true
+    config = true,
+
+    ---@module "continue"
+    ---@type Continue.Config
+    opts = {},
   },
 }

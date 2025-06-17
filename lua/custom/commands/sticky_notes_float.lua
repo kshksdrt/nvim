@@ -91,7 +91,7 @@ M.setup = function()
   vim.api.nvim_create_user_command('MyNotes', function()
     open_floating_file '~/Documents/StickyNotes.md'
   end, {})
-  vim.keymap.set('n', '<leader>n', ':MyNotes<CR>', { silent = true })
+  vim.keymap.set('n', '<leader>n', ':MyNotes<CR>', { desc = '[N]otes', silent = true })
 end
 
 return M

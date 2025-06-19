@@ -901,29 +901,22 @@ require('lazy').setup({
         --
         -- See https://github.com/pmizio/typescript-tools.nvim for more useful features
         ts_ls = {
-          setup = {
-            init_options = {
-              plugins = {
-                {
-                  name = '@vue/typescript-plugin',
-                  location = vim.fn.expand '$MASON/packages' .. '/vue-language-server' .. '/node_modules/@vue/language-server',
-                  languages = { 'vue' },
+          init_options = {
+            plugins = {
+              {
+                name = '@vue/typescript-plugin',
+                location = vim.fn.expand '$MASON/packages' .. '/vue-language-server' .. '/node_modules/@vue/language-server',
+                languages = {
+                  'typescript',
+                  'javascript',
+                  'javascriptreact',
+                  'typescriptreact',
+                  'vue',
                 },
+                configNamespace = 'typescript',
               },
             },
-            filetypes = {
-              'typescript',
-              'javascript',
-              'javascriptreact',
-              'typescriptreact',
-              'vue',
-            },
           },
-        },
-
-        prettier = {},
-
-        volar = {
           filetypes = {
             'typescript',
             'javascript',
@@ -931,11 +924,50 @@ require('lazy').setup({
             'typescriptreact',
             'vue',
           },
+        },
+
+        prettier = {},
+
+        volar = {
           init_options = {
             vue = {
-              hybridMode = false,
+              hybridMode = true,
             },
           },
+          -- filetypes = {
+          --   'typescript',
+          --   'javascript',
+          --   'javascriptreact',
+          --   'typescriptreact',
+          --   'vue',
+          -- },
+          -- on_init = function(client)
+          --   client.handlers['tsserver/request'] = function(_, result, context)
+          --     local clients = vim.lsp.get_clients { bufnr = context.bufnr, name = 'vtsls' }
+          --     if #clients == 0 then
+          --       vim.notify('Could not found `vtsls` lsp client, vue_lsp would not work without it.', vim.log.levels.ERROR)
+          --       return
+          --     end
+          --     local ts_client = clients[1]
+          --
+          --     local param = unpack(result)
+          --     local id, command, payload = unpack(param)
+          --     ts_client:exec_cmd({
+          --       command = 'typescript.tsserverRequest',
+          --       arguments = {
+          --         command,
+          --         payload,
+          --       },
+          --     }, { bufnr = context.bufnr }, function(_, r)
+          --       local response_data = { { id, r.body } }
+          --       ---@diagnostic disable-next-line: param-type-mismatch
+          --       client:notify('tsserver/response', response_data)
+          --     end)
+          --   end
+          -- end,
+          -- on_attach = function(client, _)
+          --   client.server_capabilities.documentFormattingProvider = nil
+          -- end,
         },
 
         lua_ls = {

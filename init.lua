@@ -194,6 +194,7 @@ vim.api.nvim_create_autocmd('VimEnter', {
     if vim.fn.isdirectory(vim.fn.expand '%') == 1 then
       vim.cmd 'bd'
     end
+    require('nvim-tree.api').tree.close()
   end,
 })
 

@@ -21,7 +21,7 @@ function M.setup()
       -- Construct the command, escaping the buffer name
       local command = 'string_utils --invoke=color-hex-light-bg ' .. vim.fn.shellescape(buffer_name)
 
-      function trim(s)
+      local function trim(s)
         -- ^%s* : Matches zero or more whitespace characters at the beginning of the string.
         -- (.-) : Captures the shortest possible sequence of any characters (non-greedy). This is the actual content we want to keep.
         -- %s*$ : Matches zero or more whitespace characters at the end of the string.
@@ -38,14 +38,22 @@ function M.setup()
       --   return
       -- end
 
-      pcall(vim.api.nvim_set_hl, 0, 'MiniTabLineModifiedCurrent', {
+      local success, err = pcall(vim.api.nvim_set_hl, 0, 'MiniTabLineModifiedCurrent', {
         fg = 'black',
         bg = hex_color,
       })
-      pcall(vim.api.nvim_set_hl, 0, 'MiniTabLineCurrent', {
+      -- If the call failed, show a notification with the error
+      if not success then
+        vim.notify('Failed to set MiniTabLineModifiedCurrent highlight: ' .. tostring(err), vim.log.levels.ERROR)
+      end
+
+      local success2, err2 = pcall(vim.api.nvim_set_hl, 0, 'MiniTabLineCurrent', {
         fg = 'black',
         bg = hex_color,
       })
+      if not success2 then
+        vim.notify('Failed to set MiniTabLineCurrent highlight: ' .. tostring(err2), vim.log.levels.ERROR)
+      end
 
       -- For `bufferline.nvim`
       -- `0` is the global namespace ID

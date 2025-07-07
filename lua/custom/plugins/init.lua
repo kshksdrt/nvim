@@ -133,20 +133,6 @@ return {
       }
     end,
   },
-  -- For splitting/joining blocks of code
-  {
-    'Wansmer/treesj',
-    dependencies = {
-      'nvim-treesitter/nvim-treesitter',
-    }, -- if you install parsers with `nvim-treesitter`
-    config = function()
-      local treesj = require 'treesj'
-      treesj.setup {
-        use_default_keymaps = false,
-      }
-      vim.keymap.set('n', '<leader>sj', require('treesj').toggle, { desc = '[S]plit or [J]oin code-block' })
-    end,
-  },
   -- Adds a better quickfix list UI
   {
     'kevinhwang91/nvim-bqf',

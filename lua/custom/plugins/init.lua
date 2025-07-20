@@ -82,6 +82,9 @@ return {
     config = function()
       vim.keymap.set({ 'n', 'x', 'o' }, '<leader>j', '<Plug>(leap-forward-to)', { noremap = true, silent = true, desc = 'Leap forward' })
       vim.keymap.set({ 'n', 'x', 'o' }, '<leader>k', '<Plug>(leap-backward-to)', { noremap = true, silent = true, desc = 'Leap backward' })
+      require('leap').opts.preview_filter = function()
+        return false
+      end
     end,
   },
   -- To operate on surrounding characters

@@ -1718,6 +1718,7 @@ vim.api.nvim_create_autocmd('FileType', {
 require 'custom.commands.presentation'
 require 'custom.commands.fix_quickfix'
 require 'custom.commands.cmd'
+require 'custom.commands.markdown'
 
 local buffer_coloring = require 'custom.commands.buffer_color'
 buffer_coloring.setup()

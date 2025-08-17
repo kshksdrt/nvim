@@ -880,6 +880,16 @@ require('lazy').setup({
       --  - capabilities (table): Override fields in capabilities. Can be used to disable certain LSP features.
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
+
+      local vue_plugin = {
+        name = '@vue/typescript-plugin',
+        location = vim.fn.expand '$MASON/packages' .. '/vue-language-server' .. '/node_modules/@vue/language-server',
+        languages = {
+          'vue',
+        },
+        configNamespace = 'typescript',
+      }
+
       local servers = {
         -- See `:help lspconfig-all` for a list of all the pre-configured LSPs
 
@@ -902,20 +912,45 @@ require('lazy').setup({
         --
         -- See https://github.com/pmizio/typescript-tools.nvim for more useful features
         ts_ls = {
+          on_init = function(client)
+            client.handlers['tsserver/request'] = function(_, result, context)
+              local clients = vim.lsp.get_clients { bufnr = context.bufnr, name = 'vtsls' }
+              if #clients == 0 then
+                vim.notify('Could not find `vtsls` lsp client, `vue_ls` would not work without it.', vim.log.levels.ERROR)
+                return
+              end
+              local ts_client = clients[1]
+
+              local param = unpack(result)
+              local id, command, payload = unpack(param)
+              ts_client:exec_cmd({
+                title = 'vue_request_forward', -- You can give title anything as it's used to represent a command in the UI, `:h Client:exec_cmd`
+                command = 'typescript.tsserverRequest',
+                arguments = {
+                  command,
+                  payload,
+                },
+              }, { bufnr = context.bufnr }, function(_, r)
+                local response = r and r.body
+                -- TODO: handle error or response nil here, e.g. logging
+                -- NOTE: Do NOT return if there's an error or no response, just return nil back to the vue_ls to prevent memory leak
+                local response_data = { { id, response } }
+
+                ---@diagnostic disable-next-line: param-type-mismatch
+                client:notify('tsserver/response', response_data)
+              end)
+            end
+          end,
+          on_attach = function(client, _)
+            client.server_capabilities.documentFormattingProvider = nil
+            client.server_capabilities.documentHighlightProvider = nil
+            if client.server_capabilities.documentHighlightProvider then
+              vim.api.nvim_create_augroup('lsp_document_highlight', { clear = true })
+            end
+          end,
           init_options = {
             plugins = {
-              {
-                name = '@vue/typescript-plugin',
-                location = vim.fn.expand '$MASON/packages' .. '/vue-language-server' .. '/node_modules/@vue/language-server',
-                languages = {
-                  'typescript',
-                  'javascript',
-                  'javascriptreact',
-                  'typescriptreact',
-                  'vue',
-                },
-                configNamespace = 'typescript',
-              },
+              vue_plugin,
             },
           },
           filetypes = {
@@ -927,49 +962,19 @@ require('lazy').setup({
           },
         },
 
-        prettier = {},
-
-        volar = {
-          init_options = {
-            vue = {
-              hybridMode = true,
+        vtsls = {
+          settings = {
+            vtsls = {
+              tsserver = {
+                globalPlugins = {
+                  vue_plugin,
+                },
+              },
             },
           },
-          -- filetypes = {
-          --   'typescript',
-          --   'javascript',
-          --   'javascriptreact',
-          --   'typescriptreact',
-          --   'vue',
-          -- },
-          -- on_init = function(client)
-          --   client.handlers['tsserver/request'] = function(_, result, context)
-          --     local clients = vim.lsp.get_clients { bufnr = context.bufnr, name = 'vtsls' }
-          --     if #clients == 0 then
-          --       vim.notify('Could not found `vtsls` lsp client, vue_lsp would not work without it.', vim.log.levels.ERROR)
-          --       return
-          --     end
-          --     local ts_client = clients[1]
-          --
-          --     local param = unpack(result)
-          --     local id, command, payload = unpack(param)
-          --     ts_client:exec_cmd({
-          --       command = 'typescript.tsserverRequest',
-          --       arguments = {
-          --         command,
-          --         payload,
-          --       },
-          --     }, { bufnr = context.bufnr }, function(_, r)
-          --       local response_data = { { id, r.body } }
-          --       ---@diagnostic disable-next-line: param-type-mismatch
-          --       client:notify('tsserver/response', response_data)
-          --     end)
-          --   end
-          -- end,
-          -- on_attach = function(client, _)
-          --   client.server_capabilities.documentFormattingProvider = nil
-          -- end,
         },
+
+        vue_ls = {},
 
         lua_ls = {
           -- cmd = { ... },
@@ -985,6 +990,8 @@ require('lazy').setup({
             },
           },
         },
+
+        prettier = {},
 
         csharp_ls = {},
 
@@ -1029,7 +1036,9 @@ require('lazy').setup({
             server.capabilities = require('blink.cmp').get_lsp_capabilities(server.capabilities)
 
             -- For theming, see https://github.com/neovim/nvim-lspconfig/wiki/UI-Customization
-            require('lspconfig')[server_name].setup(server)
+            vim.lsp.config(server_name, server)
+            vim.lsp.enable(server_name)
+            -- require('lspconfig')[server_name].setup(server)
           end,
         },
       }
@@ -1709,6 +1718,7 @@ vim.api.nvim_create_autocmd('FileType', {
 require 'custom.commands.presentation'
 require 'custom.commands.fix_quickfix'
 require 'custom.commands.cmd'
+require 'custom.commands.markdown'
 
 local buffer_coloring = require 'custom.commands.buffer_color'
 buffer_coloring.setup()

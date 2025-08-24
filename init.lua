@@ -669,6 +669,13 @@ require('lazy').setup({
                 },
               },
             },
+            documentation = {
+              auto_show = true,
+              auto_show_delay_ms = 500,
+              window = {
+                border = 'single',
+              },
+            },
           },
 
           appearance = {
@@ -679,7 +686,7 @@ require('lazy').setup({
           signature = {
             enabled = true,
             window = {
-              border = 'rounded',
+              border = 'single',
             },
           },
         },

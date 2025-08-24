@@ -805,7 +805,15 @@ require('lazy').setup({
       })
 
       -- Signature
-      vim.keymap.set('i', '<C-s>', vim.lsp.buf.signature_help, { desc = 'Show signature help' })
+      vim.keymap.set('i', '<C-s>', function()
+        vim.lsp.buf.signature_help {
+          border = 'single',
+          max_height = 25,
+          max_width = 120,
+        }
+      end, {
+        desc = 'Show signature help',
+      })
 
       -- Define a highlight group for the border color
       vim.api.nvim_set_hl(0, 'FloatBorderCustom', { fg = '#404040' })
@@ -848,13 +856,14 @@ require('lazy').setup({
         },
       }
 
-      -- LSP hover and floating window config
-      vim.lsp.handlers['textDocument/hover'] = vim.lsp.with(vim.lsp.handlers.hover, {
-        border = border,
-      })
-
-      vim.lsp.handlers['textDocument/signatureHelp'] = vim.lsp.with(vim.lsp.handlers.signature_help, {
-        border = border,
+      vim.keymap.set('n', 'K', function()
+        vim.lsp.buf.hover {
+          border = 'single',
+          max_height = 25,
+          max_width = 120,
+        }
+      end, {
+        desc = 'Hover documentation',
       })
 
       -- Change diagnostic symbols in the sign column (gutter)
@@ -1527,9 +1536,13 @@ require('lazy').setup({
             -- Function to count unsaved buffers
             local function get_unsaved_buffers()
               local count = 0
-              for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-                if vim.api.nvim_buf_get_option(buf, 'modified') then
-                  count = count + 1
+              for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+                -- Check if the buffer is loaded and a real file buffer
+                if vim.api.nvim_buf_is_loaded(bufnr) and vim.bo[bufnr].buflisted then
+                  -- Access the 'modified' option directly from the buffer's option table
+                  if vim.bo[bufnr].modified then
+                    count = count + 1
+                  end
                 end
               end
               return count

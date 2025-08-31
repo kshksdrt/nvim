@@ -27,6 +27,7 @@ return {
   keys = {
     -- Basic debugging keymaps, feel free to change to your liking!
     {
+      -- Start or continue the debugger
       '<F5>',
       function()
         require('dap').continue()
@@ -34,39 +35,52 @@ return {
       desc = 'Debug: Start/Continue',
     },
     {
-      '<F1>',
+      -- Stop the debugger
+      '<S-F5>', -- Shift+F5
       function()
-        require('dap').step_into()
+        require('dap').terminate()
       end,
-      desc = 'Debug: Step Into',
+      desc = 'Debug: Stop',
     },
     {
-      '<F2>',
+      -- Restart the debugger
+      '<C-S-F5>', -- Ctrl+Shift+F5
       function()
-        require('dap').step_over()
+        require('dap').restart()
       end,
-      desc = 'Debug: Step Over',
+      desc = 'Debug: Restart',
     },
     {
-      '<F3>',
-      function()
-        require('dap').step_out()
-      end,
-      desc = 'Debug: Step Out',
-    },
-    {
-      '<leader>b',
+      -- Toggle a breakpoint on the current line
+      '<F9>',
       function()
         require('dap').toggle_breakpoint()
       end,
       desc = 'Debug: Toggle Breakpoint',
     },
     {
-      '<leader>B',
+      -- Step over the current line
+      '<F10>',
       function()
-        require('dap').set_breakpoint(vim.fn.input 'Breakpoint condition: ')
+        require('dap').step_over()
       end,
-      desc = 'Debug: Set Breakpoint',
+      desc = 'Debug: Step Over',
+    },
+    {
+      -- Step into the function on the current line
+      '<F11>',
+      function()
+        require('dap').step_into()
+      end,
+      desc = 'Debug: Step Into',
+    },
+    {
+      -- Step out of the current function
+      '<S-F11>', -- Shift+F11
+      function()
+        require('dap').step_out()
+      end,
+      desc = 'Debug: Step Out',
     },
     -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
     {

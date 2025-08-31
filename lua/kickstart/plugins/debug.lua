@@ -27,6 +27,7 @@ return {
   keys = {
     -- Basic debugging keymaps, feel free to change to your liking!
     {
+      -- Start or continue the debugger
       '<F5>',
       function()
         require('dap').continue()
@@ -34,39 +35,52 @@ return {
       desc = 'Debug: Start/Continue',
     },
     {
-      '<F1>',
+      -- Stop the debugger
+      '<S-F5>', -- Shift+F5
       function()
-        require('dap').step_into()
+        require('dap').terminate()
       end,
-      desc = 'Debug: Step Into',
+      desc = 'Debug: Stop',
     },
     {
-      '<F2>',
+      -- Restart the debugger
+      '<C-S-F5>', -- Ctrl+Shift+F5
       function()
-        require('dap').step_over()
+        require('dap').restart()
       end,
-      desc = 'Debug: Step Over',
+      desc = 'Debug: Restart',
     },
     {
-      '<F3>',
-      function()
-        require('dap').step_out()
-      end,
-      desc = 'Debug: Step Out',
-    },
-    {
-      '<leader>b',
+      -- Toggle a breakpoint on the current line
+      '<F9>',
       function()
         require('dap').toggle_breakpoint()
       end,
       desc = 'Debug: Toggle Breakpoint',
     },
     {
-      '<leader>B',
+      -- Step over the current line
+      '<F10>',
       function()
-        require('dap').set_breakpoint(vim.fn.input 'Breakpoint condition: ')
+        require('dap').step_over()
       end,
-      desc = 'Debug: Set Breakpoint',
+      desc = 'Debug: Step Over',
+    },
+    {
+      -- Step into the function on the current line
+      '<F11>',
+      function()
+        require('dap').step_into()
+      end,
+      desc = 'Debug: Step Into',
+    },
+    {
+      -- Step out of the current function
+      '<S-F11>', -- Shift+F11
+      function()
+        require('dap').step_out()
+      end,
+      desc = 'Debug: Step Out',
     },
     -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
     {
@@ -135,6 +149,68 @@ return {
     dap.listeners.after.event_initialized['dapui_config'] = dapui.open
     dap.listeners.before.event_terminated['dapui_config'] = dapui.close
     dap.listeners.before.event_exited['dapui_config'] = dapui.close
+
+    local platform_utils = require 'custom.utils.platform'
+
+    local codelldb_path = platform_utils.get_home_dir() .. '/Sources/CodeLLDB'
+    local install_codelldb = function()
+      -- Define URLs and paths
+      local codelldb_for_windows = 'https://github.com/vadimcn/codelldb/releases/download/v1.11.5/CodeLLDB-win32-x64.vsix'
+      local codelldb_for_linux = 'https://github.com/vadimcn/codelldb/releases/download/v1.11.5/CodeLLDB-linux-x64.vsix'
+
+      print '🚀 Starting CodeLLDB installation.'
+      local downloaded_file_path = platform_utils.get_home_dir() .. '/temp/CodeLLDB.vsix'
+
+      -- Step 1: Download the file
+      local download_successful =
+        platform_utils.run_command('curl -L -o ' .. downloaded_file_path .. ' ' .. (platform_utils.is_windows() and codelldb_for_windows or codelldb_for_linux))
+      if not download_successful then
+        print '❌ Download CodeLLDB failed.'
+        return
+      end
+      print '✅ Download CodeLLDB complete.'
+
+      -- Step 2: Create the destination directory
+      local making_dir_successful = platform_utils.run_command('mkdir -p ' .. codelldb_path)
+      if not making_dir_successful then
+        print '❌ Failed to create destination directory.'
+        return
+      end
+      print '📂 Destination directory ensured.'
+
+      -- Step 3: Extract the contents
+      local extraction_successful = platform_utils.run_command('unzip -o ' .. downloaded_file_path .. ' -d ' .. codelldb_path)
+      if not extraction_successful then
+        print '❌ Extraction failed.'
+        return
+      end
+      print '📦 Extraction complete.'
+
+      -- Step 4: Clean up the downloaded file
+      print '🧹 Cleanup complete.'
+
+      print '\n🎉 Success! CodeLLDB installation finished.'
+    end
+
+    -- Check if the CodeLLDB already installed
+    if not platform_utils.is_dir(codelldb_path) or platform_utils.is_dir_empty(codelldb_path) then
+      vim.notify('ℹ️ CodeLLDB directory ' .. codelldb_path .. ' is empty. Performing installation.')
+      install_codelldb()
+    end
+
+    dap.adapters.codelldb = {
+      type = 'executable',
+      command = codelldb_path .. '/extension/adapter/codelldb',
+    }
+
+    dap.configurations.rust = {
+      {
+        name = 'Attach with process',
+        type = 'codelldb',
+        request = 'attach',
+        pid = '${command:pickProcess}', -- Or pickMyProcess for only processes for the current user.
+      },
+    }
 
     -- Install golang specific config
     require('dap-go').setup {

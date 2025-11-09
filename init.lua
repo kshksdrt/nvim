@@ -140,7 +140,7 @@ vim.schedule(function()
   vim.o.clipboard = 'unnamedplus'
 end)
 
--- Enable break indent
+-- Enable break dent
 vim.o.breakindent = true
 
 -- Save undo history
@@ -978,18 +978,18 @@ require('lazy').setup({
           },
         },
 
-        vtsls = {
-          settings = {
-            vtsls = {
-              tsserver = {
-                globalPlugins = {
-                  vue_plugin,
-                },
-              },
-            },
-          },
-        },
-
+        -- vtsls = {
+        --   settings = {
+        --     vtsls = {
+        --       tsserver = {
+        --         globalPlugins = {
+        --           vue_plugin,
+        --         },
+        --       },
+        --     },
+        --   },
+        -- },
+        --
         vue_ls = {},
 
         lua_ls = {
@@ -1647,7 +1647,7 @@ require('lazy').setup({
         --  the list of additional_vim_regex_highlighting and disabled languages for indent.
         additional_vim_regex_highlighting = { 'ruby' },
       },
-      indent = { enable = true, disable = { 'ruby' } },
+      indent = { enable = false, disable = { 'ruby' } },
     },
     config = function(_, opts)
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
@@ -1687,6 +1687,65 @@ require('lazy').setup({
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
   require 'kickstart.plugins.debug',
+  {
+    'saghen/blink.indent',
+    --- @module 'blink.indent'
+    --- @type blink.indent.Config
+    config = function()
+      local indent = require 'blink-indent'
+      indent.setup {
+        blocked = {
+          -- default: 'terminal', 'quickfix', 'nofile', 'prompt'
+          buftypes = { include_defaults = true },
+          -- default: 'lspinfo', 'packer', 'checkhealth',
+          -- 'help', 'man', 'gitcommit', 'dashboard', ''
+          filetypes = { include_defaults = true },
+        },
+        static = {
+          enabled = true,
+          char = '▎',
+          priority = 1,
+          -- specify multiple highlights here for rainbow-style indent guides
+          -- highlights = {
+          --   'BlinkIndentRed', 'BlinkIndentOrange', 'BlinkIndentYellow',
+          --   'BlinkIndentGreen', 'BlinkIndentViolet', 'BlinkIndentCyan'
+          -- },
+          highlights = { 'BlinkIndent' },
+        },
+        scope = {
+          enabled = true,
+          char = '▎',
+          priority = 1000,
+          -- set this to a single highlight, such as 'BlinkIndent' to disable
+          -- rainbow-style indent guides
+          -- highlights = { 'BlinkIndentScope' },
+          -- optionally add:
+          -- 'BlinkIndentRed', 'BlinkIndentCyan',
+          -- 'BlinkIndentYellow', 'BlinkIndentGreen'
+          highlights = {
+            'BlinkIndentCyan',
+          },
+
+          -- Show underlines on the line above the current scope
+          underline = {
+            enabled = false,
+            -- optionally add:
+            -- 'BlinkIndentRedUnderline', 'BlinkIndentCyanUnderline',
+            -- 'BlinkIndentYellowUnderline', 'BlinkIndentGreenUnderline'
+            highlights = {
+              'BlinkIndentOrangeUnderline',
+              'BlinkIndentVioletUnderline',
+              'BlinkIndentBlueUnderline',
+            },
+          },
+        },
+      }
+      vim.api.nvim_set_hl(0, 'BlinkIndent', {
+        fg = '#2B2B2B',
+        nocombine = false,
+      })
+    end,
+  },
   require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',

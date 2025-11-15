@@ -13,6 +13,56 @@ return {
     },
   },
   keys = {
+    {
+      'gld',
+      function()
+        Snacks.picker.lsp_definitions()
+      end,
+      desc = 'Goto Definition',
+    },
+    {
+      'glD',
+      function()
+        Snacks.picker.lsp_declarations()
+      end,
+      desc = 'Goto Declaration',
+    },
+    {
+      'glr',
+      function()
+        Snacks.picker.lsp_references()
+      end,
+      nowait = true,
+      desc = 'References',
+    },
+    {
+      'glI',
+      function()
+        Snacks.picker.lsp_implementations()
+      end,
+      desc = 'Goto Implementation',
+    },
+    {
+      'gly',
+      function()
+        Snacks.picker.lsp_type_definitions()
+      end,
+      desc = 'Goto T[y]pe Definition',
+    },
+    {
+      'glai',
+      function()
+        Snacks.picker.lsp_incoming_calls()
+      end,
+      desc = 'C[a]lls Incoming',
+    },
+    {
+      'glao',
+      function()
+        Snacks.picker.lsp_outgoing_calls()
+      end,
+      desc = 'C[a]lls Outgoing',
+    },
     -- Main pickers
     {
       '<leader>.',

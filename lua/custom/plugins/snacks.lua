@@ -14,6 +14,13 @@ return {
   },
   keys = {
     {
+      '<leader>g',
+      function()
+        Snacks.lazygit()
+      end,
+      desc = '[G]it: lazygit',
+    },
+    {
       'gld',
       function()
         Snacks.picker.lsp_definitions()

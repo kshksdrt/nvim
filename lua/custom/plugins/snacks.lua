@@ -15,8 +15,8 @@ return {
   keys = {
     {
       '<leader>g',
-      function()
-        Snacks.lazygit()
+      function(opts)
+        Snacks.lazygit.open(opts)
       end,
       desc = '[G]it: lazygit',
     },

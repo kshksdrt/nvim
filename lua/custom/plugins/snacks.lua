@@ -2,19 +2,6 @@ return {
   'folke/snacks.nvim',
   lazy = false,
   priority = 1000,
-  init = function()
-    vim.api.nvim_create_autocmd('ColorScheme', {
-      pattern = '*',
-      callback = function()
-        -- Link the border to "Normal" to make it the same brightness as your text
-        -- (Standard borders are often darker/dimmed)
-        vim.api.nvim_set_hl(0, 'SnacksPickerBorder', { link = 'Normal' })
-
-        -- Alternatively, set a specific light hex color:
-        -- vim.api.nvim_set_hl(0, "SnacksPickerBorder", { fg = "#DCD7BA" })
-      end,
-    })
-  end,
   ---@type snacks.Config
   opts = {
     dashboard = {
@@ -68,14 +55,16 @@ return {
           row = -1,
           width = 0,
           height = 0.6,
-          border = 'top', -- Root border
+          border = 'none', -- Root border
           {
             box = 'vertical',
             border = 'none',
             {
               win = 'input',
               height = 1,
-              border = 'none',
+              title = '{title} {live}',
+              title_pos = 'center',
+              border = 'single',
             },
             {
               win = 'list',
@@ -85,7 +74,7 @@ return {
           {
             win = 'preview',
             title = '{preview}',
-            border = 'none',
+            border = 'left',
             width = 0.5,
           },
         },
@@ -95,8 +84,8 @@ return {
           auto_close = true,
           ignored = true,
           hidden = true,
-          focus = 'input',
-          start_insert = true,
+          -- focus = 'input',
+          -- start_insert = true,
           prompt = '  ',
           layout = {
             layout = {
@@ -126,17 +115,6 @@ return {
             },
           },
           follow_file = true,
-        },
-        win = {
-          input = {
-            border = 'single',
-          },
-          list = {
-            border = 'single',
-          },
-          preview = {
-            border = 'single',
-          },
         },
       },
       config = function()

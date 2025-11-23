@@ -4,7 +4,119 @@ return {
   priority = 1000,
   ---@type snacks.Config
   opts = {
+    dashboard = {
+      -- preset = {
+      --   -- This preset automatically adds the "Restore Session" section
+      --   -- if persistence.nvim is installed
+      --   keys = {
+      --     { icon = ' ', key = 's', desc = 'Restore Session', section = 'session' },
+      --     -- ... other keys
+      --   },
+      -- },
+      sections = {
+        -- { section = "header" }, -- <--- I commented this out to remove the logo/text
+        {
+          section = 'keys',
+          gap = 1,
+          padding = 1,
+        },
+        -- Shows your keymaps
+        -- { pane = 2, icon = ' ', title = 'Recent Files', section = 'recent_files', indent = 2, padding = 1 },
+        -- { pane = 2, icon = ' ', title = 'Projects', section = 'projects', indent = 2, padding = 1 },
+        {
+          pane = 2,
+          icon = ' ',
+          title = 'Git Status',
+          section = 'terminal',
+          enabled = function()
+            return vim.fn.isdirectory '.git' == 1 or vim.fn.filereadable(vim.fn.getcwd() .. '/.git') == 1
+          end,
+          cmd = 'git status --short --branch --renames',
+          height = 5,
+          padding = 1,
+          ttl = 5 * 60,
+          indent = 3,
+        },
+        {
+          section = 'startup',
+        },
+      },
+    },
+    explorer = {
+      enabled = true,
+      replace_netrw = true,
+      trash = true,
+    },
     picker = {
+      layout = {
+        -- This applies to the preset layouts (like 'default', 'vscode', 'ivy')
+        layout = {
+          box = 'horizontal',
+          row = -1,
+          width = 0,
+          height = 0.6,
+          border = 'none', -- Root border
+          {
+            box = 'vertical',
+            border = 'none',
+            {
+              win = 'input',
+              height = 1,
+              title = '{title} {live}',
+              title_pos = 'center',
+              border = 'single',
+            },
+            {
+              win = 'list',
+              border = 'none',
+            },
+          },
+          {
+            win = 'preview',
+            title = '{preview}',
+            border = 'left',
+            width = 0.5,
+          },
+        },
+      },
+      sources = {
+        explorer = {
+          auto_close = true,
+          ignored = true,
+          hidden = true,
+          -- focus = 'input',
+          -- start_insert = true,
+          prompt = '  ',
+          layout = {
+            layout = {
+              -- Define the vertical layout explicitly
+              box = 'vertical',
+              position = 'right',
+              width = 40,
+              -- The input window (search bar) with no border
+              {
+                win = 'input',
+                height = 1,
+                border = 'bottom',
+              },
+              -- The file list window with no border
+              {
+                win = 'list',
+                border = 'none',
+              },
+            },
+          },
+          win = {
+            list = {
+              wo = {
+                number = false,
+                relativenumber = false,
+              },
+            },
+          },
+          follow_file = true,
+        },
+      },
       config = function()
         vim.api.nvim_set_hl(0, 'NonText', {
           fg = '#8F9491',
@@ -14,9 +126,16 @@ return {
   },
   keys = {
     {
-      '<leader>g',
+      '\\',
       function()
-        Snacks.lazygit()
+        Snacks.explorer()
+      end,
+      desc = 'Open Explorer',
+    },
+    {
+      '<leader>g',
+      function(opts)
+        Snacks.lazygit.open(opts)
       end,
       desc = '[G]it: lazygit',
     },

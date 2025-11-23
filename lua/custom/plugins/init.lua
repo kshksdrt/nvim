@@ -38,7 +38,7 @@ return {
         underline_links = true,
 
         -- Disable nvim-tree background color
-        disable_nvimtree_bg = true,
+        -- disable_nvimtree_bg = true,
 
         -- Override highlight groups (see ./lua/vscode/theme.lua)
         group_overrides = {
@@ -206,15 +206,15 @@ return {
       'nvim-treesitter/nvim-treesitter',
     },
   },
-  {
-    'niba/continue.nvim',
-    -- remember to set lazy as false
-    lazy = false,
-    -- call setup method or set config = true
-    config = true,
-
-    ---@module "continue"
-    ---@type Continue.Config
-    opts = {},
-  },
+  -- {
+  --   'niba/continue.nvim',
+  --   -- remember to set lazy as false
+  --   lazy = false,
+  --   -- call setup method or set config = true
+  --   config = true,
+  --
+  --   ---@module "continue"
+  --   ---@type Continue.Config
+  --   opts = {},
+  -- },
 }

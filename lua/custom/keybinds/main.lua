@@ -40,3 +40,6 @@ vim.keymap.set('n', '<C-l>', execute_bnext, { noremap = true, silent = true })
 
 vim.keymap.set('n', '<C-M>', execute_bnext, { noremap = true, silent = true })
 vim.keymap.set('n', '<C-,>', execute_bprevious, { noremap = true, silent = true })
+
+-- Close all buffers
+vim.keymap.set('n', 'z/', ':bufdo bd!<CR>', { noremap = true, silent = true, desc = 'Delete all buffers' })

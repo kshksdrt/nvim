@@ -102,7 +102,7 @@ if vim.g.neovide then
   vim.g.neovide_cursor_animation_length = 0.1 -- Cursor position animation
   vim.g.neovide_position_animation_length = 0 -- Window position animation
 
-  vim.g.neovide_refresh_rate = 144
+  vim.g.neovide_refresh_rate = 60
 
   vim.g.neovide_cursor_animate_command_line = false
   vim.g.neovide_cursor_antialiasing = false

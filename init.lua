@@ -93,10 +93,16 @@ vim.g.maplocalleader = ' '
 vim.g.have_nerd_font = true
 
 if vim.g.neovide then
-  vim.g.neovide_scroll_animation_length = 0
-  vim.g.neovide_cursor_animation_length = 0
+  vim.g.neovide_progress_bar_enabled = true
+  vim.g.neovide_progress_bar_height = 5.0
+  vim.g.neovide_progress_bar_animation_speed = 200.0
+  vim.g.neovide_progress_bar_hide_delay = 0.2
 
-  vim.g.neovide_refresh_rate = 60
+  -- vim.g.neovide_scroll_animation_length = 0.2 -- Default is good enough
+  vim.g.neovide_cursor_animation_length = 0.1 -- Cursor position animation
+  vim.g.neovide_position_animation_length = 0 -- Window position animation
+
+  vim.g.neovide_refresh_rate = 144
 
   vim.g.neovide_cursor_animate_command_line = false
   vim.g.neovide_cursor_antialiasing = false
@@ -104,6 +110,17 @@ if vim.g.neovide then
   vim.g.neovide_cursor_animate_in_insert_mode = false
 
   vim.g.neovide_hide_mouse_when_typing = true
+
+  vim.g.neovide_floating_blur_amount_x = 0
+  vim.g.neovide_floating_blur_amount_y = 0
+
+  vim.g.neovide_floating_shadow = false
+  vim.g.neovide_floating_z_height = 10
+  vim.g.neovide_light_angle_degrees = 45
+  vim.g.neovide_light_radius = 0
+
+  vim.g.neovide_opacity = 1
+  vim.g.neovide_normal_opacity = 1
 end
 
 -- [[ Setting options ]]

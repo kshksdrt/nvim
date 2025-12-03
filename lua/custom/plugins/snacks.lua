@@ -74,7 +74,7 @@ return {
           {
             win = 'preview',
             title = '{preview}',
-            border = 'left',
+            border = 'single',
             width = 0.5,
           },
         },

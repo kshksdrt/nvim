@@ -55,4 +55,33 @@ return {
       map('<leader>mr', cm.remove_all_metadata, '[R]emove all metadata')
     end,
   },
+  -- Typst
+  {
+    'sylvanfranklin/omni-preview.nvim',
+    dependencies = {
+      -- Typst
+      { 'chomosuke/typst-preview.nvim', lazy = true },
+      -- CSV
+      { 'hat0uma/csvview.nvim', lazy = true },
+      -- Markdown
+      { 'toppair/peek.nvim', lazy = true, build = 'deno task --quiet build:fast' },
+    },
+    config = function()
+      require('omni-preview').setup()
+      require('typst-preview').setup {
+        app = 'browser',
+        dependencies_bin = {
+          ['websocat'] = nil,
+        },
+      }
+      require('peek').setup {
+        app = 'browser',
+      }
+      require('csvview').setup {
+        view = {
+          display = 'border',
+        },
+      }
+    end,
+  },
 }

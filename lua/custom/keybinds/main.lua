@@ -43,3 +43,16 @@ vim.keymap.set('n', '<C-,>', execute_bprevious, { noremap = true, silent = true 
 
 -- Close all buffers
 vim.keymap.set('n', 'z/', ':bufdo bd!<CR>', { noremap = true, silent = true, desc = 'Delete all buffers' })
+--
+-- Copy cursor location
+vim.keymap.set('n', '<leader>cc', function()
+  local file = vim.fn.expand '%:p'
+  local line = vim.fn.line '.'
+  local loc = '+' .. line .. ' ' .. file
+  vim.fn.setreg('+', loc) -- system clipboard
+end, { desc = 'Copy [C]ursor [C]ommand' })
+
+vim.keymap.set('n', '<leader>cl', function()
+  local loc = vim.fn.expand '%:p' .. ':' .. vim.fn.line '.'
+  vim.fn.setreg('+', loc) -- use "+" for system clipboard end, { desc = "Copy full path:line to clipboard" })
+end, { desc = 'Copy [C]ursor [L]ocation' })

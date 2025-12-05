@@ -1034,6 +1034,13 @@ require('lazy').setup({
         markdown_oxide = {},
 
         rust_analyzer = {},
+
+        tinymist = {
+          settings = {
+            formatterMode = 'typstyle',
+            exportPdf = 'never',
+          },
+        },
       }
 
       -- Ensure the servers and tools above are installed

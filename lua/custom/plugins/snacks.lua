@@ -4,6 +4,21 @@ return {
   priority = 1000,
   ---@type snacks.Config
   opts = {
+    input = {
+      enabled = true,
+      icon = '',
+      win = {
+        relative = 'cursor',
+        border = 'single',
+        input = {
+          keys = {
+            -- This ensures specific key handling for the input window
+            n_esc = { '<Esc>', { 'cmp_close', 'cancel' }, mode = 'n', desc = 'Close Input' },
+            i_esc = { '<Esc>', { 'cmp_close', 'cancel' }, mode = 'i', desc = 'Close Input' },
+          },
+        },
+      },
+    },
     dashboard = {
       -- preset = {
       --   -- This preset automatically adds the "Restore Session" section
@@ -20,7 +35,6 @@ return {
           gap = 1,
           padding = 1,
         },
-        -- Shows your keymaps
         -- { pane = 2, icon = ' ', title = 'Recent Files', section = 'recent_files', indent = 2, padding = 1 },
         -- { pane = 2, icon = ' ', title = 'Projects', section = 'projects', indent = 2, padding = 1 },
         {
@@ -80,6 +94,30 @@ return {
         },
       },
       sources = {
+        select = {
+          layout = {
+            -- "cursor" positions it relative to the current cursor position
+            relative = 'cursor',
+            width = 80,
+            min_width = 80,
+
+            -- Optional: Minimalist border styling
+            layout = {
+              box = 'vertical',
+              backdrop = false, -- Removes the dark background dimming
+              width = 80,
+              min_width = 80,
+              height = 0.4,
+              { win = 'input', height = 1, border = 'single' },
+              { win = 'list', border = 'single' },
+            },
+          },
+          win = {
+            input = {
+              keys = { ['<Esc>'] = 'close' },
+            },
+          },
+        },
         explorer = {
           auto_close = true,
           ignored = true,

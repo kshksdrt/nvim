@@ -43,7 +43,7 @@ vim.keymap.set('n', '<C-,>', execute_bprevious, { noremap = true, silent = true 
 
 -- Close all buffers
 vim.keymap.set('n', 'z/', ':bufdo bd!<CR>', { noremap = true, silent = true, desc = 'Delete all buffers' })
---
+
 -- Copy cursor location
 vim.keymap.set('n', '<leader>cc', function()
   local file = vim.fn.expand '%:p'

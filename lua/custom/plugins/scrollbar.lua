@@ -45,6 +45,14 @@ return {
           highlight = 'GitSignsDelete',
         },
       },
+      excluded_filetypes = {
+        'cmp_docs',
+        'cmp_menu',
+        'noice',
+        'prompt',
+        'TelescopePrompt',
+        'snacks_input',
+      },
     }
   end,
 }

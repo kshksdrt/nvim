@@ -3,22 +3,9 @@
 --
 -- See the kickstart.nvim README for more information
 return {
-  -- Make some UI stuff pretty
-  {
-    'stevearc/dressing.nvim',
-    opts = {},
-  },
   -- Git wrapper
   {
     'tpope/vim-fugitive',
-  },
-  -- Claims to be lighter-weight and improve how fzf performance
-  {
-    'ibhagwan/fzf-lua',
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
-    config = function()
-      require('fzf-lua').setup {}
-    end,
   },
   -- Adds VS code's color scheme
   {
@@ -59,7 +46,6 @@ return {
   -- {
   --   'akinsho/bufferline.nvim',
   --   version = '*',
-  --   dependencies = 'nvim-tree/nvim-web-devicons',
   --   config = function()
   --     local bufferline = require 'bufferline'
   --     bufferline.setup {

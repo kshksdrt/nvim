@@ -679,6 +679,7 @@ require('lazy').setup({
                 },
               },
             },
+
             documentation = {
               auto_show = true,
               auto_show_delay_ms = 500,
@@ -688,11 +689,40 @@ require('lazy').setup({
             },
           },
 
+          sources = {
+            default = { 'lsp', 'path', 'snippets', 'buffer' },
+
+            providers = {
+              cmdline = {
+                min_keyword_length = function(ctx)
+                  -- when typing a command, only show when the keyword is 3 characters or longer
+                  if ctx.mode == 'cmdline' and string.find(ctx.line, ' ') == nil then
+                    return 3
+                  end
+                  return 0
+                end,
+              },
+            },
+          },
+
+          cmdline = {
+            keymap = {
+              preset = 'inherit',
+            },
+            completion = {
+              menu = {
+                auto_show = true,
+                min_keyword_length = 3,
+              },
+            },
+          },
+
           appearance = {
             -- set to 'mono' for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
             -- adjusts spacing to ensure icons are aligned
             nerd_font_variant = 'mono',
           },
+
           signature = {
             enabled = true,
             window = {

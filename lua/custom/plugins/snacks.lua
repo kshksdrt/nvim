@@ -4,6 +4,9 @@ return {
   priority = 1000,
   ---@type snacks.Config
   opts = {
+    notifier = {
+      enabled = true,
+    },
     input = {
       enabled = true,
       icon = '',

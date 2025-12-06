@@ -99,7 +99,7 @@ if vim.g.neovide then
   vim.g.neovide_progress_bar_hide_delay = 0.2
 
   -- vim.g.neovide_scroll_animation_length = 0.2 -- Default is good enough
-  vim.g.neovide_cursor_animation_length = 0.1 -- Cursor position animation
+  vim.g.neovide_cursor_animation_length = 0 -- Cursor position animation
   vim.g.neovide_position_animation_length = 0 -- Window position animation
 
   vim.g.neovide_refresh_rate = 144

@@ -6,6 +6,13 @@ return {
   opts = {
     notifier = {
       enabled = true,
+      style = 'compact',
+
+      -- "false" makes the list grow from the bottom up
+      top_down = false,
+
+      -- Optional: Add a small margin so it doesn't touch the statusline
+      margin = { bottom = 1, right = 1 },
     },
     input = {
       enabled = true,

@@ -1057,7 +1057,23 @@ require('lazy').setup({
 
         markdown_oxide = {},
 
-        rust_analyzer = {},
+        rust_analyzer = {
+          settings = {
+            checkOnSave = true,
+            check = {
+              command = 'check',
+              extraArgs = { '--jobs=2' },
+            },
+            cargo = {
+              buildScripts = {
+                enable = false,
+              },
+            },
+            procMacro = {
+              enable = true,
+            },
+          },
+        },
 
         tinymist = {
           settings = {

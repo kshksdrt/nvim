@@ -7,41 +7,6 @@ return {
   {
     'tpope/vim-fugitive',
   },
-  -- Adds VS code's color scheme
-  {
-    'Mofiqul/vscode.nvim',
-    config = function()
-      -- Lua:
-      -- For dark theme (neovim's default)
-      vim.o.background = 'dark'
-      -- For light theme
-      -- vim.o.background = 'light'
-
-      require('vscode').setup {
-        transparent = false,
-        italic_comments = false,
-
-        -- Underline `@markup.link.*` variants
-        underline_links = true,
-
-        -- Disable nvim-tree background color
-        -- disable_nvimtree_bg = true,
-
-        -- Override highlight groups (see ./lua/vscode/theme.lua)
-        group_overrides = {
-          -- this supports the same val table as vim.api.nvim_set_hl
-          -- use colors from this colorscheme by requiring vscode.colors!
-          CursorLine = {
-            bg = '#303030',
-          },
-        },
-      }
-      require('vscode').load()
-
-      -- load the theme without affecting devicon colors.
-      vim.cmd.colorscheme 'vscode'
-    end,
-  },
   -- -- To display buffers like vscode tabs with indicators for unsaved changes
   -- {
   --   'akinsho/bufferline.nvim',
@@ -66,8 +31,12 @@ return {
     'ggandor/leap.nvim',
     version = '*',
     config = function()
-      vim.keymap.set({ 'n', 'x', 'o' }, '<leader>j', '<Plug>(leap-forward-to)', { noremap = true, silent = true, desc = 'Leap forward' })
-      vim.keymap.set({ 'n', 'x', 'o' }, '<leader>k', '<Plug>(leap-backward-to)', { noremap = true, silent = true, desc = 'Leap backward' })
+      vim.keymap.set({ 'n', 'x', 'o' }, '<leader>j', function()
+        require('leap').leap { forward = true }
+      end, { noremap = true, silent = true, desc = 'Leap forward' })
+      vim.keymap.set({ 'n', 'x', 'o' }, '<leader>k', function()
+        require('leap').leap { backward = true }
+      end, { noremap = true, silent = true, desc = 'Leap forward' })
       require('leap').opts.preview_filter = function()
         return false
       end

@@ -1057,7 +1057,23 @@ require('lazy').setup({
 
         markdown_oxide = {},
 
-        rust_analyzer = {},
+        rust_analyzer = {
+          settings = {
+            checkOnSave = true,
+            check = {
+              command = 'check',
+              extraArgs = { '--jobs=2' },
+            },
+            cargo = {
+              buildScripts = {
+                enable = false,
+              },
+            },
+            procMacro = {
+              enable = true,
+            },
+          },
+        },
 
         tinymist = {
           settings = {
@@ -1556,7 +1572,7 @@ require('lazy').setup({
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
   { -- Collection of various small independent plugins/modules
-    'echasnovski/mini.nvim',
+    'nvim-mini/mini.nvim',
     version = '*',
     config = function()
       -- Better Around/Inside textobjects

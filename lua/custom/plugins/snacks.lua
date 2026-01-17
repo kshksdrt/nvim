@@ -3,176 +3,190 @@ return {
   lazy = false,
   priority = 1000,
   ---@type snacks.Config
-  opts = {
-    notifier = {
-      enabled = true,
-      style = 'compact',
+  opts = function()
+    -- Toggle the profiler
+    Snacks.toggle.profiler():map '<leader>sx'
+    -- Toggle the profiler highlights
+    Snacks.toggle.profiler_highlights():map '<leader>sy'
 
-      -- "false" makes the list grow from the bottom up
-      top_down = false,
+    return {
+      notifier = {
+        enabled = true,
+        style = 'compact',
 
-      -- Optional: Add a small margin so it doesn't touch the statusline
-      margin = { bottom = 1, right = 1 },
-    },
-    input = {
-      enabled = true,
-      icon = '',
-      win = {
-        relative = 'cursor',
-        border = 'single',
-        input = {
-          keys = {
-            -- This ensures specific key handling for the input window
-            n_esc = { '<Esc>', { 'cmp_close', 'cancel' }, mode = 'n', desc = 'Close Input' },
-            i_esc = { '<Esc>', { 'cmp_close', 'cancel' }, mode = 'i', desc = 'Close Input' },
+        -- "false" makes the list grow from the bottom up
+        top_down = false,
+
+        -- Optional: Add a small margin so it doesn't touch the statusline
+        margin = { bottom = 1, right = 1 },
+      },
+      input = {
+        enabled = true,
+        icon = '',
+        win = {
+          relative = 'cursor',
+          border = 'single',
+          input = {
+            keys = {
+              -- This ensures specific key handling for the input window
+              n_esc = { '<Esc>', { 'cmp_close', 'cancel' }, mode = 'n', desc = 'Close Input' },
+              i_esc = { '<Esc>', { 'cmp_close', 'cancel' }, mode = 'i', desc = 'Close Input' },
+            },
           },
         },
       },
-    },
-    dashboard = {
-      -- preset = {
-      --   -- This preset automatically adds the "Restore Session" section
-      --   -- if persistence.nvim is installed
-      --   keys = {
-      --     { icon = ' ', key = 's', desc = 'Restore Session', section = 'session' },
-      --     -- ... other keys
-      --   },
-      -- },
-      sections = {
-        -- { section = "header" }, -- <--- I commented this out to remove the logo/text
-        {
-          section = 'keys',
-          gap = 1,
-          padding = 1,
-        },
-        -- { pane = 2, icon = ' ', title = 'Recent Files', section = 'recent_files', indent = 2, padding = 1 },
-        -- { pane = 2, icon = ' ', title = 'Projects', section = 'projects', indent = 2, padding = 1 },
-        {
-          pane = 2,
-          icon = ' ',
-          title = 'Git Status',
-          section = 'terminal',
-          enabled = function()
-            return vim.fn.isdirectory '.git' == 1 or vim.fn.filereadable(vim.fn.getcwd() .. '/.git') == 1
-          end,
-          cmd = 'git status --short --branch --renames',
-          height = 5,
-          padding = 1,
-          ttl = 5 * 60,
-          indent = 3,
-        },
-        {
-          section = 'startup',
+      dashboard = {
+        -- preset = {
+        --   -- This preset automatically adds the "Restore Session" section
+        --   -- if persistence.nvim is installed
+        --   keys = {
+        --     { icon = ' ', key = 's', desc = 'Restore Session', section = 'session' },
+        --     -- ... other keys
+        --   },
+        -- },
+        sections = {
+          -- { section = "header" }, -- <--- I commented this out to remove the logo/text
+          {
+            section = 'keys',
+            gap = 1,
+            padding = 1,
+          },
+          -- { pane = 2, icon = ' ', title = 'Recent Files', section = 'recent_files', indent = 2, padding = 1 },
+          -- { pane = 2, icon = ' ', title = 'Projects', section = 'projects', indent = 2, padding = 1 },
+          {
+            pane = 2,
+            icon = ' ',
+            title = 'Git Status',
+            section = 'terminal',
+            enabled = function()
+              return vim.fn.isdirectory '.git' == 1 or vim.fn.filereadable(vim.fn.getcwd() .. '/.git') == 1
+            end,
+            cmd = 'git status --short --branch --renames',
+            height = 5,
+            padding = 1,
+            ttl = 5 * 60,
+            indent = 3,
+          },
+          {
+            section = 'startup',
+          },
         },
       },
-    },
-    explorer = {
-      enabled = true,
-      replace_netrw = true,
-      trash = true,
-    },
-    picker = {
-      layout = {
-        -- This applies to the preset layouts (like 'default', 'vscode', 'ivy')
+      explorer = {
+        enabled = true,
+        replace_netrw = true,
+        trash = true,
+      },
+      picker = {
         layout = {
-          box = 'horizontal',
-          row = -1,
-          width = 0,
-          height = 0.6,
-          border = 'none', -- Root border
-          {
-            box = 'vertical',
-            border = 'none',
+          -- This applies to the preset layouts (like 'default', 'vscode', 'ivy')
+          layout = {
+            box = 'horizontal',
+            row = -1,
+            width = 0,
+            height = 0.6,
+            border = 'none', -- Root border
             {
-              win = 'input',
-              height = 1,
-              title = '{title} {live}',
-              title_pos = 'center',
-              border = 'single',
-            },
-            {
-              win = 'list',
+              box = 'vertical',
               border = 'none',
-            },
-          },
-          {
-            win = 'preview',
-            title = '{preview}',
-            border = 'single',
-            width = 0.5,
-          },
-        },
-      },
-      sources = {
-        select = {
-          layout = {
-            -- "cursor" positions it relative to the current cursor position
-            relative = 'cursor',
-            width = 80,
-            min_width = 80,
-
-            -- Optional: Minimalist border styling
-            layout = {
-              box = 'vertical',
-              backdrop = false, -- Removes the dark background dimming
-              width = 80,
-              min_width = 80,
-              height = 0.4,
-              { win = 'input', height = 1, border = 'single' },
-              { win = 'list', border = 'single' },
-            },
-          },
-          win = {
-            input = {
-              keys = { ['<Esc>'] = 'close' },
-            },
-          },
-        },
-        explorer = {
-          auto_close = true,
-          ignored = true,
-          hidden = true,
-          -- focus = 'input',
-          -- start_insert = true,
-          prompt = '  ',
-          layout = {
-            layout = {
-              -- Define the vertical layout explicitly
-              box = 'vertical',
-              position = 'right',
-              width = 40,
-              -- The input window (search bar) with no border
               {
                 win = 'input',
                 height = 1,
-                border = 'bottom',
+                title = '{title} {live}',
+                title_pos = 'center',
+                border = 'single',
               },
-              -- The file list window with no border
               {
                 win = 'list',
                 border = 'none',
               },
             },
+            {
+              win = 'preview',
+              title = '{preview}',
+              border = 'single',
+              width = 0.5,
+            },
           },
-          win = {
-            list = {
-              wo = {
-                number = false,
-                relativenumber = false,
+        },
+        sources = {
+          select = {
+            layout = {
+              -- "cursor" positions it relative to the current cursor position
+              relative = 'cursor',
+              width = 80,
+              min_width = 80,
+
+              -- Optional: Minimalist border styling
+              layout = {
+                box = 'vertical',
+                backdrop = false, -- Removes the dark background dimming
+                width = 80,
+                min_width = 80,
+                height = 0.4,
+                { win = 'input', height = 1, border = 'single' },
+                { win = 'list', border = 'single' },
+              },
+            },
+            win = {
+              input = {
+                keys = { ['<Esc>'] = 'close' },
               },
             },
           },
-          follow_file = true,
+          explorer = {
+            auto_close = true,
+            ignored = true,
+            hidden = true,
+            -- focus = 'input',
+            -- start_insert = true,
+            prompt = '  ',
+            layout = {
+              layout = {
+                -- Define the vertical layout explicitly
+                box = 'vertical',
+                position = 'right',
+                width = 40,
+                -- The input window (search bar) with no border
+                {
+                  win = 'input',
+                  height = 1,
+                  border = 'bottom',
+                },
+                -- The file list window with no border
+                {
+                  win = 'list',
+                  border = 'none',
+                },
+              },
+            },
+            win = {
+              list = {
+                wo = {
+                  number = false,
+                  relativenumber = false,
+                },
+              },
+            },
+            follow_file = true,
+          },
         },
+        config = function()
+          vim.api.nvim_set_hl(0, 'NonText', {
+            fg = '#8F9491',
+          })
+        end,
       },
-      config = function()
-        vim.api.nvim_set_hl(0, 'NonText', {
-          fg = '#8F9491',
-        })
-      end,
-    },
-  },
+    }
+  end,
   keys = {
+    {
+      '<leader>su',
+      function()
+        Snacks.profiler.scratch()
+      end,
+      desc = 'Profiler Scratch Bufer',
+    },
     {
       '\\',
       function()

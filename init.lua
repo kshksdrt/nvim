@@ -634,7 +634,12 @@ require('lazy').setup({
       {
         'mason-org/mason.nvim',
         version = '^1.0.0',
-        opts = {},
+        opts = {
+          registries = {
+            'github:mason-org/mason-registry',
+            'github:Crashdummyy/mason-registry',
+          },
+        },
       },
       {
         'mason-org/mason-lspconfig.nvim',
@@ -818,29 +823,29 @@ require('lazy').setup({
           --
           -- When you move your cursor, the highlights will be cleared (the second autocommand).
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
-            local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
-            vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.document_highlight,
-            })
-
-            vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
-              buffer = event.buf,
-              group = highlight_augroup,
-              callback = vim.lsp.buf.clear_references,
-            })
-
-            vim.api.nvim_create_autocmd('LspDetach', {
-              group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
-              callback = function(event2)
-                vim.lsp.buf.clear_references()
-                vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
-              end,
-            })
-          end
-
+          -- if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
+          --   local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
+          --   vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
+          --     buffer = event.buf,
+          --     group = highlight_augroup,
+          --     callback = vim.lsp.buf.document_highlight,
+          --   })
+          --
+          --   vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+          --     buffer = event.buf,
+          --     group = highlight_augroup,
+          --     callback = vim.lsp.buf.clear_references,
+          --   })
+          --
+          --   vim.api.nvim_create_autocmd('LspDetach', {
+          --     group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
+          --     callback = function(event2)
+          --       vim.lsp.buf.clear_references()
+          --       vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
+          --     end,
+          --   })
+          -- end
+          --
           -- The following code creates a keymap to toggle inlay hints in your
           -- code, if the language server you are using supports them
           --
@@ -1000,6 +1005,11 @@ require('lazy').setup({
             end
           end,
           on_attach = function(client, _)
+            if vim.bo.filetype == 'vue' then
+              client.server_capabilities.semanticTokensProvider.full = false
+            else
+              client.server_capabilities.semanticTokensProvider.full = true
+            end
             client.server_capabilities.documentFormattingProvider = nil
             client.server_capabilities.documentHighlightProvider = nil
             if client.server_capabilities.documentHighlightProvider then
@@ -1051,9 +1061,24 @@ require('lazy').setup({
 
         prettier = {},
 
-        csharp_ls = {},
-
-        csharpier = {},
+        roslyn = {
+          ['csharp|formatting'] = {
+            csharp_enable_inlay_hints_for_implicit_object_creation = true,
+            csharp_enable_inlay_hints_for_implicit_variable_types = true,
+            indent_style = 'space',
+            indent_size = 4,
+            tab_width = 4,
+          },
+          ['csharp|code_style'] = {
+            formatting = {
+              indent_style = 'space',
+              indent_size = 4,
+            },
+          },
+          ['csharp|code_lens'] = {
+            dotnet_enable_references_code_lens = false,
+          },
+        },
 
         markdown_oxide = {},
 
@@ -1100,6 +1125,9 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'vue-language-server',
+        'vue_ls',
+        'vtsls',
+        'csharpier',
         'prettierd',
         'prettier',
       })
@@ -1681,66 +1709,66 @@ require('lazy').setup({
       MiniTabLine.setup()
     end,
   },
-  { -- Highlight, edit, and navigate code
-    'nvim-treesitter/nvim-treesitter',
-    build = ':TSUpdate',
-    main = 'nvim-treesitter.configs', -- Sets main module to use for opts
-    -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-    opts = {
-      ensure_installed = {
-        'bash',
-        'c',
-        'diff',
-        'html',
-        'lua',
-        'luadoc',
-        'markdown',
-        'markdown_inline',
-        'query',
-        'vim',
-        'vimdoc',
-        'typescript',
-        'javascript',
-        'vue',
-      },
-      -- Autoinstall languages that are not installed
-      auto_install = true,
-      highlight = {
-        enable = true,
-        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-        --  If you are experiencing weird indenting issues, add the language to
-        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
-        additional_vim_regex_highlighting = { 'ruby' },
-      },
-      indent = { enable = false, disable = { 'ruby' } },
-    },
-    config = function(_, opts)
-      -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
-
-      -- Prefer git instead of curl in order to improve connectivity in some environments
-      require('nvim-treesitter.install').prefer_git = true
-
-      opts.incremental_selection = {
-        enable = true,
-        keymaps = {
-          init_selection = 'gnn',
-          node_incremental = '<PageUp>',
-          scope_incremental = 'grc',
-          node_decremental = '<PageDown>',
-        },
-      }
-
-      ---@diagnostic disable-next-line: missing-fields
-      require('nvim-treesitter.configs').setup(opts)
-
-      -- There are additional nvim-treesitter modules that you can use to interact
-      -- with nvim-treesitter. You should go explore a few and see what interests you:
-      --
-      --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
-      --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
-      --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
-    end,
-  },
+  --:{ -- Highlight, edit, and navigate code
+  --   'nvim-treesitter/nvim-treesitter',
+  --   build = ':TSUpdate',
+  --   main = 'nvim-treesitter.configs', -- Sets main module to use for opts
+  --   -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+  --   opts = {
+  --     ensure_installed = {
+  --       'bash',
+  --       'c',
+  --       'diff',
+  --       'html',
+  --       'lua',
+  --       'luadoc',
+  --       'markdown',
+  --       'markdown_inline',
+  --       'query',
+  --       'vim',
+  --       'vimdoc',
+  --       'typescript',
+  --       'javascript',
+  --       'vue',
+  --     },
+  --     -- Autoinstall languages that are not installed
+  --     auto_install = true,
+  --     highlight = {
+  --       enable = true,
+  --       -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
+  --       --  If you are experiencing weird indenting issues, add the language to
+  --       --  the list of additional_vim_regex_highlighting and disabled languages for indent.
+  --       additional_vim_regex_highlighting = { 'ruby' },
+  --     },
+  --     indent = { enable = false, disable = { 'ruby' } },
+  --   },
+  --   config = function(_, opts)
+  --     -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
+  --
+  --     -- Prefer git instead of curl in order to improve connectivity in some environments
+  --     require('nvim-treesitter.install').prefer_git = true
+  --
+  --     opts.incremental_selection = {
+  --       enable = true,
+  --       keymaps = {
+  --         init_selection = 'gnn',
+  --         node_incremental = '<PageUp>',
+  --         scope_incremental = 'grc',
+  --         node_decremental = '<PageDown>',
+  --       },
+  --     }
+  --
+  --     ---@diagnostic disable-next-line: missing-fields
+  --     require('nvim-treesitter.configs').setup(opts)
+  --
+  --     -- There are additional nvim-treesitter modules that you can use to interact
+  --     -- with nvim-treesitter. You should go explore a few and see what interests you:
+  --     --
+  --     --    - Incremental selection: Included, see `:help nvim-treesitter-incremental-selection-mod`
+  --     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
+  --     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
+  --   end,
+  -- },
 
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
@@ -1815,6 +1843,7 @@ require('lazy').setup({
   -- require 'kickstart.plugins.lint',
   require 'kickstart.plugins.autopairs',
   require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.treesitter',
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.

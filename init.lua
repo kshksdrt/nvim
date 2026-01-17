@@ -1623,42 +1623,53 @@ require('lazy').setup({
       --  and try some other statusline plugin
 
       local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
+
+      -- 1. Colors
+      local function set_statusline_highlights()
+        vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = '#858585', fg = '#000000' })
+        vim.api.nvim_set_hl(0, 'MiniStatuslineBody', { bg = '#444444', fg = '#ffffff' })
+        vim.api.nvim_set_hl(0, 'MiniStatuslineUnsaved', { bg = '#d6bd7c', fg = '#000000' })
+      end
+
+      set_statusline_highlights()
+
+      vim.api.nvim_create_autocmd('ColorScheme', {
+        pattern = '*',
+        callback = set_statusline_highlights,
+      })
+
+      -- 2. Unsaved count
+      local unsaved_count = 0
+
+      local function update_unsaved_count()
+        local count = 0
+        for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+          if vim.api.nvim_buf_is_loaded(bufnr) and vim.bo[bufnr].buflisted then
+            if vim.bo[bufnr].modified then
+              count = count + 1
+            end
+          end
+        end
+        unsaved_count = count
+      end
+
+      local group = vim.api.nvim_create_augroup('MiniStatuslineUnsaved', { clear = true })
+      vim.api.nvim_create_autocmd({ 'BufModifiedSet', 'BufWritePost', 'BufDelete' }, {
+        group = group,
+        callback = update_unsaved_count,
+      })
+      update_unsaved_count()
+
+      -- 3. Statusline config
       statusline.setup {
+        -- set use_icons to true if you have a Nerd Font
         use_icons = vim.g.have_nerd_font,
         content = {
           active = function()
-            local function get_mode()
-              local mode, mode_hl = MiniStatusline.section_mode { trunc_width = 120 }
-              return string.upper(mode), mode_hl
-            end
-
-            -- Function to count unsaved buffers
-            local function get_unsaved_buffers()
-              local count = 0
-              for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
-                -- Check if the buffer is loaded and a real file buffer
-                if vim.api.nvim_buf_is_loaded(bufnr) and vim.bo[bufnr].buflisted then
-                  -- Access the 'modified' option directly from the buffer's option table
-                  if vim.bo[bufnr].modified then
-                    count = count + 1
-                  end
-                end
-              end
-              return count
-            end
-
             local git = MiniStatusline.section_git { trunc_width = 75, bold = false }
-
-            vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = '#858585', fg = '#000000' })
-            vim.api.nvim_set_hl(0, 'MiniStatuslineBody', { bg = '#444444', fg = '#ffffff' })
-
-            -- Add highlight group for unsaved buffers section
-            vim.api.nvim_set_hl(0, 'MiniStatuslineUnsaved', { bg = '#d6bd7c', fg = '#000000' })
 
             -- Removed fileinfo section which contains the file size
             local location = MiniStatusline.section_location { trunc_width = 75 }
-            local unsaved = get_unsaved_buffers()
 
             -- vim.api.nvim_buf_get_name(0) gets the full path of the current buffer (0 means current)
             -- vim.fn.fnamemodify(..., ':t') extracts the filename (tail) from the path
@@ -1673,8 +1684,11 @@ require('lazy').setup({
             }
 
             -- Only add unsaved buffers section if count is greater than 0
-            if unsaved > 0 then
-              table.insert(groups, { hl = 'MiniStatuslineUnsaved', strings = { string.format(' Unsaved: %d ', unsaved) } })
+            if unsaved_count > 0 then
+              table.insert(groups, {
+                hl = 'MiniStatuslineUnsaved',
+                strings = { string.format(' Unsaved: %d ', unsaved_count) },
+              })
             end
 
             return MiniStatusline.combine_groups(groups)

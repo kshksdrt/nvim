@@ -18,7 +18,10 @@ return {
         top_down = false,
 
         -- Optional: Add a small margin so it doesn't touch the statusline
-        margin = { bottom = 1, right = 1 },
+        margin = {
+          bottom = 1,
+          right = 1,
+        },
       },
       input = {
         enabled = true,
@@ -169,6 +172,18 @@ return {
               },
             },
             follow_file = true,
+          },
+          notifications = {
+            win = {
+              input = {
+                keys = {},
+              },
+              list = {
+                wo = {
+                  wrap = true,
+                },
+              },
+            },
           },
         },
         config = function()

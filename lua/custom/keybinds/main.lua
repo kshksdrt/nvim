@@ -23,8 +23,10 @@ vim.api.nvim_set_keymap('x', 'ae', ':<C-u>normal! ggVG<CR>', { noremap = true, s
 vim.api.nvim_set_keymap('o', 'ae', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
 
 -- Navigation
-vim.keymap.set('n', '<C-i>', '<C-o>', { noremap = true, silent = true, desc = 'Jump to older position in jumplist' })
-vim.keymap.set('n', '<C-o>', '<C-i>', { noremap = true, silent = true, desc = 'Jump to newer position in jumplist' })
+vim.keymap.set('n', '<C-i>', '<C-o>', { noremap = true, silent = true, desc = 'Jump to older position in jumplist' }) -- Conflicts with tmux
+vim.keymap.set('n', '<C-o>', '<C-i>', { noremap = true, silent = true, desc = 'Jump to newer position in jumplist' }) -- Conflicts with tmux
+vim.keymap.set('n', '<C-c>', '<C-o>', { noremap = true, silent = true, desc = 'Jump to older position in jumplist' }) -- Does not conflict with tmux
+vim.keymap.set('n', '<C-v>', '<C-i>', { noremap = true, silent = true, desc = 'Jump to newer position in jumplist' }) -- Does not conflict with tmux
 
 -- Move to previous/next buffer
 local execute_bprevious = function()

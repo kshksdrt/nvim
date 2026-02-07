@@ -133,7 +133,7 @@ vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
 
-vim.o.relativenumber = true
+vim.o.relativenumber = false
 
 -- Disable line wrap
 vim.opt.wrap = false
@@ -1672,7 +1672,18 @@ require('lazy').setup({
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
+      -- To disable the plugin's automatic mapping creation
+      require('mini.surround').setup {
+        mappings = {
+          add = '',
+          delete = '',
+          find = '',
+          find_left = '',
+          highlight = '',
+          replace = '',
+          update_n_lines = '',
+        },
+      }
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
@@ -1903,9 +1914,15 @@ require('lazy').setup({
           },
         },
       }
-      vim.api.nvim_set_hl(0, 'BlinkIndent', {
-        fg = '#2B2B2B',
-        nocombine = false,
+
+      vim.api.nvim_create_autocmd('ColorScheme', {
+        pattern = '*',
+        callback = function()
+          vim.api.nvim_set_hl(0, 'BlinkIndent', {
+            fg = '#2B2B2B',
+            nocombine = false,
+          })
+        end,
       })
     end,
   },

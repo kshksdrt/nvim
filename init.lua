@@ -1672,7 +1672,18 @@ require('lazy').setup({
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
+      -- To disable the plugin's automatic mapping creation
+      require('mini.surround').setup {
+        mappings = {
+          add = '',
+          delete = '',
+          find = '',
+          find_left = '',
+          highlight = '',
+          replace = '',
+          update_n_lines = '',
+        },
+      }
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,

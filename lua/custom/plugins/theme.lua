@@ -31,7 +31,7 @@ return {
       require('vscode').load()
 
       -- load the theme without affecting devicon colors.
-      -- vim.cmd.colorscheme 'vscode'
+      vim.cmd.colorscheme 'vscode'
     end,
   },
   {
@@ -108,7 +108,7 @@ return {
       }
 
       -- setup must be called before loading
-      vim.cmd.colorscheme 'kanagawa'
+      -- vim.cmd.colorscheme 'kanagawa'
     end,
   },
 }

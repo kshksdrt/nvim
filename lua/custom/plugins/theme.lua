@@ -61,8 +61,8 @@ return {
     config = function()
       -- Default options:
       require('kanagawa').setup {
-        compile = false, -- enable compiling the colorscheme
-        undercurl = false, -- enable undercurls
+        compile = true,
+        undercurl = false,
         commentStyle = {
           bold = false,
           italic = false,
@@ -100,9 +100,9 @@ return {
             PmenuThumb = { bg = theme.ui.bg_p2 },
           }
         end,
-        theme = 'dragon', -- Load "wave" theme
-        background = { -- map the value of 'background' option to a theme
-          dark = 'dragon', -- try "dragon" !
+        theme = 'dragon',
+        background = {
+          dark = 'dragon',
           light = 'lotus',
         },
       }

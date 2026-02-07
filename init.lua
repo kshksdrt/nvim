@@ -1914,9 +1914,15 @@ require('lazy').setup({
           },
         },
       }
-      vim.api.nvim_set_hl(0, 'BlinkIndent', {
-        fg = '#2B2B2B',
-        nocombine = false,
+
+      vim.api.nvim_create_autocmd('ColorScheme', {
+        pattern = '*',
+        callback = function()
+          vim.api.nvim_set_hl(0, 'BlinkIndent', {
+            fg = '#2B2B2B',
+            nocombine = false,
+          })
+        end,
       })
     end,
   },

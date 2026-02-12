@@ -43,8 +43,16 @@ vim.keymap.set('n', '<C-l>', execute_bnext, { noremap = true, silent = true })
 vim.keymap.set('n', '<C-M>', execute_bnext, { noremap = true, silent = true })
 vim.keymap.set('n', '<C-,>', execute_bprevious, { noremap = true, silent = true })
 
--- Close all buffers
+-- Buffer management
 vim.keymap.set('n', 'z/', ':bufdo bd!<CR>', { noremap = true, silent = true, desc = 'Delete all buffers' })
+vim.keymap.set('n', 'z;', function()
+  local current = vim.api.nvim_get_current_buf()
+  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
+    if buf ~= current and vim.api.nvim_buf_is_valid(buf) then
+      vim.api.nvim_buf_delete(buf, { force = true })
+    end
+  end
+end, { noremap = true, silent = true, desc = 'Delete other buffers' })
 
 -- Copy cursor location
 vim.keymap.set('n', '<leader>cc', function()

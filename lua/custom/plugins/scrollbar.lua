@@ -9,13 +9,13 @@ return {
       callback = function()
         vim.api.nvim_set_hl(0, 'ScrollView', {
           fg = '#424242',
-          bg = '#d3d3d3',
+          bg = '#D3D3D3',
           force = true,
         })
 
         vim.api.nvim_set_hl(0, 'SatelliteQuickfix', {
           fg = '#EF00FC', -- A highly saturated pink
-          bg = 'NONE',
+          bg = '#D3D3D3',
           force = true,
         })
       end,

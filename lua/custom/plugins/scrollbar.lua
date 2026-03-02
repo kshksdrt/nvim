@@ -9,7 +9,13 @@ return {
       callback = function()
         vim.api.nvim_set_hl(0, 'ScrollView', {
           fg = '#424242',
-          bg = '#d3d3d3',
+          bg = '#D3D3D3',
+          force = true,
+        })
+
+        vim.api.nvim_set_hl(0, 'SatelliteQuickfix', {
+          fg = '#EF00FC', -- A highly saturated pink
+          bg = '#D3D3D3',
           force = true,
         })
       end,
@@ -18,7 +24,7 @@ return {
 
     require('satellite').setup {
       current_only = false,
-      winblend = 50,
+      winblend = 75,
       zindex = 40,
       excluded_filetypes = {
         'cmp_docs',
@@ -29,6 +35,7 @@ return {
         'snacks_input',
         'alpha',
         'dashboard',
+        'qf',
       },
       width = 2,
       handlers = {
@@ -36,11 +43,13 @@ return {
           enable = true,
           symbols = { '⎺', '⎻', '⎼', '⎽' },
         },
-        search = { enable = true },
+        search = {
+          enable = true,
+        },
         diagnostic = {
           enable = true,
           signs = { '-', '=', '≡' },
-          min_severity = vim.diagnostic.severity.HINT,
+          min_severity = vim.diagnostic.severity.ERROR,
         },
         gitsigns = {
           enable = true,
@@ -56,6 +65,7 @@ return {
           key = 'm',
         },
         quickfix = {
+          enable = true,
           signs = { '-', '=', '≡' },
         },
       },

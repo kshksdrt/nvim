@@ -98,6 +98,8 @@ if platform_utils.is_windows() then
   vim.opt.shellcmdflag = '-NoLogo -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -Command'
   vim.opt.shellquote = ''
   vim.opt.shellxquote = ''
+else
+  vim.opt.shell = 'fish'
 end
 
 if vim.g.neovide then

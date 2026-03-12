@@ -92,7 +92,18 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
+local platform_utils = require 'custom.utils.platform'
+if platform_utils.is_windows() then
+  vim.opt.shell = 'pwsh'
+  vim.opt.shellcmdflag = '-NoLogo -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -Command'
+  vim.opt.shellquote = ''
+  vim.opt.shellxquote = ''
+end
+
 if vim.g.neovide then
+  vim.opt.title = true
+  vim.opt.titlestring = vim.fn.fnamemodify(vim.fn.getcwd(), ':t') .. ' - Neovide'
+
   vim.g.neovide_progress_bar_enabled = true
   vim.g.neovide_progress_bar_height = 5.0
   vim.g.neovide_progress_bar_animation_speed = 200.0

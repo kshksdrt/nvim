@@ -106,6 +106,8 @@ if vim.g.neovide then
   vim.opt.title = true
   vim.opt.titlestring = vim.fn.fnamemodify(vim.fn.getcwd(), ':t') .. ' - Neovide'
 
+  vim.opt.linespace = 2
+
   vim.g.neovide_progress_bar_enabled = true
   vim.g.neovide_progress_bar_height = 5.0
   vim.g.neovide_progress_bar_animation_speed = 200.0

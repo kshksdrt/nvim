@@ -14,6 +14,7 @@ vim.keymap.set('n', '<BS>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<Del>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<PageUp>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<PageDown>', '<Nop>', { noremap = true, silent = true })
+vim.keymap.set('n', 'zs', '<Nop>', { noremap = true, silent = true })
 
 -- My custom text objects
 --  Gives you text objects for the contents of current buffer.
@@ -66,3 +67,6 @@ vim.keymap.set('n', '<leader>cl', function()
   local loc = vim.fn.expand '%:p' .. ':' .. vim.fn.line '.'
   vim.fn.setreg('+', loc) -- use "+" for system clipboard end, { desc = "Copy full path:line to clipboard" })
 end, { desc = 'Copy [C]ursor [L]ocation' })
+
+-- Zen mode
+vim.keymap.set('n', 'ze', ':ZenMode<CR>', { noremap = true, silent = true, desc = 'ToggleZen mode' })

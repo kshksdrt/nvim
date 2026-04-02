@@ -7,7 +7,7 @@ return {
     'lewis6991/gitsigns.nvim',
     config = function()
       local gitsigns = require 'gitsigns'
-      local colors = require('vscode.colors').get_colors()
+      -- local colors = require('vscode.colors').get_colors()
 
       gitsigns.setup {
         signs = {
@@ -52,12 +52,12 @@ return {
         },
         signs_staged_enable = true,
         on_attach = function(bufnr)
-          vim.api.nvim_set_hl(0, 'GitSignsAdd', { fg = colors.vscGitAdded, bg = 'NONE', bold = false })
-          vim.api.nvim_set_hl(0, 'GitSignsChange', { fg = colors.vscGitModified, bg = 'NONE', bold = false })
-          vim.api.nvim_set_hl(0, 'GitSignsDelete', { fg = colors.vscGitDeleted, bg = 'NONE', bold = false })
-          vim.api.nvim_set_hl(0, 'GitSignsStagedAdd', { fg = colors.vscGitAdded, bg = 'NONE', bold = false })
-          vim.api.nvim_set_hl(0, 'GitSignsStagedChange', { fg = colors.vscGitModified, bg = 'NONE', bold = false })
-          vim.api.nvim_set_hl(0, 'GitSignsStagedDelete', { fg = colors.vscGitDeleted, bg = 'NONE', bold = false })
+          -- vim.api.nvim_set_hl(0, 'GitSignsAdd', { fg = colors.vscGitAdded, bg = 'NONE', bold = false })
+          -- vim.api.nvim_set_hl(0, 'GitSignsChange', { fg = colors.vscGitModified, bg = 'NONE', bold = false })
+          -- vim.api.nvim_set_hl(0, 'GitSignsDelete', { fg = colors.vscGitDeleted, bg = 'NONE', bold = false })
+          -- vim.api.nvim_set_hl(0, 'GitSignsStagedAdd', { fg = colors.vscGitAdded, bg = 'NONE', bold = false })
+          -- vim.api.nvim_set_hl(0, 'GitSignsStagedChange', { fg = colors.vscGitModified, bg = 'NONE', bold = false })
+          -- vim.api.nvim_set_hl(0, 'GitSignsStagedDelete', { fg = colors.vscGitDeleted, bg = 'NONE', bold = false })
 
           local function map(mode, l, r, opts)
             opts = opts or {}

@@ -28,7 +28,7 @@ return {
   -- },
   -- Fast slanting motions
   {
-    'ggandor/leap.nvim',
+    url = 'https://codeberg.org/andyg/leap.nvim',
     version = '*',
     config = function()
       vim.keymap.set({ 'n', 'x', 'o' }, '<leader>j', function()

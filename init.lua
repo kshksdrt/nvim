@@ -663,6 +663,7 @@ require('lazy').setup({
       'WhoIsSethDaniel/mason-tool-installer.nvim',
       {
         'saghen/blink.cmp',
+        branch = 'v1',
         lazy = false,
         dependencies = {
           'rafamadriz/friendly-snippets', -- optional: provides snippets for the snippet source

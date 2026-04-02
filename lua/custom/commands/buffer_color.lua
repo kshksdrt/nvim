@@ -42,6 +42,8 @@ function M.setup()
 
       local hex_color = generate_color(full_path)
 
+      vim.api.nvim_set_hl(0, 'MiniTabLineModifiedHidden', { link = 'TabLine' })
+      vim.api.nvim_set_hl(0, 'MiniTabLineModifiedVisible', { fg = 'black', bg = hex_color })
       vim.api.nvim_set_hl(0, 'MiniTabLineModifiedCurrent', { fg = 'black', bg = hex_color })
       vim.api.nvim_set_hl(0, 'MiniTabLineCurrent', { fg = 'black', bg = hex_color })
     end,

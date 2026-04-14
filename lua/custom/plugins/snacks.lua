@@ -173,6 +173,11 @@ return {
             },
             follow_file = true,
           },
+          sources = {
+            grep = {
+              cmd = 'rg',
+            },
+          },
           notifications = {
             win = {
               input = {

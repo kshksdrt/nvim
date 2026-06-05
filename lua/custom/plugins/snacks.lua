@@ -81,6 +81,30 @@ return {
         trash = true,
       },
       picker = {
+        actions = {
+          -- <c-q>: send to quickfix list, but with a readable title
+          qflist = function(picker)
+            -- Build a name from the source + whatever you typed, captured
+            -- BEFORE the default action runs (it closes the picker).
+            local src = (picker.opts and picker.opts.source) or 'picker'
+            local title = src:gsub('^%l', string.upper) -- "grep" -> "Grep"
+
+            local f = (picker.input and picker.input.filter) or {}
+            local search = (f.search and f.search ~= '' and f.search) or f.pattern
+            if search and search ~= '' then
+              title = ('%s: %s'):format(title, search)
+            end
+
+            -- Let snacks build + open the qf list (correct item formatting).
+            Snacks.picker.actions.qflist(picker)
+
+            -- Relabel just the title of the list snacks just created.
+            -- 'a' with a `what` dict updates the current list's title and
+            -- context(data structure of context should match the context value to the lsp setqflist instance)
+            -- without touching its items.
+            vim.fn.setqflist({}, 'a', { title = title, context = { time = os.time() } })
+          end,
+        },
         layout = {
           -- This applies to the preset layouts (like 'default', 'vscode', 'ivy')
           layout = {
@@ -195,6 +219,138 @@ return {
           vim.api.nvim_set_hl(0, 'NonText', {
             fg = '#8F9491',
           })
+
+          -- Short labels for the category prefix. Keys are matched case-insensitively
+          -- against the part of the title before the ':'. All values are < 10 chars.
+          local CONCISE = {
+            -- LSP (from your lsp_qf helper)
+            references = 'refs',
+            definitions = 'def',
+            implementations = 'impl',
+            ['type definitions'] = 'typedef',
+            declarations = 'decl',
+            -- Common snacks sources (from <c-q>)
+            grep = 'grep',
+            grep_word = 'grepword',
+            buffers = 'buf',
+            diagnostics = 'diag',
+            files = 'files',
+            recent = 'recent',
+            git_files = 'gitfiles',
+            git_status = 'gitstat',
+            git_log = 'gitlog',
+            lines = 'lines',
+            marks = 'marks',
+            jumps = 'jumps',
+            keymaps = 'keymaps',
+            commands = 'cmds',
+            help = 'help',
+            man = 'man',
+            symbols = 'symbols',
+            lsp_symbols = 'symbols',
+            todo = 'todo',
+            spelling = 'spell',
+            undo = 'undo',
+            loclist = 'loclist',
+            qflist = 'qflist',
+          }
+
+          local DATE_W = 16 -- width of "%Y-%m-%d %H:%M"
+          local PREFIX_W = 8 -- prefix column width (< 10)
+
+          -- Split a title into (concise prefix, remainder).
+          local function split_title(title)
+            local head, tail = title:match '^([^:]+):%s*(.*)$'
+            if head then
+              return CONCISE[head:lower()] or head:lower():sub(1, PREFIX_W), tail
+            end
+            -- No colon: a bare category word gets abbreviated; anything else
+            -- (fallback filenames, "(untitled)") shows in full in the rest column.
+            local key = title:lower()
+            if CONCISE[key] then
+              return CONCISE[key], ''
+            end
+            return '', title
+          end
+
+          -- Preview: dump the contents of the highlighted quickfix list.
+          local function qf_preview(ctx)
+            local qf = vim.fn.getqflist { nr = ctx.item.nr, items = 0 }
+            local lines = {}
+            for _, e in ipairs(qf.items) do
+              local name = e.bufnr > 0 and vim.fn.bufname(e.bufnr) or ''
+              name = name ~= '' and vim.fn.fnamemodify(name, ':~:.') or '[No file]'
+              local text = (e.text or ''):gsub('^%s+', '')
+              lines[#lines + 1] = ('%s|%d col %d| %s'):format(name, e.lnum or 0, e.col or 0, text)
+            end
+            if #lines == 0 then
+              lines = { '(empty list)' }
+            end
+            ctx.preview:set_lines(lines)
+            ctx.preview:set_title(ctx.item.title)
+            ctx.preview:highlight { ft = 'qf' }
+            return true
+          end
+
+          vim.keymap.set('n', '<leader>sQ', function()
+            local function qf_time(context)
+              if type(context) == 'table' and context.time then
+                return os.date('%Y-%m-%d %H:%M', context.time)
+              end
+            end
+
+            local count = vim.fn.getqflist({ nr = '$' }).nr
+            local items = {}
+            for nr = count, 1, -1 do -- newest first
+              local info = vim.fn.getqflist { nr = nr, title = 0, size = 0, items = 0, context = 0 }
+              local title = info.title
+              if not title or title == '' or title == ':setqflist()' then
+                local first = info.items[1]
+                if first and first.bufnr > 0 then
+                  title = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(first.bufnr), ':t')
+                else
+                  title = '(untitled)'
+                end
+              end
+              local prefix, rest = split_title(title)
+              table.insert(items, {
+                idx = #items + 1,
+                nr = nr,
+                title = title, -- full title: used for matching + preview
+                prefix = prefix,
+                rest = rest,
+                size = info.size,
+                when = qf_time(info.context),
+                text = title, -- what the fuzzy matcher searches
+              })
+            end
+
+            Snacks.picker {
+              title = 'QF History',
+              items = items,
+              preview = qf_preview,
+              format = function(item)
+                local date = item.when or string.rep(' ', DATE_W)
+                local prefix = item.prefix .. string.rep(' ', PREFIX_W - #item.prefix)
+                local ret = {
+                  { date, 'Comment' },
+                  { '  ' },
+                  { prefix, 'Identifier' },
+                  { '  ' },
+                }
+                if item.rest ~= '' then
+                  ret[#ret + 1] = { item.rest, 'Title' }
+                end
+                ret[#ret + 1] = { ('  (%d)'):format(item.size), 'Comment' }
+                return ret
+              end,
+              confirm = function(picker, item)
+                picker:close()
+                vim.cmd(item.nr .. 'chistory')
+                vim.cmd 'botright copen'
+              end,
+            }
+          end, { desc = 'Quickfix History (newest first)' })
         end,
       },
     }

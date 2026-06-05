@@ -797,49 +797,70 @@ require('lazy').setup({
       vim.api.nvim_create_autocmd('LspAttach', {
         group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
         callback = function(event)
-          -- NOTE: Remember that Lua is a real programming language, and as such it is possible
-          -- to define small helper and utility functions so you don't have to repeat yourself.
-          --
-          -- In this case, we create a function that lets us more easily define mappings specific
-          -- for LSP related items. It sets the mode, buffer and description for us each time.
+          -- Buffer-local mapping helper: sets mode, buffer and description for us.
           local map = function(keys, func, desc, mode)
             mode = mode or 'n'
             vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = 'LSP: ' .. desc })
           end
 
-          -- Rename the variable under your cursor.
-          --  Most Language Servers support renaming across files, etc.
-          map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame Symbol')
-          map('<F2>', vim.lsp.buf.rename, 'Rename Symbol')
-
-          -- Execute a code action, usually your cursor needs to be on top of an error
-          -- or a suggestion from your LSP for this to activate.
-          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
-
-          -- WARN: This is not Goto Definition, this is Goto Declaration.
-          --  For example, in C this would take you to the header.
-          map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-
-          -- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
-          ---@param client vim.lsp.Client
-          ---@param method vim.lsp.protocol.Method
-          ---@param bufnr? integer some lsp support methods only in specific files
-          ---@return boolean
-          local function client_supports_method(client, method, bufnr)
-            if vim.fn.has 'nvim-0.11' == 1 then
-              return client:supports_method(method, bufnr)
-            else
-              return client.supports_method(method, { bufnr = bufnr })
+          -- Wrap an LSP "locations" method so its results land in a *named*
+          -- quickfix list. The symbol under the cursor is captured at call time
+          -- (before the async request returns) and baked into the qf title, so
+          -- `:chistory` and the Snacks history picker read like
+          -- "References: my_function" instead of a bare "References".
+          --
+          --   needs_context = true  -> references(context, opts)
+          --   needs_context = false -> definition/implementation/type_definition(opts)
+          local function lsp_qf(label, fn, needs_context)
+            return function()
+              local symbol = vim.fn.expand '<cword>'
+              local opts = {
+                on_list = function(t)
+                  -- ' ' (space) action pushes a NEW list onto the stack -> history.
+                  vim.fn.setqflist({}, ' ', {
+                    title = ('%s: %s'):format(label, symbol),
+                    items = t.items,
+                    context = { time = os.time(), lsp = t.context },
+                  })
+                  if #t.items == 1 then
+                    vim.cmd.cfirst() -- jump straight to a lone result
+                  else
+                    vim.cmd 'botright copen'
+                  end
+                end,
+              }
+              if needs_context then
+                fn(nil, opts)
+              else
+                fn(opts)
+              end
             end
           end
 
-          -- The following two autocommands are used to highlight references of the
-          -- word under your cursor when your cursor rests there for a little while.
-          --    See `:help CursorHold` for information about when this is executed
-          --
-          -- When you move your cursor, the highlights will be cleared (the second autocommand).
+          -- Goto navigation. These override Neovim's built-in gr* defaults with
+          -- versions that produce titled quickfix lists.
+          map('gd', lsp_qf('Definitions', vim.lsp.buf.definition, false), '[G]oto [D]efinition')
+          map('grr', lsp_qf('References', vim.lsp.buf.references, true), '[G]oto [R]eferences')
+          map('gri', lsp_qf('Implementations', vim.lsp.buf.implementation, false), '[G]oto [I]mplementation')
+          map('grt', lsp_qf('Type Definitions', vim.lsp.buf.type_definition, false), '[G]oto [T]ype Definition')
+
+          -- Rename the symbol under your cursor (most servers do this across files).
+          map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame Symbol')
+          map('<F2>', vim.lsp.buf.rename, 'Rename Symbol')
+
+          -- Code action. Cursor usually needs to be on an error/suggestion.
+          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
+
+          -- WARN: This is Goto Declaration, not Goto Definition.
+          --  For example, in C this would take you to the header.
+          map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
+
           local client = vim.lsp.get_client_by_id(event.data.client_id)
-          -- if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
+
+          -- Highlight references of the word under the cursor when it rests there
+          -- for a little while, and clear the highlights when the cursor moves.
+          --    See `:help CursorHold`.
+          -- if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
           --   local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
           --   vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
           --     buffer = event.buf,
@@ -861,12 +882,10 @@ require('lazy').setup({
           --     end,
           --   })
           -- end
-          --
-          -- The following code creates a keymap to toggle inlay hints in your
-          -- code, if the language server you are using supports them
-          --
-          -- This may be unwanted, since they displace some of your code
-          if client and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
+
+          -- Toggle inlay hints, if the language server supports them.
+          -- (This may be unwanted, since hints displace some of your code.)
+          if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf) then
             map('<leader>th', function()
               vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled { bufnr = event.buf })
             end, '[T]oggle Inlay [H]ints')
@@ -1669,7 +1688,12 @@ require('lazy').setup({
   },
 
   -- Highlight todo, notes, etc in comments
-  { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
+  {
+    'folke/todo-comments.nvim',
+    event = 'VimEnter',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    opts = { signs = false },
+  },
 
   { -- Collection of various small independent plugins/modules
     'nvim-mini/mini.nvim',

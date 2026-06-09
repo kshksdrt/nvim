@@ -1,7 +1,5 @@
--- You can add your own plugins here or in other files in this directory!
---  I promise not to create any merge conflicts in this directory :)
---
--- See the kickstart.nvim README for more information
+-- Extra plugin specs. Every *.lua file in this directory is auto-imported by
+-- `{ import = 'plugins' }` in init.lua, so a returned spec table here is loaded automatically.
 return {
   -- Git wrapper
   {

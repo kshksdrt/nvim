@@ -1,10 +1,6 @@
 -- debug.lua
 --
--- Shows how to use the DAP plugin to debug your code.
---
--- Primarily focused on configuring the debugger for Go, but can
--- be extended to other languages as well. That's why it's called
--- kickstart.nvim and not kitchen-sink.nvim ;)
+-- DAP setup: CodeLLDB install + Rust/Go adapters (uses utils.platform for paths).
 
 return {
   -- NOTE: Yes, you can install new plugins here!
@@ -150,7 +146,7 @@ return {
     dap.listeners.before.event_terminated['dapui_config'] = dapui.close
     dap.listeners.before.event_exited['dapui_config'] = dapui.close
 
-    local platform_utils = require 'custom.utils.platform'
+    local platform_utils = require 'utils.platform'
 
     local codelldb_path = platform_utils.get_home_dir() .. '/Sources/CodeLLDB'
     local install_codelldb = function()

@@ -30,7 +30,7 @@ local function open_floating_file(filepath)
   local function expand_path(path)
     if path:sub(1, 1) == '~' then
       -- Check if it is windows.
-      local platform_utils = require 'custom.utils.platform'
+      local platform_utils = require 'utils.platform'
       local is_windows = platform_utils.is_windows()
       -- An alternative that used to work.
       -- if vim.loop.os_uname().sysname == 'Windows_NT' then

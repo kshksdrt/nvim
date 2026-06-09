@@ -1,87 +1,6 @@
---[[
-
-=====================================================================
-==================== READ THIS BEFORE CONTINUING ====================
-=====================================================================
-========                                    .-----.          ========
-========         .----------------------.   | === |          ========
-========         |.-""""""""""""""""""-.|   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||   KICKSTART.NVIM   ||   |-----|          ========
-========         ||                    ||   | === |          ========
-========         ||                    ||   |-----|          ========
-========         ||:Tutor              ||   |:::::|          ========
-========         |'-..................-'|   |____o|          ========
-========         `"")----------------(""`   ___________      ========
-========        /::::::::::|  |::::::::::\  \ no mouse \     ========
-========       /:::========|  |==hjkl==:::\  \ required \    ========
-========      '""""""""""""'  '""""""""""""'  '""""""""""'   ========
-========                                                     ========
-=====================================================================
-=====================================================================
-
-What is Kickstart?
-
-  Kickstart.nvim is *not* a distribution.
-
-  Kickstart.nvim is a starting point for your own configuration.
-    The goal is that you can read every line of code, top-to-bottom, understand
-    what your configuration is doing, and modify it to suit your needs.
-
-    Once you've done that, you can start exploring, configuring and tinkering to
-    make Neovim your own! That might mean leaving Kickstart just the way it is for a while
-    or immediately breaking it into modular pieces. It's up to you!
-
-    If you don't know anything about Lua, I recommend taking some time to read through
-    a guide. One possible example which will only take 10-15 minutes:
-      - https://learnxinyminutes.com/docs/lua/
-
-    After understanding a bit more about Lua, you can use `:help lua-guide` as a
-    reference for how Neovim integrates Lua.
-    - :help lua-guide
-    - (or HTML version): https://neovim.io/doc/user/lua-guide.html
-
-Kickstart Guide:
-
-  TODO: The very first thing you should do is to run the command `:Tutor` in Neovim.
-
-    If you don't know what this means, type the following:
-      - <escape key>
-      - :
-      - Tutor
-      - <enter key>
-
-    (If you already know the Neovim basics, you can skip this step.)
-
-  Once you've completed that, you can continue working through **AND READING** the rest
-  of the kickstart init.lua.
-
-  Next, run AND READ `:help`.
-    This will open up a help window with some basic information
-    about reading, navigating and searching the builtin help documentation.
-
-    This should be the first place you go to look when you're stuck or confused
-    with something. It's one of my favorite Neovim features.
-
-    MOST IMPORTANTLY, we provide a keymap "<space>sh" to [s]earch the [h]elp documentation,
-    which is very useful when you're not exactly sure of what you're looking for.
-
-  I have left several `:help X` comments throughout the init.lua
-    These are hints about where to find more information about the relevant settings,
-    plugins or Neovim features used in Kickstart.
-
-
-    Throughout the file. These are for you, the reader, to help you understand what is happening.
-    Feel free to delete them once you know what you're doing, but they should serve as a guide
-    for when you are first encountering a few different constructs in your Neovim config.
-
-If you experience any errors while trying to install kickstart, run `:checkhealth` for more info.
-
-I hope you enjoy your Neovim journey,
-- TJ
-
-P.S. You can delete this when you're done too. It's your config now! :)
---]]
+-- Neovim config (kshksdrt)
+-- Leader = <Space>, Local leader = <Space>
+-- Layout: lua/{plugins,keymaps,commands,utils}/ ; init.lua = options + base keymaps + lazy bootstrap.
 
 -- Set <space> as the leader key
 -- See `:help mapleader`
@@ -92,7 +11,7 @@ vim.g.maplocalleader = ' '
 -- Set to true if you have a Nerd Font installed and selected in the terminal
 vim.g.have_nerd_font = true
 
-local platform_utils = require 'custom.utils.platform'
+local platform_utils = require 'utils.platform'
 if platform_utils.is_windows() then
   vim.opt.shell = 'pwsh'
   vim.opt.shellcmdflag = '-NoLogo -NoProfile -NonInteractive -ExecutionPolicy RemoteSigned -Command'
@@ -303,7 +222,7 @@ end, { noremap = true, silent = true, desc = 'Execute selected lines as commands
 --  See `:help vim.hl.on_yank()`
 vim.api.nvim_create_autocmd('TextYankPost', {
   desc = 'Highlight when yanking (copying) text',
-  group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
+  group = vim.api.nvim_create_augroup('yank-highlight', { clear = true }),
   callback = function()
     vim.hl.on_yank()
   end,
@@ -795,7 +714,7 @@ require('lazy').setup({
       --    an lsp (for example, opening `main.rs` is associated with `rust_analyzer`) this
       --    function will be executed to configure the current buffer
       vim.api.nvim_create_autocmd('LspAttach', {
-        group = vim.api.nvim_create_augroup('kickstart-lsp-attach', { clear = true }),
+        group = vim.api.nvim_create_augroup('lsp-attach', { clear = true }),
         callback = function(event)
           -- Buffer-local mapping helper: sets mode, buffer and description for us.
           local map = function(keys, func, desc, mode)
@@ -861,7 +780,7 @@ require('lazy').setup({
           -- for a little while, and clear the highlights when the cursor moves.
           --    See `:help CursorHold`.
           -- if client and client:supports_method(vim.lsp.protocol.Methods.textDocument_documentHighlight, event.buf) then
-          --   local highlight_augroup = vim.api.nvim_create_augroup('kickstart-lsp-highlight', { clear = false })
+          --   local highlight_augroup = vim.api.nvim_create_augroup('lsp-highlight', { clear = false })
           --   vim.api.nvim_create_autocmd({ 'CursorHold', 'CursorHoldI' }, {
           --     buffer = event.buf,
           --     group = highlight_augroup,
@@ -875,10 +794,10 @@ require('lazy').setup({
           --   })
           --
           --   vim.api.nvim_create_autocmd('LspDetach', {
-          --     group = vim.api.nvim_create_augroup('kickstart-lsp-detach', { clear = true }),
+          --     group = vim.api.nvim_create_augroup('lsp-detach', { clear = true }),
           --     callback = function(event2)
           --       vim.lsp.buf.clear_references()
-          --       vim.api.nvim_clear_autocmds { group = 'kickstart-lsp-highlight', buffer = event2.buf }
+          --       vim.api.nvim_clear_autocmds { group = 'lsp-highlight', buffer = event2.buf }
           --     end,
           --   })
           -- end
@@ -1169,7 +1088,7 @@ require('lazy').setup({
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
       require('mason-lspconfig').setup {
-        ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+        ensure_installed = {}, -- explicitly empty: installs are driven by mason-tool-installer above
         automatic_installation = false,
         handlers = {
           function(server_name)
@@ -1687,18 +1606,24 @@ require('lazy').setup({
     end,
   },
 
-  -- Highlight todo, notes, etc in comments
-  {
-    'folke/todo-comments.nvim',
-    event = 'VimEnter',
-    dependencies = { 'nvim-lua/plenary.nvim' },
-    opts = { signs = false },
-  },
-
   { -- Collection of various small independent plugins/modules
     'nvim-mini/mini.nvim',
     version = '*',
     config = function()
+      local hipatterns = require 'mini.hipatterns'
+      hipatterns.setup {
+        highlighters = {
+          -- Highlight standalone 'FIXME', 'HACK', 'TODO', 'NOTE'
+          fixme = { pattern = '%f[%w]()FIXME()%f[%W]', group = 'MiniHipatternsFixme' },
+          hack = { pattern = '%f[%w]()HACK()%f[%W]', group = 'MiniHipatternsHack' },
+          todo = { pattern = '%f[%w]()TODO()%f[%W]', group = 'MiniHipatternsTodo' },
+          note = { pattern = '%f[%w]()NOTE()%f[%W]', group = 'MiniHipatternsNote' },
+
+          -- Highlight hex color strings (`#rrggbb`) using that color
+          hex_color = hipatterns.gen_highlighter.hex_color(),
+        },
+      }
+
       -- Better Around/Inside textobjects
       --
       -- Examples:
@@ -1761,7 +1686,15 @@ require('lazy').setup({
       end
 
       local group = vim.api.nvim_create_augroup('MiniStatuslineUnsaved', { clear = true })
-      vim.api.nvim_create_autocmd({ 'BufModifiedSet', 'BufWritePost', 'BufDelete' }, {
+      -- The 'modified' flag toggling is observed via OptionSet/'modified' — Neovim
+      -- removed BufModifiedSet (see :h deprecated.txt). OptionSet matches the option
+      -- name through `pattern`, so it can't share the '*'-pattern buffer events below.
+      vim.api.nvim_create_autocmd('OptionSet', {
+        group = group,
+        pattern = 'modified',
+        callback = update_unsaved_count,
+      })
+      vim.api.nvim_create_autocmd({ 'BufWritePost', 'BufDelete' }, {
         group = group,
         callback = update_unsaved_count,
       })
@@ -1891,16 +1824,6 @@ require('lazy').setup({
   --   end,
   -- },
 
-  -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
-  -- init.lua. If you want these files, they are in the repository, so you can just download them and
-  -- place them in the correct locations.
-
-  -- NOTE: Next step on your Neovim journey: Add/Configure additional plugins for Kickstart
-  --
-  --  Here are some example plugins that I've included in the Kickstart repository.
-  --  Uncomment any of the lines below to enable them (you will need to restart nvim).
-  --
-  require 'kickstart.plugins.debug',
   {
     'saghen/blink.indent',
     --- @module 'blink.indent'
@@ -1966,16 +1889,10 @@ require('lazy').setup({
       })
     end,
   },
-  require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
-  require 'kickstart.plugins.autopairs',
-  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
-  require 'kickstart.plugins.treesitter',
-
-  -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
-  --    This is the easiest way to modularize your config.
-  --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  { import = 'custom.plugins' },
+  -- Every spec file in lua/plugins/*.lua is auto-imported here (yours plus the folded-in
+  -- debug/autopairs/gitsigns/treesitter). Add a plugin by dropping a new file in that dir.
+  --    See `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
+  { import = 'plugins' },
 
   -- For additional information with loading, sourcing and examples see `:help lazy.nvim-🔌-plugin-spec`
   -- Or use telescope!
@@ -2006,7 +1923,7 @@ require('lazy').setup({
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
 
-require 'custom.keybinds.init'
+require 'keymaps'
 
 vim.api.nvim_create_autocmd('FileType', {
   pattern = 'qf',
@@ -2015,12 +1932,12 @@ vim.api.nvim_create_autocmd('FileType', {
   end,
 })
 
-require 'custom.commands.presentation'
-require 'custom.commands.fix_quickfix'
-require 'custom.commands.cmd'
-require 'custom.commands.markdown'
+require 'commands.presentation'
+require 'commands.fix_quickfix'
+require 'commands.cmd'
+require 'commands.markdown'
 
-local buffer_coloring = require 'custom.commands.buffer_color'
+local buffer_coloring = require 'commands.buffer_color'
 buffer_coloring.setup()
-local stickies = require 'custom.commands.sticky_notes_float'
+local stickies = require 'commands.sticky_notes_float'
 stickies.setup()

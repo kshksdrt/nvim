@@ -1,4 +1,4 @@
-require 'custom.keybinds.from_community.git'
+require 'keymaps.from_community.git'
 
 -- Keybinds from ThePrimeagen. See https://github.com/ThePrimeagen/init.lua/blob/master/lua/theprimeagen/remap.lua
 -- vim.keymap.set('v', 'J', ":m '>+1<CR>gv=gv", { desc = 'Move selected lines down' })

@@ -61,6 +61,12 @@ return {
     config = function()
       require('pandoc').setup()
 
+      -- Stylesheet for rendered HTML, linked by absolute path so edits
+      -- apply on browser refresh without re-rendering
+      local css = vim.fn.stdpath 'config' .. '/assets/pandoc.css'
+      -- Filter that adds line numbers to all code blocks
+      local number_lines = vim.fn.stdpath 'config' .. '/assets/number-lines.lua'
+
       vim.api.nvim_create_user_command('PandocPreview', function()
         if vim.bo.filetype ~= 'markdown' then
           vim.notify('PandocPreview only works for markdown files', vim.log.levels.WARN)
@@ -79,7 +85,21 @@ return {
         -- Save buffer before rendering
         vim.cmd 'update'
 
-        vim.fn.jobstart({ bin, input, '--standalone', '--output', output }, {
+        vim.fn.jobstart({
+          bin,
+          input,
+          '--standalone',
+          '--toc',
+          '--css',
+          css,
+          '--lua-filter',
+          number_lines,
+          -- Enable the next 2 lines when using a css that does not limit max-width
+          -- '-V',
+          -- 'header-includes=<style>body { max-width: 70ch; margin: auto; font-size: 15px; }</style>',
+          '--output',
+          output,
+        }, {
           on_exit = function(_, code)
             if code == 0 then
               vim.notify('Pandoc: HTML render complete. Opening...', vim.log.levels.INFO)
@@ -113,7 +133,21 @@ return {
         local config = require('pandoc.config').get()
         local bin = config.default.bin or 'pandoc'
 
-        vim.fn.jobstart({ bin, input, '--standalone', '--output', output }, {
+        vim.fn.jobstart({
+          bin,
+          input,
+          '--standalone',
+          '--toc',
+          '--css',
+          css,
+          '--lua-filter',
+          number_lines,
+          -- Enable the next 2 lines when using a css that does not limit max-width
+          -- '-V',
+          -- 'header-includes=<style>body { max-width: 70ch; margin: auto; font-size: 15px; }</style>',
+          '--output',
+          output,
+        }, {
           on_exit = function(_, code)
             if code == 0 then
               vim.notify('Pandoc: Exported to ' .. output, vim.log.levels.INFO)

@@ -1936,6 +1936,7 @@ require 'commands.presentation'
 require 'commands.fix_quickfix'
 require 'commands.cmd'
 require 'commands.markdown'
+require 'commands.pandoc'
 
 local buffer_coloring = require 'commands.buffer_color'
 buffer_coloring.setup()

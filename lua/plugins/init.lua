@@ -1,6 +1,15 @@
 -- Extra plugin specs. Every *.lua file in this directory is auto-imported by
 -- `{ import = 'plugins' }` in init.lua, so a returned spec table here is loaded automatically.
 return {
+  -- Better motion-repeatability using ; and , (found to be most useful for ]c to navigate git hunks)
+  {
+    'mawkler/demicolon.nvim',
+    dependencies = {
+      'nvim-treesitter/nvim-treesitter',
+      'nvim-treesitter/nvim-treesitter-textobjects',
+    },
+    opts = {},
+  },
   -- Git wrapper
   {
     'tpope/vim-fugitive',

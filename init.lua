@@ -1609,6 +1609,9 @@ require('lazy').setup({
   { -- Collection of various small independent plugins/modules
     'nvim-mini/mini.nvim',
     version = '*',
+    dependencies = {
+      'kshksdrt/mini-tabline-colorizer',
+    },
     config = function()
       local hipatterns = require 'mini.hipatterns'
       hipatterns.setup {
@@ -1708,17 +1711,15 @@ require('lazy').setup({
           active = function()
             local git = MiniStatusline.section_git { trunc_width = 75, bold = false }
 
-            -- Removed fileinfo section which contains the file size
             local location = MiniStatusline.section_location { trunc_width = 75 }
 
-            -- vim.api.nvim_buf_get_name(0) gets the full path of the current buffer (0 means current)
-            -- vim.fn.fnamemodify(..., ':t') extracts the filename (tail) from the path
-            local current_filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':t')
+            local current_filepath = vim.api.nvim_buf_get_name(0)
+            -- local current_filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':t')
 
             -- Create groups array with main components
             local groups = {
               { hl = 'MiniStatuslineDevinfo', strings = { git } },
-              { hl = 'MiniStatuslineBody', strings = { ' ' .. current_filename .. ' ' } },
+              { hl = 'MiniStatuslineBody', strings = { ' ' .. current_filepath .. ' ' } },
               '%=',
               { hl = 'MiniStatuslineLocation', strings = { location } },
             }
@@ -1761,6 +1762,9 @@ require('lazy').setup({
       }
 
       MiniTabLine.setup()
+
+      -- Add 'kshksdrt/mini-tabline-colorizer' as a dependency to mini to install plugin using Lazy.
+      require('mini-tabline-colorizer').setup()
     end,
   },
   --:{ -- Highlight, edit, and navigate code
@@ -1938,7 +1942,5 @@ require 'commands.cmd'
 require 'commands.markdown'
 require 'commands.pandoc'
 
-local buffer_coloring = require 'commands.buffer_color'
-buffer_coloring.setup()
 local stickies = require 'commands.sticky_notes_float'
 stickies.setup()

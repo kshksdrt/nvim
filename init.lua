@@ -1610,7 +1610,7 @@ require('lazy').setup({
     'nvim-mini/mini.nvim',
     version = '*',
     dependencies = {
-      'kshksdrt/mini-tabline-colorizer',
+      -- 'kshksdrt/mini-tabline-colorizer',
     },
     config = function()
       local hipatterns = require 'mini.hipatterns'
@@ -1748,23 +1748,23 @@ require('lazy').setup({
       local MiniTabLine = require 'mini.tabline'
       local helper = MiniTabLine.helper
 
-      MiniTabLine.config = {
-        format = function(buf_id, label)
-          local tabname = ''
-          local separator = '|'
-          if helper.get_icon == nil then
-            tabname = string.format(' %s ', label)
-          else
-            tabname = string.format(' %s %s ', helper.get_icon(vim.api.nvim_buf_get_name(buf_id)), label)
-          end
-          return tabname .. separator
-        end,
-      }
-
-      MiniTabLine.setup()
-
-      -- Add 'kshksdrt/mini-tabline-colorizer' as a dependency to mini to install plugin using Lazy.
-      require('mini-tabline-colorizer').setup()
+      --    MiniTabLine.config = {
+      --      format = function(buf_id, label)
+      --        local tabname = ''
+      --        local separator = '|'
+      --        if helper.get_icon == nil then
+      --          tabname = string.format(' %s ', label)
+      --        else
+      --          tabname = string.format(' %s %s ', helper.get_icon(vim.api.nvim_buf_get_name(buf_id)), label)
+      --        end
+      --        return tabname .. separator
+      --      end,
+      --    }
+      --
+      --    MiniTabLine.setup()
+      --
+      -- -- Add 'kshksdrt/mini-tabline-colorizer' as a dependency to mini to install plugin using Lazy.
+      --    require('mini-tabline-colorizer').setup()
     end,
   },
   --:{ -- Highlight, edit, and navigate code

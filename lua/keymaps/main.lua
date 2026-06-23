@@ -49,15 +49,43 @@ vim.keymap.set('n', 'H', '<cmd>tabprev<cr>', { noremap = true, silent = true })
 vim.keymap.set('n', 'L', '<cmd>tabnext<cr>', { noremap = true, silent = true })
 
 -- Buffer management
-vim.keymap.set('n', 'z/', ':bufdo bd!<CR>', { noremap = true, silent = true, desc = 'Delete all buffers' })
+--
+-- Buffers are GLOBAL across every tab page (a tab is just a window layout), so a
+-- plain `:bd`/`:bdelete` of a buffer shown in a window -- the current split OR a
+-- window on another tab -- closes that window and scrambles the layout. folke's
+-- Snacks.bufdelete (already loaded; see lua/plugins/snacks.lua) avoids this: it
+-- finds every window displaying the buffer (across ALL tabpages, via
+-- win_findbuf), swaps in the alternate/most-recently-used buffer, then deletes --
+-- so the window survives and no tab gets corrupted. It also prompts to save if
+-- the buffer is modified.
+-- Source: ~/.local/share/nvim/lazy/snacks.nvim/lua/snacks/bufdelete.lua
+vim.keymap.set('n', 'zq', function()
+  Snacks.bufdelete() -- delete the current buffer
+end, { noremap = true, silent = true, desc = 'Delete current buffer (keep layout)' })
 vim.keymap.set('n', 'z;', function()
-  local current = vim.api.nvim_get_current_buf()
-  for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-    if buf ~= current and vim.api.nvim_buf_is_valid(buf) then
-      vim.api.nvim_buf_delete(buf, { force = true })
-    end
+  Snacks.bufdelete.other() -- delete every buffer except the current one
+end, { noremap = true, silent = true, desc = 'Delete other buffers (keep layout)' })
+vim.keymap.set('n', 'z/', function()
+  Snacks.bufdelete.all() -- delete all buffers
+end, { noremap = true, silent = true, desc = 'Delete all buffers (keep layout)' })
+
+-- Route the muscle-memory `:bd[!]` / `:bdelete[!]` through the same safe delete,
+-- so even a typed command stops closing windows and corrupting other tabs.
+-- `Bdelete` is the layout-preserving wrapper (bang -> force, optional buffer
+-- id/name arg). The abbreviations only rewrite the bare command (guarded by an
+-- exact `==# 'bd'` match), so `:bd 3` / `:bd!` still expand -- to `Bdelete 3` /
+-- `Bdelete!` -- and pass their arg/bang through, while a stray `bd` mid-command
+-- (e.g. `:g/x/bd`) is left untouched.
+vim.api.nvim_create_user_command('Bdelete', function(o)
+  local opts = { force = o.bang }
+  if o.args ~= '' then
+    opts.buf = tonumber(o.args) -- numeric buffer id, or...
+    opts.file = opts.buf == nil and o.args or nil -- ...a buffer name
   end
-end, { noremap = true, silent = true, desc = 'Delete other buffers' })
+  Snacks.bufdelete(opts)
+end, { bang = true, nargs = '?', complete = 'buffer', desc = 'Delete buffer without disrupting window layout' })
+vim.cmd [[cnoreabbrev <expr> bd (getcmdtype() ==# ':' && getcmdline() ==# 'bd') ? 'Bdelete' : 'bd']]
+vim.cmd [[cnoreabbrev <expr> bdelete (getcmdtype() ==# ':' && getcmdline() ==# 'bdelete') ? 'Bdelete' : 'bdelete']]
 
 -- Copy cursor location
 vim.keymap.set('n', '<leader>cc', function()

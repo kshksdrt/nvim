@@ -16,9 +16,10 @@ return {
       enabled = true,
       ruler = true, -- disables the ruler text in the cmd line area
       showcmd = true, -- disables the command in the last line of the screen
-      -- you may turn on/off statusline in zen mode by setting 'laststatus'
-      -- statusline will be shown only if 'laststatus' == 3
-      laststatus = 3, -- turn off the statusline in zen mode
+      -- Keep the statusline visible in zen mode so the "Unsaved: N" indicator
+      -- stays in view. 3 = global statusline (shown); 0 would hide it entirely.
+      -- Pinned here so it works even if the global 'laststatus' is ever not 3.
+      laststatus = 3,
     },
   },
 }

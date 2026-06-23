@@ -83,6 +83,15 @@ vim.o.mouse = 'a'
 -- Don't show the mode, since it's already in the status line
 vim.o.showmode = false
 
+-- Never show the top tabline bar; the statusline's tabpage indicator (see the
+-- mini.statusline content function) reports current/total tabpage instead.
+vim.o.showtabline = 0
+
+-- One global statusline shared by all windows instead of one per split.
+-- mini.statusline's content already handles laststatus==3 (always renders the
+-- active section), so the bar reflects the focused window.
+vim.o.laststatus = 3
+
 -- Sync clipboard between OS and Neovim.
 --  Schedule the setting after `UiEnter` because it can increase startup-time.
 --  Remove this option if you want your OS clipboard to remain independent.
@@ -1661,9 +1670,13 @@ require('lazy').setup({
 
       -- 1. Colors
       local function set_statusline_highlights()
-        vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = '#858585', fg = '#000000' })
+        vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = '#a8a8a8', fg = '#000000' })
         vim.api.nvim_set_hl(0, 'MiniStatuslineBody', { bg = '#444444', fg = '#ffffff' })
         vim.api.nvim_set_hl(0, 'MiniStatuslineUnsaved', { bg = '#d6bd7c', fg = '#000000' })
+        -- Filepath is split into dir (dim) + filename (bright); same bg so the
+        -- segment stays continuous. Built as a raw string in the content fn below.
+        vim.api.nvim_set_hl(0, 'MiniStatuslinePath', { bg = '#444444', fg = '#bcbcbc' })
+        vim.api.nvim_set_hl(0, 'MiniStatuslineFilename', { bg = '#444444', fg = '#ffffff', bold = true })
       end
 
       set_statusline_highlights()
@@ -1714,15 +1727,41 @@ require('lazy').setup({
             local location = MiniStatusline.section_location { trunc_width = 75 }
 
             local current_filepath = vim.api.nvim_buf_get_name(0)
-            -- local current_filename = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':t')
+
+            -- Split the path so the filename can be highlighted brighter than its
+            -- directory. Embed the highlight switches in one raw string (rather than
+            -- two table groups) so combine_groups' per-group space padding doesn't
+            -- open a gap at the slash; raw strings are passed through verbatim.
+            local file_segment
+            if current_filepath == '' then
+              file_segment = '%#MiniStatuslineBody# [No Name] '
+            else
+              local filedir = vim.fn.fnamemodify(current_filepath, ':h')
+              local filename = vim.fn.fnamemodify(current_filepath, ':t')
+              local sep = filedir:sub(-1) == '/' and '' or '/'
+              file_segment = string.format('%%#MiniStatuslinePath# %s%s%%#MiniStatuslineFilename#%s ', filedir, sep, filename)
+            end
 
             -- Create groups array with main components
             local groups = {
               { hl = 'MiniStatuslineDevinfo', strings = { git } },
-              { hl = 'MiniStatuslineBody', strings = { ' ' .. current_filepath .. ' ' } },
+              file_segment,
               '%=',
               { hl = 'MiniStatuslineLocation', strings = { location } },
             }
+
+            -- Tabpage indicator: only meaningful with more than one tabpage.
+            -- tabpagenr() is cheap, so it's read live here rather than cached.
+            -- No "Tab" label — the tabpage highlight color (below) is the cue.
+            local n_tabpages = vim.fn.tabpagenr '$'
+            if n_tabpages > 1 then
+              -- Position 1: leftmost, before the git branch section.
+              table.insert(groups, 1, {
+                -- Reuse mini.tabline's own tabpage highlight so the color matches it.
+                hl = 'MiniTablineTabpagesection',
+                strings = { string.format(' %d/%d ', vim.fn.tabpagenr(), n_tabpages) },
+              })
+            end
 
             -- Only add unsaved buffers section if count is greater than 0
             if unsaved_count > 0 then
@@ -1745,8 +1784,8 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
-      local MiniTabLine = require 'mini.tabline'
-      local helper = MiniTabLine.helper
+      -- local MiniTabLine = require 'mini.tabline'
+      -- local helper = MiniTabLine.helper
 
       --    MiniTabLine.config = {
       --      format = function(buf_id, label)

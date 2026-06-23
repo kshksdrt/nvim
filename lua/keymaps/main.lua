@@ -44,6 +44,10 @@ vim.keymap.set('n', '<C-l>', execute_bnext, { noremap = true, silent = true })
 vim.keymap.set('n', '<C-M>', execute_bnext, { noremap = true, silent = true })
 vim.keymap.set('n', '<C-,>', execute_bprevious, { noremap = true, silent = true })
 
+-- Move to previous/next tab
+vim.keymap.set('n', 'H', '<cmd>tabprev<cr>', { noremap = true, silent = true })
+vim.keymap.set('n', 'L', '<cmd>tabnext<cr>', { noremap = true, silent = true })
+
 -- Buffer management
 vim.keymap.set('n', 'z/', ':bufdo bd!<CR>', { noremap = true, silent = true, desc = 'Delete all buffers' })
 vim.keymap.set('n', 'z;', function()

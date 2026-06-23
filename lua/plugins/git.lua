@@ -1,7 +1,21 @@
 return {
   {
+    'esmuellert/codediff.nvim',
+    cmd = 'CodeDiff',
+    opts = {
+      keymaps = {
+        view = {
+          next_file = '<Tab>',
+          prev_file = '<S-Tab>',
+        },
+      },
+    },
+  },
+  {
+
     'dlyongemallo/diffview.nvim',
     dependencies = {
+
       'nvim-lua/plenary.nvim',
     },
     config = function()

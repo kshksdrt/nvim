@@ -536,9 +536,9 @@ return {
     {
       'gh',
       function()
-        require('snacks').picker.git_diff()
+        require('snacks').picker.git_status()
       end,
-      desc = 'Git diff',
+      desc = 'Git status',
     },
     {
       'gm',

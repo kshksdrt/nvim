@@ -9,6 +9,26 @@ return {
           prev_file = '<S-Tab>',
         },
       },
+      explorer = {
+        file_filter = {
+          ignore = {
+            '.git/**',
+            '.jj/**',
+            '*.pdf',
+            '*.png',
+            '*.jpg',
+            '*.jpeg',
+            '*.gif',
+            '*.bmp',
+            '*.webp',
+            '*.tiff',
+            '*.heic',
+            '*.avif',
+            '*.ico',
+            '*.svg',
+          },
+        },
+      },
     },
   },
   {

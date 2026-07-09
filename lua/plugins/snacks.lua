@@ -190,11 +190,6 @@ return {
             },
             follow_file = true,
           },
-          sources = {
-            grep = {
-              cmd = 'rg',
-            },
-          },
           notifications = {
             win = {
               input = {
@@ -455,6 +450,16 @@ return {
         require('snacks').picker.grep_word()
       end,
       desc = 'Search Word',
+    },
+    {
+      '<leader>sW',
+      function()
+        -- Trim leading/trailing runs of non-word chars (brackets, quotes,
+        -- punctuation) so `("foo/bar.lua"),` searches for `foo/bar.lua`.
+        local word = vim.fn.expand('<cWORD>'):gsub('^%W+', ''):gsub('%W+$', '')
+        require('snacks').picker.files { pattern = word }
+      end,
+      desc = 'Search Files for WORD under cursor',
     },
     {
       '-',

@@ -445,6 +445,19 @@ return {
       desc = 'Search by Grep',
     },
     {
+      '<leader>sG',
+      function()
+        -- One-shot grep: rg runs once, then the picker input fuzzy-filters
+        -- the loaded results instead of respawning rg per keystroke.
+        vim.ui.input({ prompt = 'Grep ' }, function(pattern)
+          if pattern and pattern ~= '' then
+            Snacks.picker.grep { search = pattern, live = false }
+          end
+        end)
+      end,
+      desc = 'Search by Grep (one-shot)',
+    },
+    {
       '<leader>sw',
       function()
         require('snacks').picker.grep_word()

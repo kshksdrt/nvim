@@ -93,7 +93,8 @@ return {
         overrides = function(colors)
           local theme = colors.theme
           return {
-            CursorLine = { bg = '#1F1F28' },
+            -- yellowish-grey, tuned to stand out about as much as the statusline
+            CursorLine = { bg = '#33302a' },
             Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 }, -- add `blend = vim.o.pumblend` to enable transparency
             PmenuSel = { fg = 'NONE', bg = theme.ui.bg_p2 },
             PmenuSbar = { bg = theme.ui.bg_m1 },

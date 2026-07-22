@@ -1726,7 +1726,9 @@ require('lazy').setup({
 
             local location = MiniStatusline.section_location { trunc_width = 75 }
 
-            local current_filepath = vim.api.nvim_buf_get_name(0)
+            -- ':.' makes the path relative to the cwd; paths outside the cwd
+            -- are left as-is (absolute).
+            local current_filepath = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':.')
 
             -- Split the path so the filename can be highlighted brighter than its
             -- directory. Embed the highlight switches in one raw string (rather than
@@ -1739,6 +1741,10 @@ require('lazy').setup({
               local filedir = vim.fn.fnamemodify(current_filepath, ':h')
               local filename = vim.fn.fnamemodify(current_filepath, ':t')
               local sep = filedir:sub(-1) == '/' and '' or '/'
+              -- A file directly in the cwd has ':h' == '.'; show just the name.
+              if filedir == '.' then
+                filedir, sep = '', ''
+              end
               file_segment = string.format('%%#MiniStatuslinePath# %s%s%%#MiniStatuslineFilename#%s ', filedir, sep, filename)
             end
 

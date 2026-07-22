@@ -1619,7 +1619,7 @@ require('lazy').setup({
     'nvim-mini/mini.nvim',
     version = '*',
     dependencies = {
-      -- 'kshksdrt/mini-tabline-colorizer',
+      'kshksdrt/mini-tabline-colorizer',
     },
     config = function()
       local hipatterns = require 'mini.hipatterns'
@@ -1790,26 +1790,45 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
-      -- local MiniTabLine = require 'mini.tabline'
-      -- local helper = MiniTabLine.helper
+      -- mini.tabline preview: show only the current buffer's tab (not its
+      -- usual full buffer list) across the top, reusing mini.tabline's own
+      -- highlight groups and ColorScheme-refresh behavior from setup(). To go
+      -- back to no top tabline, delete this block and flip showtabline back
+      -- to 0 above (setup() below forces it to 2).
+      require('mini.tabline').setup()
+      _G.MiniTablineCurrentTab = function()
+        local buf_id = vim.api.nvim_get_current_buf()
+        local bufpath = vim.api.nvim_buf_get_name(buf_id)
+        local hl = vim.bo[buf_id].modified and 'MiniTablineModifiedCurrent' or 'MiniTablineCurrent'
+        -- No trailing MiniTablineFill switch on either segment: leaving the
+        -- last group active lets it carry through the rest of the line,
+        -- covering the full width instead of just wrapping the text.
+        if bufpath == '' then
+          return string.format('%%#%s# [No Name]', hl)
+        end
+        local label = vim.fn.fnamemodify(bufpath, ':t')
+        -- ':.' makes the path relative to the cwd; paths outside the cwd are
+        -- left as-is (absolute) — same convention as the statusline's
+        -- current_filepath above.
+        local shown_path = vim.fn.fnamemodify(bufpath, ':.')
+        -- Full path appended in MiniTablineCurrentPath: same per-path bg as
+        -- `hl` (both are colored_groups below) but a muted static fg, so it
+        -- reads as secondary detail next to the bold filename.
+        return string.format('%%#%s# %s %%#MiniTablineCurrentPath# %s', hl, label, shown_path)
+      end
+      vim.o.tabline = '%!v:lua.MiniTablineCurrentTab()'
 
-      --    MiniTabLine.config = {
-      --      format = function(buf_id, label)
-      --        local tabname = ''
-      --        local separator = '|'
-      --        if helper.get_icon == nil then
-      --          tabname = string.format(' %s ', label)
-      --        else
-      --          tabname = string.format(' %s %s ', helper.get_icon(vim.api.nvim_buf_get_name(buf_id)), label)
-      --        end
-      --        return tabname .. separator
-      --      end,
-      --    }
-      --
-      --    MiniTabLine.setup()
-      --
-      -- -- Add 'kshksdrt/mini-tabline-colorizer' as a dependency to mini to install plugin using Lazy.
-      --    require('mini-tabline-colorizer').setup()
+      require('mini-tabline-colorizer').setup {
+        saturation = 0.5,
+        brightness = 0.3,
+        colored_groups = {
+          'MiniTablineCurrent',
+          'MiniTablineModifiedCurrent',
+          { name = 'MiniTablineCurrentPath', fg = '#8E8E8E' },
+        },
+        linked_groups = {},
+        flash_ms = 150,
+      }
     end,
   },
   --:{ -- Highlight, edit, and navigate code

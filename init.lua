@@ -1725,7 +1725,8 @@ require('lazy').setup({
         vim.api.nvim_set_hl(0, 'MiniStatuslinePath', { bg = '#444444', fg = '#bcbcbc' })
         vim.api.nvim_set_hl(0, 'MiniStatuslineFilename', { bg = '#444444', fg = '#ffffff', bold = true })
 
-        -- MiniStatuslineBreadcrumbFile is set separately, per-filetype, in ts_breadcrumb().
+        -- MiniStatuslineBreadcrumbFile (the tabline filename chip) is owned by
+        -- mini-tabline-colorizer, which sets its per-buffer bg + contrast fg.
         vim.api.nvim_set_hl(0, 'MiniStatuslineBreadcrumbSep', { bg = BREADCRUMB_BG, fg = '#7a7a7a' })
         for kind, sources in pairs(BREADCRUMB_KIND_HL_SOURCES) do
           local fg
@@ -1810,22 +1811,6 @@ require('lazy').setup({
       -- nf-fa-caret_right, falling back to a plain '^' without a nerd font.
       local ts_breadcrumb_caret = vim.g.have_nerd_font and '\u{f0da}' or '^'
 
-      -- Avoids re-setting the highlight (and forcing a redraw) when unchanged.
-      local last_breadcrumb_file_hl_source = nil
-
-      -- Filename color depends on filetype, so set on demand.
-      local function set_breadcrumb_file_hl(hl_source)
-        if hl_source == last_breadcrumb_file_hl_source then
-          return
-        end
-        last_breadcrumb_file_hl_source = hl_source
-        local fg = vim.api.nvim_get_hl(0, { name = hl_source, link = false }).fg
-        vim.api.nvim_set_hl(0, 'MiniStatuslineBreadcrumbFile', {
-          bg = BREADCRUMB_BG,
-          fg = fg and string.format('#%06x', fg),
-        })
-      end
-
       -- Breadcrumb: filename + cursor's enclosing symbols, as one raw
       -- pre-highlighted string (combine_groups() would double-pad multiple
       -- groups). nil (falls back to cwd) only for unnamed buffers.
@@ -1837,13 +1822,12 @@ require('lazy').setup({
         end
         local filename = vim.fn.fnamemodify(bufname, ':t')
 
-        local file_icon, file_hl_source = require('mini.icons').get('file', filename)
-        set_breadcrumb_file_hl(file_hl_source)
+        -- The filename chip's colors (per-buffer bg + contrast fg) are owned by
+        -- mini-tabline-colorizer (see its setup below), so only the icon glyph
+        -- is taken from mini.icons here — its per-filetype color is discarded.
+        local file_icon = require('mini.icons').get('file', filename)
         local segments = {
-          {
-            hl = 'MiniStatuslineBreadcrumbFile',
-            text = vim.g.have_nerd_font and (file_icon .. ' ' .. filename) or filename,
-          },
+          { hl = 'MiniStatuslineBreadcrumbFile', icon = file_icon, name = filename },
         }
 
         local parser = vim.treesitter.get_parser(bufnr)
@@ -1858,12 +1842,11 @@ require('lazy').setup({
           while node do
             local name_node = node:field('name')[1]
             if name_node then
-              local text = vim.treesitter.get_node_text(name_node, 0)
               local kind = blink_kind_for_node_type(node:type())
-              local icon = kind and vim.g.have_nerd_font and kind_icons[kind]
               table.insert(ts_segments, 1, {
                 hl = kind and ('MiniStatuslineBreadcrumb' .. kind) or 'MiniStatuslineBreadcrumbSep',
-                text = icon and (icon .. ' ' .. text) or text,
+                icon = kind and kind_icons[kind],
+                name = vim.treesitter.get_node_text(name_node, 0),
               })
             end
             node = node:parent()
@@ -1873,15 +1856,50 @@ require('lazy').setup({
           end
         end
 
+        -- All but the last 2 nodes get truncated past 24 characters.
+        for i = 1, #segments - 2 do
+          local name = segments[i].name
+          if #name > 24 then
+            segments[i].name = name:sub(1, 23) .. '…'
+          end
+        end
+
         -- Leading space goes right after each %#Group# switch, not before.
         local chunks = {}
         for i, seg in ipairs(segments) do
           if i > 1 then
             table.insert(chunks, '%#MiniStatuslineBreadcrumbSep# ' .. ts_breadcrumb_caret)
           end
-          table.insert(chunks, '%#' .. seg.hl .. '# ' .. seg.text)
+          local text = (seg.icon and vim.g.have_nerd_font) and (seg.icon .. ' ' .. seg.name) or seg.name
+          local chunk = '%#' .. seg.hl .. '# ' .. text
+          -- The filename chip (segment 1) is the only one with its own bg color
+          -- (per-buffer, via mini-tabline-colorizer); give it a trailing space so
+          -- the pill has right padding matching its leading space.
+          if i == 1 then
+            chunk = chunk .. ' '
+          end
+          table.insert(chunks, chunk)
         end
         return table.concat(chunks) .. ' '
+      end
+
+      -- Current buffer's filename + its cwd-relative path, as one raw
+      -- highlighted string in the plain statusline palette: bright filename
+      -- (MiniStatuslineFilename) + dim path (MiniStatuslinePath), both on the
+      -- shared body bg — deliberately boring, no per-buffer tint. This is the
+      -- text that used to live in the tabline; the colorful breadcrumb took its
+      -- place there (see the tabline block below). Path bg == body bg, so the
+      -- trailing group harmlessly bleeds across the '%=' gap.
+      local function file_path_segment()
+        local bufpath = vim.api.nvim_buf_get_name(0)
+        if bufpath == '' then
+          return '%#MiniStatuslineBody# [No Name] '
+        end
+        local label = vim.fn.fnamemodify(bufpath, ':t')
+        -- ':.' makes the path relative to the cwd; paths outside the cwd are
+        -- left absolute.
+        local shown_path = vim.fn.fnamemodify(bufpath, ':.')
+        return string.format('%%#MiniStatuslineFilename# %s %%#MiniStatuslinePath#%s ', label, shown_path)
       end
 
       -- 3. Statusline config
@@ -1916,8 +1934,9 @@ require('lazy').setup({
             --   file_segment = string.format('%%#MiniStatuslinePath# %s%s%%#MiniStatuslineFilename#%s ', filedir, sep, filename)
             -- end
 
-            -- ts_breadcrumb() above, falling back to the cwd name.
-            local position_group = ts_breadcrumb() or { hl = 'MiniStatuslinePath', strings = { vim.fn.fnamemodify(vim.fn.getcwd(), ':t') } }
+            -- Filename + cwd-relative path (file_path_segment() above). The
+            -- breadcrumb that used to live here now drives the tabline instead.
+            local position_group = file_path_segment()
 
             -- Create groups array with main components
             local status_line_widget_groups = {
@@ -1999,41 +2018,42 @@ require('lazy').setup({
         return '%2l:%-2v'
       end
 
-      -- mini.tabline preview: show only the current buffer's tab (not its
-      -- usual full buffer list) across the top, reusing mini.tabline's own
-      -- highlight groups and ColorScheme-refresh behavior from setup(). To go
-      -- back to no top tabline, delete this block and flip showtabline back
-      -- to 0 above (setup() below forces it to 2).
+      -- Top tabline: show the breadcrumb (filename + the cursor's enclosing
+      -- treesitter symbols) built by ts_breadcrumb() above, instead of the
+      -- buffer list. Swapped with the statusline, which now shows the filename +
+      -- relative path (file_path_segment). mini.tabline.setup() is still called
+      -- for its highlight groups, its ColorScheme refresh, and to force
+      -- showtabline=2. To go back to no top tabline, delete this block and flip
+      -- showtabline back to 0 above.
       require('mini.tabline').setup()
-      _G.MiniTablineCurrentTab = function()
-        local buf_id = vim.api.nvim_get_current_buf()
-        local bufpath = vim.api.nvim_buf_get_name(buf_id)
-        local hl = vim.bo[buf_id].modified and 'MiniTablineModifiedCurrent' or 'MiniTablineCurrent'
-        -- No trailing MiniTablineFill switch on either segment: leaving the
-        -- last group active lets it carry through the rest of the line,
-        -- covering the full width instead of just wrapping the text.
-        if bufpath == '' then
-          return string.format('%%#%s# [No Name]', hl)
-        end
-        local label = vim.fn.fnamemodify(bufpath, ':t')
-        -- ':.' makes the path relative to the cwd; paths outside the cwd are
-        -- left as-is (absolute) — same convention as the statusline's
-        -- current_filepath above.
-        local shown_path = vim.fn.fnamemodify(bufpath, ':.')
-        -- Full path appended in MiniTablineCurrentPath: same per-path bg as
-        -- `hl` (both are colored_groups below) but a muted static fg, so it
-        -- reads as secondary detail next to the bold filename.
-        return string.format('%%#%s# %s %%#MiniTablineCurrentPath# %s', hl, label, shown_path)
+      _G.MiniTablineBreadcrumb = function()
+        -- Fall back to the cwd name for unnamed buffers (as the breadcrumb's old
+        -- statusline slot did). ts_breadcrumb() already leaves its last group
+        -- open, so it fills the rest of the bar.
+        return ts_breadcrumb() or ('%#MiniStatuslinePath# ' .. vim.fn.fnamemodify(vim.fn.getcwd(), ':t'))
       end
-      vim.o.tabline = '%!v:lua.MiniTablineCurrentTab()'
+      vim.o.tabline = '%!v:lua.MiniTablineBreadcrumb()'
 
+      -- The breadcrumb tracks the cursor within the syntax tree, but the tabline
+      -- (unlike the statusline) isn't redrawn on cursor movement, so request a
+      -- redraw explicitly. Same per-move cost the statusline used to pay when it
+      -- hosted the breadcrumb.
+      vim.api.nvim_create_autocmd({ 'CursorMoved', 'CursorMovedI' }, {
+        group = vim.api.nvim_create_augroup('BreadcrumbTablineRedraw', { clear = true }),
+        callback = function()
+          vim.cmd 'redrawtabline'
+        end,
+      })
+
+      -- Tint the breadcrumb's filename chip (the first segment on the tabline)
+      -- with a per-buffer color, hashed from the buffer path: bg = the hashed
+      -- color, fg = auto contrast. This is the only rendered group it owns now;
+      -- ts_breadcrumb() no longer sets MiniStatuslineBreadcrumbFile itself.
       require('mini-tabline-colorizer').setup {
         saturation = 0.5,
         brightness = 0.3,
         colored_groups = {
-          'MiniTablineCurrent',
-          'MiniTablineModifiedCurrent',
-          { name = 'MiniTablineCurrentPath', fg = '#8E8E8E' },
+          'MiniStatuslineBreadcrumbFile',
         },
         linked_groups = {},
         flash_ms = 150,

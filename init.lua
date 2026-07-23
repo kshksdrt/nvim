@@ -1856,8 +1856,10 @@ require('lazy').setup({
           end
         end
 
-        -- All but the last 2 nodes get truncated past 24 characters.
-        for i = 1, #segments - 2 do
+        -- Symbol nodes past 24 characters get truncated, except the last 2 (the
+        -- innermost, most relevant scopes). The filename chip (segment 1) is
+        -- always shown in full.
+        for i = 2, #segments - 2 do
           local name = segments[i].name
           if #name > 24 then
             segments[i].name = name:sub(1, 23) .. '…'

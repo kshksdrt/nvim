@@ -2050,8 +2050,8 @@ require('lazy').setup({
       -- color, fg = auto contrast. This is the only rendered group it owns now;
       -- ts_breadcrumb() no longer sets MiniStatuslineBreadcrumbFile itself.
       require('mini-tabline-colorizer').setup {
-        saturation = 0.5,
-        brightness = 0.3,
+        saturation = 0.6,
+        brightness = 0.4,
         colored_groups = {
           'MiniStatuslineBreadcrumbFile',
         },

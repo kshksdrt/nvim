@@ -102,3 +102,8 @@ end, { desc = 'Copy [C]ursor [L]ocation' })
 
 -- Zen mode
 vim.keymap.set('n', 'ze', ':ZenMode<CR>', { noremap = true, silent = true, desc = 'ToggleZen mode' })
+
+-- Clear quickfix list
+vim.keymap.set('n', '<leader>xc', function()
+  vim.fn.setqflist {}
+end, { desc = 'Clear quickfix list' })

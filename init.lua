@@ -1810,7 +1810,7 @@ require('lazy').setup({
             if qf_info.size > 0 then
               table.insert(status_line_widget_groups, #status_line_widget_groups, {
                 hl = 'MiniStatuslineQuickfix',
-                strings = { string.format(' QF position: (%d of %d) ', qf_info.idx, qf_info.size) },
+                strings = { string.format('QF: %d of %d', qf_info.idx, qf_info.size) },
               })
             end
 

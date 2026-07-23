@@ -1689,6 +1689,26 @@ require('lazy').setup({
 
       local statusline = require 'mini.statusline'
 
+      -- fg source per breadcrumb kind: treesitter capture, else base syntax group.
+      -- Shared bg for all MiniStatuslineBreadcrumb* groups.
+      local BREADCRUMB_BG = '#2d2d2d'
+
+      --stylua: ignore
+      local BREADCRUMB_KIND_HL_SOURCES = {
+        Function    = { '@function', 'Function' },
+        Method      = { '@function.method', 'Function' },
+        Constructor = { '@constructor', 'Special' },
+        Class       = { '@type', 'Type' },
+        Struct      = { '@type', 'Type' },
+        Interface   = { '@type', 'Type' },
+        Enum        = { '@type', 'Type' },
+        Module      = { '@module', 'Include' },
+        Field       = { '@property', 'Identifier' },
+        Property    = { '@property', 'Identifier' },
+        Variable    = { '@variable', 'Identifier' },
+        Constant    = { '@constant', 'Constant' },
+      }
+
       -- 1. Colors
       local function set_statusline_highlights()
         vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = '#a8a8a8', fg = '#000000' })
@@ -1704,6 +1724,22 @@ require('lazy').setup({
         -- segment stays continuous. Built as a raw string in the content fn below.
         vim.api.nvim_set_hl(0, 'MiniStatuslinePath', { bg = '#444444', fg = '#bcbcbc' })
         vim.api.nvim_set_hl(0, 'MiniStatuslineFilename', { bg = '#444444', fg = '#ffffff', bold = true })
+
+        -- MiniStatuslineBreadcrumbFile is set separately, per-filetype, in ts_breadcrumb().
+        vim.api.nvim_set_hl(0, 'MiniStatuslineBreadcrumbSep', { bg = BREADCRUMB_BG, fg = '#7a7a7a' })
+        for kind, sources in pairs(BREADCRUMB_KIND_HL_SOURCES) do
+          local fg
+          for _, group in ipairs(sources) do
+            fg = vim.api.nvim_get_hl(0, { name = group, link = false }).fg
+            if fg then
+              break
+            end
+          end
+          vim.api.nvim_set_hl(0, 'MiniStatuslineBreadcrumb' .. kind, {
+            bg = BREADCRUMB_BG,
+            fg = fg and string.format('#%06x', fg),
+          })
+        end
       end
 
       set_statusline_highlights()
@@ -1743,6 +1779,111 @@ require('lazy').setup({
       })
       update_unsaved_count()
 
+      -- Maps a treesitter node type to a blink.cmp kind_icons key by substring.
+      --stylua: ignore
+      local ts_type_blink_kinds = {
+        { 'class',       'Class' },
+        { 'struct',      'Struct' },
+        { 'interface',   'Interface' },
+        { 'enum',        'Enum' },
+        { 'namespace',   'Module' },
+        { 'module',      'Module' },
+        { 'impl',        'Struct' },
+        { 'constructor', 'Constructor' },
+        { 'method',      'Method' },
+        { 'function',    'Function' },
+        { 'field',       'Field' },
+        { 'property',    'Property' },
+        { 'variable',    'Variable' },
+        { 'constant',    'Constant' },
+      }
+
+      local function blink_kind_for_node_type(node_type)
+        for _, pair in ipairs(ts_type_blink_kinds) do
+          if node_type:find(pair[1], 1, true) then
+            return pair[2]
+          end
+        end
+        return nil
+      end
+
+      -- nf-fa-caret_right, falling back to a plain '^' without a nerd font.
+      local ts_breadcrumb_caret = vim.g.have_nerd_font and '\u{f0da}' or '^'
+
+      -- Avoids re-setting the highlight (and forcing a redraw) when unchanged.
+      local last_breadcrumb_file_hl_source = nil
+
+      -- Filename color depends on filetype, so set on demand.
+      local function set_breadcrumb_file_hl(hl_source)
+        if hl_source == last_breadcrumb_file_hl_source then
+          return
+        end
+        last_breadcrumb_file_hl_source = hl_source
+        local fg = vim.api.nvim_get_hl(0, { name = hl_source, link = false }).fg
+        vim.api.nvim_set_hl(0, 'MiniStatuslineBreadcrumbFile', {
+          bg = BREADCRUMB_BG,
+          fg = fg and string.format('#%06x', fg),
+        })
+      end
+
+      -- Breadcrumb: filename + cursor's enclosing symbols, as one raw
+      -- pre-highlighted string (combine_groups() would double-pad multiple
+      -- groups). nil (falls back to cwd) only for unnamed buffers.
+      local function ts_breadcrumb()
+        local bufnr = vim.api.nvim_get_current_buf()
+        local bufname = vim.api.nvim_buf_get_name(bufnr)
+        if bufname == '' then
+          return nil
+        end
+        local filename = vim.fn.fnamemodify(bufname, ':t')
+
+        local file_icon, file_hl_source = require('mini.icons').get('file', filename)
+        set_breadcrumb_file_hl(file_hl_source)
+        local segments = {
+          {
+            hl = 'MiniStatuslineBreadcrumbFile',
+            text = vim.g.have_nerd_font and (file_icon .. ' ' .. filename) or filename,
+          },
+        }
+
+        local parser = vim.treesitter.get_parser(bufnr)
+        if parser then
+          parser:parse() -- cheap no-op if the tree is already up to date
+
+          -- Live config, so a future kind_icons change stays in sync.
+          local kind_icons = require('blink.cmp.config').appearance.kind_icons
+
+          local node = vim.treesitter.get_node()
+          local ts_segments = {}
+          while node do
+            local name_node = node:field('name')[1]
+            if name_node then
+              local text = vim.treesitter.get_node_text(name_node, 0)
+              local kind = blink_kind_for_node_type(node:type())
+              local icon = kind and vim.g.have_nerd_font and kind_icons[kind]
+              table.insert(ts_segments, 1, {
+                hl = kind and ('MiniStatuslineBreadcrumb' .. kind) or 'MiniStatuslineBreadcrumbSep',
+                text = icon and (icon .. ' ' .. text) or text,
+              })
+            end
+            node = node:parent()
+          end
+          for _, seg in ipairs(ts_segments) do
+            table.insert(segments, seg)
+          end
+        end
+
+        -- Leading space goes right after each %#Group# switch, not before.
+        local chunks = {}
+        for i, seg in ipairs(segments) do
+          if i > 1 then
+            table.insert(chunks, '%#MiniStatuslineBreadcrumbSep# ' .. ts_breadcrumb_caret)
+          end
+          table.insert(chunks, '%#' .. seg.hl .. '# ' .. seg.text)
+        end
+        return table.concat(chunks) .. ' '
+      end
+
       -- 3. Statusline config
       statusline.setup {
         -- set use_icons to true if you have a Nerd Font
@@ -1775,15 +1916,14 @@ require('lazy').setup({
             --   file_segment = string.format('%%#MiniStatuslinePath# %s%s%%#MiniStatuslineFilename#%s ', filedir, sep, filename)
             -- end
 
-            -- Last path component of the cwd, e.g. '~/project' -> 'project'.
-            -- Read live (cheap) rather than cached, since :cd/:tcd can change it.
-            local cwd_name = vim.fn.fnamemodify(vim.fn.getcwd(), ':t')
+            -- ts_breadcrumb() above, falling back to the cwd name.
+            local position_group = ts_breadcrumb() or { hl = 'MiniStatuslinePath', strings = { vim.fn.fnamemodify(vim.fn.getcwd(), ':t') } }
 
             -- Create groups array with main components
             local status_line_widget_groups = {
               { hl = 'MiniStatuslineDevinfo', strings = { git } },
               -- file_segment,
-              { hl = 'MiniStatuslinePath', strings = { cwd_name } },
+              position_group,
               '%=',
               { hl = 'MiniStatuslineLocation', strings = { location } },
             }

@@ -742,8 +742,29 @@ require('lazy').setup({
           local function lsp_qf(label, fn, needs_context)
             return function()
               local symbol = vim.fn.expand '<cword>'
+
+              -- Surface a statusline indicator (see the LSP-activity section
+              -- in the mini.statusline content() below) while this async
+              -- request is in flight. Token-guarded so a request that never
+              -- completes (e.g. a server silently doesn't support the method,
+              -- so on_list is never invoked) can't get stuck showing forever
+              -- once a newer request starts, and can't clear a newer request's
+              -- indicator out from under it.
+              _G.LspActivityToken = (_G.LspActivityToken or 0) + 1
+              local token = _G.LspActivityToken
+              _G.LspActivity = label
+              vim.cmd 'redrawstatus'
+              local function clear_activity()
+                if _G.LspActivityToken == token then
+                  _G.LspActivity = nil
+                  vim.cmd 'redrawstatus'
+                end
+              end
+              vim.defer_fn(clear_activity, 15000) -- safety net if the server never responds
+
               local opts = {
                 on_list = function(t)
+                  clear_activity()
                   -- ' ' (space) action pushes a NEW list onto the stack -> history.
                   vim.fn.setqflist({}, ' ', {
                     title = ('%s: %s'):format(label, symbol),
@@ -1673,6 +1694,12 @@ require('lazy').setup({
         vim.api.nvim_set_hl(0, 'MiniStatuslineDevinfo', { bg = '#a8a8a8', fg = '#000000' })
         vim.api.nvim_set_hl(0, 'MiniStatuslineBody', { bg = '#444444', fg = '#ffffff' })
         vim.api.nvim_set_hl(0, 'MiniStatuslineUnsaved', { bg = '#d6bd7c', fg = '#000000' })
+        vim.api.nvim_set_hl(0, 'MiniStatuslineLspActivity', { bg = '#00af00', fg = '#000000', bold = true })
+        vim.api.nvim_set_hl(0, 'MiniStatuslineQuickfix', { bg = '#5fafd7', fg = '#000000' })
+        -- Muted (non-saturated) red on the same bg as the surrounding body text,
+        -- so the error count reads as a quiet annotation rather than an alert
+        -- block like the saturated Unsaved/LspActivity sections.
+        vim.api.nvim_set_hl(0, 'MiniStatuslineDiagnosticError', { bg = '#444444', fg = '#af8787' })
         -- Filepath is split into dir (dim) + filename (bright); same bg so the
         -- segment stays continuous. Built as a raw string in the content fn below.
         vim.api.nvim_set_hl(0, 'MiniStatuslinePath', { bg = '#444444', fg = '#bcbcbc' })
@@ -1728,33 +1755,64 @@ require('lazy').setup({
 
             -- ':.' makes the path relative to the cwd; paths outside the cwd
             -- are left as-is (absolute).
-            local current_filepath = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':.')
+            -- local current_filepath = vim.fn.fnamemodify(vim.api.nvim_buf_get_name(0), ':.')
 
             -- Split the path so the filename can be highlighted brighter than its
             -- directory. Embed the highlight switches in one raw string (rather than
             -- two table groups) so combine_groups' per-group space padding doesn't
             -- open a gap at the slash; raw strings are passed through verbatim.
-            local file_segment
-            if current_filepath == '' then
-              file_segment = '%#MiniStatuslineBody# [No Name] '
-            else
-              local filedir = vim.fn.fnamemodify(current_filepath, ':h')
-              local filename = vim.fn.fnamemodify(current_filepath, ':t')
-              local sep = filedir:sub(-1) == '/' and '' or '/'
-              -- A file directly in the cwd has ':h' == '.'; show just the name.
-              if filedir == '.' then
-                filedir, sep = '', ''
-              end
-              file_segment = string.format('%%#MiniStatuslinePath# %s%s%%#MiniStatuslineFilename#%s ', filedir, sep, filename)
-            end
+            -- local file_segment
+            -- if current_filepath == '' then
+            --   file_segment = '%#MiniStatuslineBody# [No Name] '
+            -- else
+            --   local filedir = vim.fn.fnamemodify(current_filepath, ':h')
+            --   local filename = vim.fn.fnamemodify(current_filepath, ':t')
+            --   local sep = filedir:sub(-1) == '/' and '' or '/'
+            --   -- A file directly in the cwd has ':h' == '.'; show just the name.
+            --   if filedir == '.' then
+            --     filedir, sep = '', ''
+            --   end
+            --   file_segment = string.format('%%#MiniStatuslinePath# %s%s%%#MiniStatuslineFilename#%s ', filedir, sep, filename)
+            -- end
+
+            -- Last path component of the cwd, e.g. '~/project' -> 'project'.
+            -- Read live (cheap) rather than cached, since :cd/:tcd can change it.
+            local cwd_name = vim.fn.fnamemodify(vim.fn.getcwd(), ':t')
 
             -- Create groups array with main components
-            local groups = {
+            local status_line_widget_groups = {
               { hl = 'MiniStatuslineDevinfo', strings = { git } },
-              file_segment,
+              -- file_segment,
+              { hl = 'MiniStatuslinePath', strings = { cwd_name } },
               '%=',
               { hl = 'MiniStatuslineLocation', strings = { location } },
             }
+
+            -- Quiet error-diagnostic count for the current buffer, e.g. " 3".
+            -- Uses the same glyph as the gutter's error sign (see the
+            -- vim.diagnostic.config signs block above) so the two stay
+            -- visually associated without duplicating the sign's saturated color.
+            -- Hidden when there are no errors.
+            local error_count = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.ERROR })
+            if error_count > 0 then
+              local error_icon = vim.g.have_nerd_font and '' or 'E'
+              table.insert(status_line_widget_groups, #status_line_widget_groups, {
+                hl = 'MiniStatuslineDiagnosticError',
+                strings = { string.format(' %s %d ', error_icon, error_count) },
+              })
+            end
+
+            -- Quickfix position, e.g. "QF position: (2 of 14)". idx/size come
+            -- from the quickfix list's own cursor, which :cnext/:cprev/:cc
+            -- maintain regardless of whether the quickfix window is open.
+            -- Hidden when the list is empty.
+            local qf_info = vim.fn.getqflist { idx = 0, size = 0 }
+            if qf_info.size > 0 then
+              table.insert(status_line_widget_groups, #status_line_widget_groups, {
+                hl = 'MiniStatuslineQuickfix',
+                strings = { string.format(' QF position: (%d of %d) ', qf_info.idx, qf_info.size) },
+              })
+            end
 
             -- Tabpage indicator: only meaningful with more than one tabpage.
             -- tabpagenr() is cheap, so it's read live here rather than cached.
@@ -1762,22 +1820,33 @@ require('lazy').setup({
             local n_tabpages = vim.fn.tabpagenr '$'
             if n_tabpages > 1 then
               -- Position 1: leftmost, before the git branch section.
-              table.insert(groups, 1, {
+              table.insert(status_line_widget_groups, 1, {
                 -- Reuse mini.tabline's own tabpage highlight so the color matches it.
                 hl = 'MiniTablineTabpagesection',
                 strings = { string.format(' %d/%d ', vim.fn.tabpagenr(), n_tabpages) },
               })
             end
 
+            -- Saturated green "LSP processing..." indicator, shown while an
+            -- async goto/references request is in flight. _G.LspActivity is
+            -- set/cleared by the lsp_qf() wrapper (see LspAttach above) and
+            -- holds the operation label, e.g. "References" or "Definitions".
+            if _G.LspActivity then
+              table.insert(status_line_widget_groups, {
+                hl = 'MiniStatuslineLspActivity',
+                strings = { string.format(' LSP processing... (%s) ', _G.LspActivity:lower()) },
+              })
+            end
+
             -- Only add unsaved buffers section if count is greater than 0
             if unsaved_count > 0 then
-              table.insert(groups, {
+              table.insert(status_line_widget_groups, {
                 hl = 'MiniStatuslineUnsaved',
                 strings = { string.format(' Unsaved: %d ', unsaved_count) },
               })
             end
 
-            return MiniStatusline.combine_groups(groups)
+            return MiniStatusline.combine_groups(status_line_widget_groups)
           end,
         },
       }

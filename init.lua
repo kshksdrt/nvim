@@ -584,10 +584,10 @@ require('lazy').setup({
           },
         },
       },
-      {
-        'mason-org/mason-lspconfig.nvim',
-        version = '^1.0.0',
-      },
+      -- NOTE: no `mason-lspconfig` here on purpose. Servers are configured and enabled
+      -- directly through the built-in `vim.lsp` API at the end of this block, and
+      -- mason-tool-installer is given real Mason package names, so nothing needs its
+      -- lspconfig-name <-> package-name translation table.
       'WhoIsSethDaniel/mason-tool-installer.nvim',
       {
         'saghen/blink.cmp',
@@ -928,15 +928,20 @@ require('lazy').setup({
       --  - settings (table): Override the default settings passed when initializing the server.
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
 
+      -- Shipped inside the `vue-language-server` mason package; loaded into `ts_ls` below
+      -- as a tsserver plugin so `vue_ls` can run in hybrid mode. `$MASON` is exported by
+      -- `require('mason').setup()` above.
       local vue_plugin = {
         name = '@vue/typescript-plugin',
-        location = vim.fn.expand '$MASON/packages' .. '/vue-language-server' .. '/node_modules/@vue/language-server',
-        languages = {
-          'vue',
-        },
+        location = vim.fn.expand '$MASON/packages/vue-language-server/node_modules/@vue/language-server',
+        languages = { 'vue' },
         configNamespace = 'typescript',
       }
 
+      -- Keys are *lspconfig server names* (`:help lspconfig-all`); every key here gets
+      -- configured and enabled at the bottom of this block. Mason package names are a
+      -- separate namespace -- see the `mason-tool-installer` list below. Formatters and
+      -- linters do NOT belong in here; they are Mason packages only.
       local servers = {
         -- See `:help lspconfig-all` for a list of all the pre-configured LSPs
 
@@ -952,80 +957,32 @@ require('lazy').setup({
 
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
-        -- Some languages (like typescript) have entire language plugins that can be useful:
-        --    https://github.com/pmizio/typescript-tools.nvim
-        --
-        -- But for many setups, the LSP (`ts_ls`) will work just fine
-        --
-        -- See https://github.com/pmizio/typescript-tools.nvim for more useful features
+        -- TypeScript 7 (`typescript-go`), the native Go port of tsserver. Owns plain
+        -- JS/TS. Feature coverage is still partial (diagnostics, hover, go-to-definition,
+        -- references, signature help) and it cannot load tsserver plugins, which is why
+        -- `ts_ls` below is kept around purely for Vue. Defaults (cmd, root_dir, deno
+        -- detection, inlay hints) come from nvim-lspconfig's `lsp/tsgo.lua`.
+        tsgo = {},
+
+        -- Kept *only* for Vue, as the carrier of `@vue/typescript-plugin`. `vue_ls` runs in
+        -- hybrid mode: it owns the template/style blocks and forwards `tsserver/request`
+        -- to whichever TS client is attached to the buffer. nvim-lspconfig's stock
+        -- `vue_ls` config already installs that forwarding handler, so no `on_init` here.
+        -- See https://github.com/vuejs/language-tools/wiki/Neovim
         ts_ls = {
-          on_init = function(client)
-            client.handlers['tsserver/request'] = function(_, result, context)
-              local clients = vim.lsp.get_clients { bufnr = context.bufnr, name = 'vtsls' }
-              if #clients == 0 then
-                vim.notify('Could not find `vtsls` lsp client, `vue_ls` would not work without it.', vim.log.levels.ERROR)
-                return
-              end
-              local ts_client = clients[1]
-
-              local param = unpack(result)
-              local id, command, payload = unpack(param)
-              ts_client:exec_cmd({
-                title = 'vue_request_forward', -- You can give title anything as it's used to represent a command in the UI, `:h Client:exec_cmd`
-                command = 'typescript.tsserverRequest',
-                arguments = {
-                  command,
-                  payload,
-                },
-              }, { bufnr = context.bufnr }, function(_, r)
-                local response = r and r.body
-                -- TODO: handle error or response nil here, e.g. logging
-                -- NOTE: Do NOT return if there's an error or no response, just return nil back to the vue_ls to prevent memory leak
-                local response_data = { { id, response } }
-
-                ---@diagnostic disable-next-line: param-type-mismatch
-                client:notify('tsserver/response', response_data)
-              end)
-            end
-          end,
+          filetypes = { 'vue' },
+          init_options = {
+            plugins = { vue_plugin },
+          },
           on_attach = function(client, _)
-            if vim.bo.filetype == 'vue' then
-              client.server_capabilities.semanticTokensProvider.full = false
-            else
-              client.server_capabilities.semanticTokensProvider.full = true
-            end
+            -- vue_ls supplies semantic tokens for .vue files; let it win.
+            client.server_capabilities.semanticTokensProvider.full = false
+            -- Formatting and highlighting come from conform.nvim (prettier) and treesitter.
             client.server_capabilities.documentFormattingProvider = nil
             client.server_capabilities.documentHighlightProvider = nil
-            if client.server_capabilities.documentHighlightProvider then
-              vim.api.nvim_create_augroup('lsp_document_highlight', { clear = true })
-            end
           end,
-          init_options = {
-            plugins = {
-              vue_plugin,
-            },
-          },
-          filetypes = {
-            'typescript',
-            'javascript',
-            'javascriptreact',
-            'typescriptreact',
-            'vue',
-          },
         },
 
-        -- vtsls = {
-        --   settings = {
-        --     vtsls = {
-        --       tsserver = {
-        --         globalPlugins = {
-        --           vue_plugin,
-        --         },
-        --       },
-        --     },
-        --   },
-        -- },
-        --
         vue_ls = {},
 
         lua_ls = {
@@ -1043,8 +1000,7 @@ require('lazy').setup({
           },
         },
 
-        prettier = {},
-
+        -- Configured (and enabled) by roslyn.nvim itself; this only layers on settings.
         roslyn = {
           ['csharp|formatting'] = {
             csharp_enable_inlay_hints_for_implicit_object_creation = true,
@@ -1092,49 +1048,42 @@ require('lazy').setup({
         },
       }
 
-      -- Ensure the servers and tools above are installed
-      --
-      -- To check the current status of installed tools and/or manually install
-      -- other tools, you can run
-      --    :Mason
-      --
-      -- You can press `g?` for help in this menu.
-      --
-      -- `mason` had to be setup earlier: to configure its options see the
-      -- `dependencies` table for `nvim-lspconfig` above.
-      --
-      -- You can add other tools here that you want Mason to install
-      -- for you, so that they are available from within Neovim.
-      local ensure_installed = vim.tbl_keys(servers or {})
-      vim.list_extend(ensure_installed, {
-        'stylua', -- Used to format Lua code
-        'vue-language-server',
-        'vue_ls',
-        'vtsls',
-        'csharpier',
-        'prettierd',
-        'prettier',
-      })
-      require('mason-tool-installer').setup { ensure_installed = ensure_installed }
-
-      require('mason-lspconfig').setup {
-        ensure_installed = {}, -- explicitly empty: installs are driven by mason-tool-installer above
-        automatic_installation = false,
-        handlers = {
-          function(server_name)
-            local server = servers[server_name] or {}
-            -- This handles overriding only values explicitly passed
-            -- by the server configuration above. Useful when disabling
-            -- certain features of an LSP (for example, turning off formatting for ts_ls)
-            server.capabilities = require('blink.cmp').get_lsp_capabilities(server.capabilities)
-
-            -- For theming, see https://github.com/neovim/nvim-lspconfig/wiki/UI-Customization
-            vim.lsp.config(server_name, server)
-            vim.lsp.enable(server_name)
-            -- require('lspconfig')[server_name].setup(server)
-          end,
+      -- Mason *package* names -- browse/verify them with `:Mason` (`g?` for help).
+      -- Spelled out rather than derived from `servers`, because the two namespaces don't
+      -- line up: `ts_ls` ships as `typescript-language-server`, and formatters have no
+      -- server entry at all. Translating between them needs a lookup table that goes
+      -- stale (the one this config used to rely on still called `vue_ls` "volar" and had
+      -- never heard of `tsgo`, so both were silently skipped). Real names can't go stale.
+      require('mason-tool-installer').setup {
+        ensure_installed = {
+          -- Language servers
+          'gopls',
+          'lua-language-server',
+          'markdown-oxide',
+          'roslyn',
+          'rust-analyzer',
+          'tinymist',
+          'tsgo', -- TypeScript 7 / @typescript/native-preview
+          'typescript-language-server', -- `ts_ls`, Vue only
+          'vue-language-server',
+          -- Formatters
+          'csharpier',
+          'prettier',
+          'prettierd',
+          'stylua',
         },
       }
+
+      -- Configure and enable every server in `servers` -- this table is the single source
+      -- of truth for what runs. Note this enables exactly what is listed and nothing else,
+      -- unlike the old mason-lspconfig handler, which enabled whatever happened to be
+      -- installed in Mason and so quietly started servers that were never configured here.
+      -- For theming, see https://github.com/neovim/nvim-lspconfig/wiki/UI-Customization
+      for name, server in pairs(servers) do
+        server.capabilities = require('blink.cmp').get_lsp_capabilities(server.capabilities)
+        vim.lsp.config(name, server)
+      end
+      vim.lsp.enable(vim.tbl_keys(servers))
     end,
   },
 

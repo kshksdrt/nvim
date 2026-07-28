@@ -647,7 +647,7 @@ return {
       desc = 'Colorschemes',
     },
     {
-      '<leader>fn',
+      '<leader>sn',
       function()
         require('snacks').picker.files { cwd = vim.fn.stdpath 'config' }
       end,

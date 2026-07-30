@@ -2185,6 +2185,7 @@ require 'commands.fix_quickfix'
 require 'commands.cmd'
 require 'commands.markdown'
 require 'commands.pandoc'
+require 'commands.line'
 
 local stickies = require 'commands.sticky_notes_float'
 stickies.setup()

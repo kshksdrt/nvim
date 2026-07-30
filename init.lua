@@ -938,6 +938,12 @@ require('lazy').setup({
         configNamespace = 'typescript',
       }
 
+      -- The filetypes the JS/TS server owns, whichever one is currently selected. `vue` is
+      -- deliberately absent: it always belongs to `ts_ls` (see below), never to `tsgo`.
+      -- Shared with the `:TsServer` toggle at the end of this block, which reassigns these
+      -- between the two servers -- so this list must stay the only copy.
+      local ts_filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' }
+
       -- Keys are *lspconfig server names* (`:help lspconfig-all`); every key here gets
       -- configured and enabled at the bottom of this block. Mason package names are a
       -- separate namespace -- see the `mason-tool-installer` list below. Formatters and
@@ -961,25 +967,34 @@ require('lazy').setup({
         -- JS/TS. Feature coverage is still partial (diagnostics, hover, go-to-definition,
         -- references, signature help) and it cannot load tsserver plugins, which is why
         -- `ts_ls` below is kept around purely for Vue. Defaults (cmd, root_dir, deno
-        -- detection, inlay hints) come from nvim-lspconfig's `lsp/tsgo.lua`.
-        tsgo = {},
+        -- detection, inlay hints) come from nvim-lspconfig's `lsp/tsgo.lua`. This is the
+        -- default owner of `ts_filetypes`; `:TsServer` hands them to `ts_ls` instead.
+        tsgo = { filetypes = ts_filetypes },
 
-        -- Kept *only* for Vue, as the carrier of `@vue/typescript-plugin`. `vue_ls` runs in
-        -- hybrid mode: it owns the template/style blocks and forwards `tsserver/request`
-        -- to whichever TS client is attached to the buffer. nvim-lspconfig's stock
-        -- `vue_ls` config already installs that forwarding handler, so no `on_init` here.
+        -- Always owns Vue, as the carrier of `@vue/typescript-plugin`: `vue_ls` runs in
+        -- hybrid mode, owning the template/style blocks and forwarding `tsserver/request`
+        -- to whichever TS client is attached to the buffer, and only `ts_ls` can load that
+        -- plugin. nvim-lspconfig's stock `vue_ls` config already installs the forwarding
+        -- handler, so no `on_init` is needed here.
+        -- Also takes over `ts_filetypes` when `:TsServer` selects it over `tsgo`.
         -- See https://github.com/vuejs/language-tools/wiki/Neovim
         ts_ls = {
           filetypes = { 'vue' },
           init_options = {
             plugins = { vue_plugin },
           },
-          on_attach = function(client, _)
-            -- vue_ls supplies semantic tokens for .vue files; let it win.
-            client.server_capabilities.semanticTokensProvider.full = false
+          on_attach = function(client, bufnr)
+            -- vue_ls supplies semantic tokens for .vue files, so let it win there; keep
+            -- them elsewhere, where ts_ls is the only provider. Read the filetype from
+            -- `bufnr`, not the current buffer: re-attaches driven by `:TsServer` fire for
+            -- buffers that may not be the focused one.
+            local caps = client.server_capabilities
+            if caps.semanticTokensProvider then
+              caps.semanticTokensProvider.full = vim.bo[bufnr].filetype ~= 'vue'
+            end
             -- Formatting and highlighting come from conform.nvim (prettier) and treesitter.
-            client.server_capabilities.documentFormattingProvider = nil
-            client.server_capabilities.documentHighlightProvider = nil
+            caps.documentFormattingProvider = nil
+            caps.documentHighlightProvider = nil
           end,
         },
 
@@ -1084,6 +1099,67 @@ require('lazy').setup({
         vim.lsp.config(name, server)
       end
       vim.lsp.enable(vim.tbl_keys(servers))
+
+      -- `:TsServer [tsgo|ts_ls]` -- choose which server handles `ts_filetypes`. With no
+      -- argument it toggles; naming the one already selected restarts it. Vue is never
+      -- reassigned: `ts_ls` keeps it in both modes (see its entry above).
+      local ts_selected = 'tsgo' -- whichever of the two owns `ts_filetypes` right now
+
+      local function select_ts_server(name)
+        ts_selected = name
+
+        -- Stop both servers' clients, remembering where they were so we can re-attach.
+        local buffers, stopping = {}, {}
+        for _, client in ipairs(vim.lsp.get_clients()) do
+          if client.name == 'tsgo' or client.name == 'ts_ls' then
+            for buf in pairs(client.attached_buffers) do
+              buffers[buf] = true
+            end
+            client:stop()
+            stopping[#stopping + 1] = client
+          end
+        end
+
+        if name == 'tsgo' then
+          vim.lsp.config('ts_ls', { filetypes = { 'vue' } })
+          vim.lsp.enable 'tsgo'
+        else
+          vim.lsp.enable('tsgo', false)
+          vim.lsp.config('ts_ls', { filetypes = vim.list_extend({ 'vue' }, ts_filetypes) })
+        end
+
+        -- Re-attach only once the old clients are fully down; re-triggering FileType while
+        -- one is still shutting down just hands the buffer back to the dying client.
+        local timer = assert(vim.uv.new_timer())
+        timer:start(
+          100,
+          100,
+          vim.schedule_wrap(function()
+            for _, client in ipairs(stopping) do
+              if not client:is_stopped() then
+                return
+              end
+            end
+            timer:close()
+            for buf in pairs(buffers) do
+              if vim.api.nvim_buf_is_loaded(buf) then
+                vim.api.nvim_exec_autocmds('FileType', { buffer = buf, modeline = false })
+              end
+            end
+            vim.notify('JS/TS language server: ' .. name)
+          end)
+        )
+      end
+
+      vim.api.nvim_create_user_command('TsServer', function(opts)
+        select_ts_server(opts.args ~= '' and opts.args or (ts_selected == 'tsgo' and 'ts_ls' or 'tsgo'))
+      end, {
+        nargs = '?',
+        desc = 'Switch the JS/TS language server between tsgo and ts_ls (restarts if already selected)',
+        complete = function()
+          return { 'tsgo', 'ts_ls' }
+        end,
+      })
     end,
   },
 

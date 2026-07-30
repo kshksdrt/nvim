@@ -1723,9 +1723,25 @@ require('lazy').setup({
         pattern = 'modified',
         callback = update_unsaved_count,
       })
+      -- BufDelete fires *before* the buffer leaves the buffer list, so recounting
+      -- inline still counts the buffer being deleted. Defer to the next tick, when
+      -- the list is settled, and coalesce the burst that bulk deletes produce
+      -- (Snacks.bufdelete.all() fires one BufDelete per buffer). The count feeds a
+      -- statusline widget that nothing else redraws here, hence the redrawstatus.
+      local recount_pending = false
       vim.api.nvim_create_autocmd({ 'BufWritePost', 'BufDelete' }, {
         group = group,
-        callback = update_unsaved_count,
+        callback = function()
+          if recount_pending then
+            return
+          end
+          recount_pending = true
+          vim.schedule(function()
+            recount_pending = false
+            update_unsaved_count()
+            vim.cmd.redrawstatus { bang = true }
+          end)
+        end,
       })
       update_unsaved_count()
 

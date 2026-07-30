@@ -16,8 +16,7 @@ vim.keymap.set('n', '<PageUp>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<PageDown>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', 'zs', '<Nop>', { noremap = true, silent = true })
 
--- My custom text objects
---  Gives you text objects for the contents of current buffer.
+-- Custom text objects: ie/ae select the whole buffer.
 vim.api.nvim_set_keymap('x', 'ie', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('o', 'ie', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('x', 'ae', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
@@ -50,14 +49,10 @@ vim.keymap.set('n', 'L', '<cmd>tabnext<cr>', { noremap = true, silent = true })
 
 -- Buffer management
 --
--- Buffers are GLOBAL across every tab page (a tab is just a window layout), so a
--- plain `:bd`/`:bdelete` of a buffer shown in a window -- the current split OR a
--- window on another tab -- closes that window and scrambles the layout. folke's
--- Snacks.bufdelete (already loaded; see lua/plugins/snacks.lua) avoids this: it
--- finds every window displaying the buffer (across ALL tabpages, via
--- win_findbuf), swaps in the alternate/most-recently-used buffer, then deletes --
--- so the window survives and no tab gets corrupted. It also prompts to save if
--- the buffer is modified.
+-- Buffers are global across tabpages, so a plain `:bd` of a visible buffer closes
+-- its window and scrambles the layout. Snacks.bufdelete swaps the alternate/MRU
+-- buffer into every window showing it (all tabpages) before deleting, and prompts
+-- to save if modified.
 -- Source: ~/.local/share/nvim/lazy/snacks.nvim/lua/snacks/bufdelete.lua
 vim.keymap.set('n', 'zq', function()
   Snacks.bufdelete() -- delete the current buffer
@@ -69,13 +64,10 @@ vim.keymap.set('n', 'z/', function()
   Snacks.bufdelete.all() -- delete all buffers
 end, { noremap = true, silent = true, desc = 'Delete all buffers (keep layout)' })
 
--- Route the muscle-memory `:bd[!]` / `:bdelete[!]` through the same safe delete,
--- so even a typed command stops closing windows and corrupting other tabs.
--- `Bdelete` is the layout-preserving wrapper (bang -> force, optional buffer
--- id/name arg). The abbreviations only rewrite the bare command (guarded by an
--- exact `==# 'bd'` match), so `:bd 3` / `:bd!` still expand -- to `Bdelete 3` /
--- `Bdelete!` -- and pass their arg/bang through, while a stray `bd` mid-command
--- (e.g. `:g/x/bd`) is left untouched.
+-- Route muscle-memory `:bd[!]` / `:bdelete[!]` through the same safe delete.
+-- The abbreviations rewrite only the bare command (exact `==#` guard), so `:bd 3`
+-- and `:bd!` still expand and pass their arg/bang through, while a stray `bd`
+-- mid-command (e.g. `:g/x/bd`) is left untouched.
 vim.api.nvim_create_user_command('Bdelete', function(o)
   local opts = { force = o.bang }
   if o.args ~= '' then
@@ -106,4 +98,7 @@ vim.keymap.set('n', 'ze', ':ZenMode<CR>', { noremap = true, silent = true, desc 
 -- Clear quickfix list
 vim.keymap.set('n', '<leader>xc', function()
   vim.fn.setqflist {}
+  -- setqflist() doesn't dirty the statusline, so the "QF: x of y" widget would
+  -- show a stale count until the next redraw.
+  vim.cmd.redrawstatus { bang = true }
 end, { desc = 'Clear quickfix list' })

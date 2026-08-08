@@ -786,25 +786,38 @@ require('lazy').setup({
             end
           end
 
+          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          local Methods = vim.lsp.protocol.Methods
+
+          -- Bind a mapping only if the attaching client implements its method. LspAttach
+          -- fires once per client, so the real server still installs these when it arrives.
+          -- The guard just stops a client without the capability from claiming the key.
+          -- copilot.lua starts its own LSP client on InsertEnter. In a large TS project it
+          -- gets there first. Unguarded, `gd` warned 'method "textDocument/definition" is
+          -- not supported by any server activated for this buffer' until TS caught up.
+          local function map_if(method, keys, func, desc, mode)
+            if client and client:supports_method(method, event.buf) then
+              map(keys, func, desc, mode)
+            end
+          end
+
           -- Goto navigation. These override Neovim's built-in gr* defaults with
           -- versions that produce titled quickfix lists.
-          map('gd', lsp_qf('Definitions', vim.lsp.buf.definition, false), '[G]oto [D]efinition')
-          map('grr', lsp_qf('References', vim.lsp.buf.references, true), '[G]oto [R]eferences')
-          map('gri', lsp_qf('Implementations', vim.lsp.buf.implementation, false), '[G]oto [I]mplementation')
-          map('grt', lsp_qf('Type Definitions', vim.lsp.buf.type_definition, false), '[G]oto [T]ype Definition')
+          map_if(Methods.textDocument_definition, 'gd', lsp_qf('Definitions', vim.lsp.buf.definition, false), '[G]oto [D]efinition')
+          map_if(Methods.textDocument_references, 'grr', lsp_qf('References', vim.lsp.buf.references, true), '[G]oto [R]eferences')
+          map_if(Methods.textDocument_implementation, 'gri', lsp_qf('Implementations', vim.lsp.buf.implementation, false), '[G]oto [I]mplementation')
+          map_if(Methods.textDocument_typeDefinition, 'grt', lsp_qf('Type Definitions', vim.lsp.buf.type_definition, false), '[G]oto [T]ype Definition')
 
           -- Rename the symbol under your cursor (most servers do this across files).
-          map('<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame Symbol')
-          map('<F2>', vim.lsp.buf.rename, 'Rename Symbol')
+          map_if(Methods.textDocument_rename, '<leader>rn', vim.lsp.buf.rename, '[R]e[n]ame Symbol')
+          map_if(Methods.textDocument_rename, '<F2>', vim.lsp.buf.rename, 'Rename Symbol')
 
           -- Code action. Cursor usually needs to be on an error/suggestion.
-          map('<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
+          map_if(Methods.textDocument_codeAction, '<leader>ca', vim.lsp.buf.code_action, '[C]ode [A]ction', { 'n', 'x' })
 
           -- WARN: This is Goto Declaration, not Goto Definition.
           --  For example, in C this would take you to the header.
-          map('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
-
-          local client = vim.lsp.get_client_by_id(event.data.client_id)
+          map_if(Methods.textDocument_declaration, 'gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
 
           -- Highlight references of the word under the cursor when it rests there
           -- for a little while, and clear the highlights when the cursor moves.

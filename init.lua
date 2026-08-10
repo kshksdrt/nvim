@@ -27,6 +27,10 @@ if vim.g.neovide then
 
   vim.opt.linespace = 2
 
+  -- Skia's defaults (0.0/0.5) thicken glyph stems; these match Alacritty's rendering
+  vim.g.neovide_text_gamma = 0.9
+  vim.g.neovide_text_contrast = 0.1
+
   vim.g.neovide_progress_bar_enabled = true
   vim.g.neovide_progress_bar_height = 5.0
   vim.g.neovide_progress_bar_animation_speed = 200.0

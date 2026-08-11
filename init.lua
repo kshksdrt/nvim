@@ -968,7 +968,29 @@ require('lazy').setup({
       local servers = {
         -- See `:help lspconfig-all` for a list of all the pre-configured LSPs
 
-        -- clangd = {},
+        -- C/C++/ObjC/CUDA. Deliberately the *system* clangd (Arch's `clang`, currently
+        -- 22.x) rather than a Mason copy, so it shares the resource dir and the GCC
+        -- toolchain headers the local compiler uses -- a Mason clangd pinned to an older
+        -- LLVM drifts from those and invents errors in system headers. Hence no `clangd`
+        -- in the `mason-tool-installer` list below.
+        -- Root markers (`compile_commands.json`, `.clangd`, `compile_flags.txt`, `.git`,
+        -- ...), utf-8 offset negotiation, and the buffer-local `:LspClangdSwitchSourceHeader`
+        -- / `:LspClangdShowSymbolInfo` commands all come from nvim-lspconfig's `lsp/clangd.lua`.
+        clangd = {
+          -- Only the flag that actually differs from clangd 22's defaults. Background
+          -- indexing (at low thread priority), clang-tidy diagnostics, iwyu header
+          -- insertion, detailed completion and `.clangd` config reading are all on by
+          -- default already -- passing them again just gives this list room to rot.
+          -- `memory` trades RAM for faster reparses; drop it if a big C++ tree gets heavy.
+          cmd = { 'clangd', '--pch-storage=memory' },
+          init_options = {
+            -- Applied only to files with no `compile_commands.json` entry: scratch files,
+            -- single-file programs, headers outside the build. Kept language-neutral,
+            -- since this same server owns C++ -- a `-std=` here would break one of the
+            -- two. Per-project flags and standards belong in `.clangd`/`compile_flags.txt`.
+            fallbackFlags = { '-Wall', '-Wextra' },
+          },
+        },
 
         gopls = {
           cmd = { 'gopls' },
@@ -1088,7 +1110,8 @@ require('lazy').setup({
       -- never heard of `tsgo`, so both were silently skipped). Real names can't go stale.
       require('mason-tool-installer').setup {
         ensure_installed = {
-          -- Language servers
+          -- Language servers -- `clangd` is deliberately absent, it comes from the system
+          -- clang install; see its entry in `servers` above for why.
           'gopls',
           'lua-language-server',
           'markdown-oxide',
@@ -1230,10 +1253,12 @@ require('lazy').setup({
         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
           return
         end
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        -- Skip format-on-save for languages that don't have a well standardized coding
+        -- style. `c` is deliberately *not* in this list: clangd formats it with its
+        -- embedded clang-format, honouring the project's `.clang-format` and falling back
+        -- to LLVM style when the tree has none. Nothing in `formatters_by_ft` claims `c`,
+        -- so that runs through the `lsp_format = 'fallback'` below.
+        local disable_filetypes = { cpp = true }
         if disable_filetypes[vim.bo[bufnr].filetype] then
           return nil
         else

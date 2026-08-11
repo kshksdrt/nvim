@@ -4,9 +4,7 @@ return {
   priority = 1000,
   ---@type snacks.Config
   opts = function()
-    -- Toggle the profiler
     Snacks.toggle.profiler():map '<leader>sx'
-    -- Toggle the profiler highlights
     Snacks.toggle.profiler_highlights():map '<leader>sy'
 
     return {
@@ -14,10 +12,10 @@ return {
         enabled = true,
         style = 'compact',
 
-        -- "false" makes the list grow from the bottom up
+        -- Grow the list upward from the bottom.
         top_down = false,
 
-        -- Optional: Add a small margin so it doesn't touch the statusline
+        -- Keeps notifications off the statusline.
         margin = {
           bottom = 1,
           right = 1,
@@ -31,7 +29,7 @@ return {
           border = 'single',
           input = {
             keys = {
-              -- This ensures specific key handling for the input window
+              -- <Esc> closes the completion menu first, then cancels the input.
               n_esc = { '<Esc>', { 'cmp_close', 'cancel' }, mode = 'n', desc = 'Close Input' },
               i_esc = { '<Esc>', { 'cmp_close', 'cancel' }, mode = 'i', desc = 'Close Input' },
             },
@@ -39,16 +37,15 @@ return {
         },
       },
       dashboard = {
+        -- Disabled: a preset that adds a "Restore Session" entry when
+        -- persistence.nvim is installed.
         -- preset = {
-        --   -- This preset automatically adds the "Restore Session" section
-        --   -- if persistence.nvim is installed
         --   keys = {
         --     { icon = ' ', key = 's', desc = 'Restore Session', section = 'session' },
-        --     -- ... other keys
         --   },
         -- },
         sections = {
-          -- { section = "header" }, -- <--- I commented this out to remove the logo/text
+          -- { section = "header" }, -- off: hides the logo
           {
             section = 'keys',
             gap = 1,
@@ -91,10 +88,10 @@ return {
             -- Let snacks build + open the qf list (correct item formatting).
             Snacks.picker.actions.qflist(picker)
 
-            -- Relabel just the title of the list snacks just created.
-            -- 'a' with a `what` dict updates the current list's title and
-            -- context(data structure of context should match the context value to the lsp setqflist instance)
-            -- without touching its items.
+            -- Relabel the list snacks just created. The 'a' action updates the
+            -- current list's title and context without touching its items. The
+            -- context shape matches the one lsp_qf() sets in init.lua, so the
+            -- <leader>sQ history picker below can read either.
             vim.fn.setqflist({}, 'a', { title = title, context = { time = os.time() } })
           end,
         },
@@ -137,10 +134,9 @@ return {
               width = 80,
               min_width = 80,
 
-              -- Optional: Minimalist border styling
               layout = {
                 box = 'vertical',
-                backdrop = false, -- Removes the dark background dimming
+                backdrop = false, -- no dark dimming behind the picker
                 width = 80,
                 min_width = 80,
                 height = 0.4,
@@ -163,17 +159,15 @@ return {
             prompt = '  ',
             layout = {
               layout = {
-                -- Define the vertical layout explicitly
                 box = 'vertical',
                 position = 'right',
                 width = 40,
-                -- The input window (search bar) with no border
+                -- Search bar, separated from the list by a single rule.
                 {
                   win = 'input',
                   height = 1,
                   border = 'bottom',
                 },
-                -- The file list window with no border
                 {
                   win = 'list',
                   border = 'none',
@@ -211,13 +205,13 @@ return {
           -- Short labels for the category prefix. Keys are matched case-insensitively
           -- against the part of the title before the ':'. All values are < 10 chars.
           local CONCISE = {
-            -- LSP (from your lsp_qf helper)
+            -- Titles produced by lsp_qf() in init.lua.
             references = 'refs',
             definitions = 'def',
             implementations = 'impl',
             ['type definitions'] = 'typedef',
             declarations = 'decl',
-            -- Common snacks sources (from <c-q>)
+            -- Common snacks sources, titled by the qflist action above.
             grep = 'grep',
             grep_word = 'grepword',
             buffers = 'buf',
@@ -349,7 +343,7 @@ return {
       function()
         Snacks.profiler.scratch()
       end,
-      desc = 'Profiler Scratch Bufer',
+      desc = 'Profiler Scratch Buffer',
     },
     {
       '\\',

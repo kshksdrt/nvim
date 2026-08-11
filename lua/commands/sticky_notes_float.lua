@@ -5,6 +5,8 @@
 -- |____/|_|\____|    |_|  |_| |_/_/   \_\_| \_||_|\_\____|
 --
 -- to vimichael: https://github.com/vimichael/my-nvim-config
+--
+-- `:MyNotes` (<leader>n) opens ~/Documents/StickyNotes.md in a centered float.
 
 local M = {}
 
@@ -29,11 +31,8 @@ end
 local function open_floating_file(filepath)
   local function expand_path(path)
     if path:sub(1, 1) == '~' then
-      -- Check if it is windows.
       local platform_utils = require 'utils.platform'
       local is_windows = platform_utils.is_windows()
-      -- An alternative that used to work.
-      -- if vim.loop.os_uname().sysname == 'Windows_NT' then
 
       if is_windows then
         return os.getenv 'USERPROFILE' .. path:sub(2)
@@ -46,16 +45,15 @@ local function open_floating_file(filepath)
 
   local path = expand_path(filepath)
 
-  -- If file does not exist
   if vim.fn.filereadable(path) == 0 then
     vim.notify('Could not find' .. ' ' .. path, vim.log.levels.ERROR)
     return
   end
 
-  -- Look for an existing buffer with this file
+  -- Reuse the buffer for this file, creating it if there isn't one.
   local buf = vim.fn.bufnr(path, true)
 
-  -- If the buffer doesn't exist, create one and edit the file
+  -- Defensive: bufnr(_, true) creates on miss, so this shouldn't be reachable.
   if buf == -1 then
     buf = vim.api.nvim_create_buf(false, false)
     vim.api.nvim_buf_set_name(buf, path)
@@ -71,7 +69,7 @@ local function open_floating_file(filepath)
     noremap = true,
     silent = true,
     callback = function()
-      -- Check if the buffer has unsaved changes
+      -- Refuse to close on `q` while there are unsaved changes.
       if vim.api.nvim_get_option_value('modified', { buf = buf }) then
         vim.notify('This file has unsaved changes.', vim.log.levels.WARN)
       else

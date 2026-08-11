@@ -1,5 +1,7 @@
+-- Colorschemes. kanagawa is the active one; it loads after the tokyonight spec
+-- in init.lua and so wins. The others are kept installed but inactive.
 return {
-  -- Adds VS code's color scheme
+  -- Disabled: VS Code colorscheme.
   -- {
   --   'Mofiqul/vscode.nvim',
   --   config = function()
@@ -37,12 +39,12 @@ return {
   {
     'no-clown-fiesta/no-clown-fiesta.nvim',
     config = function()
-      -- Default options:
+      -- Configured but not loaded; uncomment the colorscheme call to use it.
       require('no-clown-fiesta').setup {
-        theme = 'dark', -- supported themes are: dark, dim, light
-        transparent = false, -- Enable this to disable the bg color
+        theme = 'dark', -- also: dim, light
+        transparent = false,
         styles = {
-          -- You can set any of the style values specified for `:h nvim_set_hl`
+          -- Any of the style keys `:h nvim_set_hl` accepts.
           comments = {},
           functions = {},
           keywords = {},
@@ -59,7 +61,6 @@ return {
   {
     'rebelot/kanagawa.nvim',
     config = function()
-      -- Default options:
       require('kanagawa').setup {
         compile = true,
         undercurl = false,
@@ -83,19 +84,19 @@ return {
           bold = false,
           italic = false,
         },
-        transparent = false, -- do not set background color
-        dimInactive = true, -- dim inactive window `:h hl-NormalNC`
-        terminalColors = true, -- define vim.g.terminal_color_{0,17}
-        colors = { -- add/modify theme and palette colors
+        transparent = false,
+        dimInactive = true, -- `:h hl-NormalNC`
+        terminalColors = true, -- defines vim.g.terminal_color_{0,17}
+        colors = {
           palette = {},
           theme = { wave = {}, lotus = {}, dragon = {}, all = {} },
         },
         overrides = function(colors)
           local theme = colors.theme
           return {
-            -- yellowish-grey, tuned to stand out about as much as the statusline
+            -- Yellowish grey, tuned to stand out about as much as the statusline.
             CursorLine = { bg = '#33302a' },
-            Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 }, -- add `blend = vim.o.pumblend` to enable transparency
+            Pmenu = { fg = theme.ui.shade0, bg = theme.ui.bg_p1 }, -- `blend = vim.o.pumblend` for transparency
             PmenuSel = { fg = 'NONE', bg = theme.ui.bg_p2 },
             PmenuSbar = { bg = theme.ui.bg_m1 },
             PmenuThumb = { bg = theme.ui.bg_p2 },
@@ -108,7 +109,7 @@ return {
         },
       }
 
-      -- setup must be called before loading
+      -- setup() must run before the colorscheme is loaded.
       vim.cmd.colorscheme 'kanagawa'
     end,
   },

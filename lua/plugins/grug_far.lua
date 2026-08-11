@@ -2,11 +2,8 @@ return {
   'MagicDuck/grug-far.nvim',
   config = function()
     local grug_far = require 'grug-far'
-    grug_far.setup {
-      -- options, see Configuration section below
-      -- there are no required options atm
-      -- engine = 'ripgrep' is default, but 'astgrep' can be specified
-    }
+    -- All defaults. `engine = 'astgrep'` is the alternative to ripgrep.
+    grug_far.setup {}
 
     vim.keymap.set('n', '<leader>S', grug_far.open, {
       desc = 'Search and Replace (Grug far)',

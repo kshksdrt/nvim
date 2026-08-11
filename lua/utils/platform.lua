@@ -1,12 +1,14 @@
+-- Small OS helpers, shared by plugins/debug.lua and commands/sticky_notes_float.lua.
+
 local M = {}
 
 M.is_windows = function()
   return vim.fn.has 'win32' == 1 or vim.fn.has 'win64' == 1
 end
 
---- A function to run a cmd
+--- Run a shell command, printing it first.
 --- @param cmd string The command to execute
---- @return boolean wasSuccessful Whether the command was successfully executed
+--- @return boolean wasSuccessful Whether the command succeeded
 M.run_command = function(cmd)
   print('🚀 Executing: ' .. cmd)
 
@@ -21,39 +23,36 @@ M.run_command = function(cmd)
   -- end
 end
 
+--- POSIX only. `ls -A` skips '.' and '..'; errors are silenced, and a failed
+--- command counts as empty.
 M.is_dir_empty = function(path)
-  -- `ls -A` lists all entries except for '.' and '..'.
-  -- `2>/dev/null` redirects any errors (like "directory not found") so they don't print.
-  -- This command is for POSIX systems (Linux, macOS).
   local handle = io.popen('ls -A ' .. path .. ' 2>/dev/null')
   if not handle then
     return true
-  end -- Treat command failure as "empty"
+  end
 
-  -- Read the first line of output. If there is any output, the directory is not empty.
+  -- Any output at all means the directory has entries.
   local first_item = handle:read '*l'
   handle:close()
   return first_item == nil
 end
 
---- Checks if a path is a directory using OS-specific shell commands.
--- @param path The file system path to check.
--- @return boolean True if the path is a directory, false otherwise.
+--- Whether a path is a directory, via a shell command.
+--- @param path string The file system path to check
+--- @return boolean isDirectory
 M.is_dir = function(path)
-  -- Check if we are on Windows by looking at the directory separator
+  -- The directory separator gives away the platform.
   local is_windows = package.config:sub(1, 1) == '\\'
 
   local command
   if is_windows then
-    -- On Windows, check for the existence of the "NUL" device file within the path.
-    -- This trick reliably identifies directories.
+    -- Only directories have a "NUL" device file inside them.
     command = 'if exist "' .. path .. '\\NUL" (exit 0) else (exit 1)'
   else
-    -- On POSIX systems (Linux, macOS), `test -d` is the standard way.
     command = 'test -d "' .. path .. '"'
   end
 
-  -- os.execute returns a success status for exit code 0.
+  -- os.execute reports success for exit code 0.
   return os.execute(command)
 end
 

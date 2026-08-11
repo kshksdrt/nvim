@@ -8,9 +8,8 @@ return {
       require('nvim-treesitter').setup {
         highlight = {
           enable = true,
-          -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
-          --  If you are experiencing weird indenting issues, add the language to
-          --  the list of additional_vim_regex_highlighting and disabled languages for indent.
+          -- Keep vim's regex highlighting on alongside treesitter. Some languages
+          -- (Ruby among them) still need it for their indent rules.
           additional_vim_regex_highlighting = true,
         },
         indent = { enable = true, disable = { 'ruby' } },

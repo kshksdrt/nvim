@@ -1,10 +1,7 @@
--- TIP: Disable arrow keys in normal mode
--- vim.keymap.set('n', '<left>', '<cmd>echo "Use h to move!!"<CR>')
--- vim.keymap.set('n', '<right>', '<cmd>echo "Use l to move!!"<CR>')
--- vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
--- vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
+-- General keymaps. Window maps live in keymaps/window.lua, which rebinds the
+-- arrow keys disabled here to window navigation.
 
--- Disable arrows, enter, backspace and delete keys in normal mode
+-- Disable arrows, enter, backspace and delete in normal mode.
 vim.keymap.set('n', '<Up>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<Down>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<Left>', '<Nop>', { noremap = true, silent = true })
@@ -47,12 +44,11 @@ vim.keymap.set('n', '<C-,>', execute_bprevious, { noremap = true, silent = true 
 vim.keymap.set('n', 'H', '<cmd>tabprev<cr>', { noremap = true, silent = true })
 vim.keymap.set('n', 'L', '<cmd>tabnext<cr>', { noremap = true, silent = true })
 
--- Buffer management
+-- Buffer management.
 --
--- Buffers are global across tabpages, so a plain `:bd` of a visible buffer closes
+-- Buffers are global across tabpages, so a plain `:bd` on a visible buffer closes
 -- its window and scrambles the layout. Snacks.bufdelete swaps the alternate/MRU
--- buffer into every window showing it (all tabpages) before deleting, and prompts
--- to save if modified.
+-- buffer into every window showing it first, and prompts to save if modified.
 -- Source: ~/.local/share/nvim/lazy/snacks.nvim/lua/snacks/bufdelete.lua
 vim.keymap.set('n', 'zq', function()
   Snacks.bufdelete() -- delete the current buffer
@@ -65,9 +61,9 @@ vim.keymap.set('n', 'z/', function()
 end, { noremap = true, silent = true, desc = 'Delete all buffers (keep layout)' })
 
 -- Route muscle-memory `:bd[!]` / `:bdelete[!]` through the same safe delete.
--- The abbreviations rewrite only the bare command (exact `==#` guard), so `:bd 3`
--- and `:bd!` still expand and pass their arg/bang through, while a stray `bd`
--- mid-command (e.g. `:g/x/bd`) is left untouched.
+-- The abbreviations rewrite only the bare command (the exact `==#` guard), so
+-- `:bd 3` and `:bd!` still pass their arg and bang through, and a stray `bd`
+-- mid-command (`:g/x/bd`) is left alone.
 vim.api.nvim_create_user_command('Bdelete', function(o)
   local opts = { force = o.bang }
   if o.args ~= '' then
@@ -89,7 +85,7 @@ end, { desc = 'Copy [C]ursor [C]ommand' })
 
 vim.keymap.set('n', '<leader>cl', function()
   local loc = vim.fn.expand '%:p' .. ':' .. vim.fn.line '.'
-  vim.fn.setreg('+', loc) -- use "+" for system clipboard end, { desc = "Copy full path:line to clipboard" })
+  vim.fn.setreg('+', loc) -- system clipboard; paste back with `:Line` (commands/line.lua)
 end, { desc = 'Copy [C]ursor [L]ocation' })
 
 -- Zen mode
@@ -98,7 +94,7 @@ vim.keymap.set('n', 'ze', ':ZenMode<CR>', { noremap = true, silent = true, desc 
 -- Clear quickfix list
 vim.keymap.set('n', '<leader>xc', function()
   vim.fn.setqflist {}
-  -- setqflist() doesn't dirty the statusline, so the "QF: x of y" widget would
-  -- show a stale count until the next redraw.
+  -- setqflist() doesn't dirty the statusline, so the "QF: x of y" widget in
+  -- init.lua would show a stale count until the next redraw.
   vim.cmd.redrawstatus { bang = true }
 end, { desc = 'Clear quickfix list' })

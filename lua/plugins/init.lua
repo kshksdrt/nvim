@@ -1,7 +1,7 @@
--- Extra plugin specs. Every *.lua file in this directory is auto-imported by
--- `{ import = 'plugins' }` in init.lua, so a returned spec table here is loaded automatically.
+-- Small plugin specs that don't need a file of their own. Every *.lua in this
+-- directory is auto-imported by `{ import = 'plugins' }` in init.lua.
 return {
-  -- Better motion-repeatability using ; and , (found to be most useful for ]c to navigate git hunks)
+  -- Makes ; and , repeat the last motion. Mostly used to repeat ]c between git hunks.
   {
     'mawkler/demicolon.nvim',
     dependencies = {
@@ -14,7 +14,7 @@ return {
   {
     'tpope/vim-fugitive',
   },
-  -- -- To display buffers like vscode tabs with indicators for unsaved changes
+  -- Disabled: VS Code style buffer tabs with unsaved-change indicators.
   -- {
   --   'akinsho/bufferline.nvim',
   --   version = '*',
@@ -33,7 +33,7 @@ return {
   --     }
   --   end,
   -- },
-  -- Fast slanting motions
+  -- Jump anywhere on screen with a two-character search.
   {
     url = 'https://codeberg.org/andyg/leap.nvim',
     version = '*',
@@ -49,10 +49,11 @@ return {
       end
     end,
   },
-  -- To operate on surrounding characters
+  -- Add, change and delete surrounding pairs. Owns the surround keys; mini.surround
+  -- is set up with empty mappings in init.lua so the two don't collide.
   {
     'kylechui/nvim-surround',
-    version = '*', -- Use for stability; omit to use `main` branch for the latest features
+    version = '*', -- Pinned for stability; drop for `main`
     event = 'VeryLazy',
     config = function()
       require('nvim-surround').setup()
@@ -72,13 +73,13 @@ return {
       }
     end,
   },
-  -- Confirmation for quiting
+  -- Confirmation prompt on quit.
   {
     'yutkat/confirm-quit.nvim',
     event = 'CmdlineEnter',
     opts = {},
   },
-  -- To easily add annotations in one command
+  -- Generates doc annotations for the item under the cursor.
   {
     'danymat/neogen',
     config = true,
@@ -109,7 +110,7 @@ return {
         preview = {
           auto_preview = false,
           auto_enable = true,
-          auto_resize_height = true, -- highly recommended enable
+          auto_resize_height = true,
           preview = {
             win_height = 12,
             win_vheight = 12,
@@ -121,11 +122,9 @@ return {
               local bufname = vim.api.nvim_buf_get_name(bufnr)
               local fsize = vim.fn.getfsize(bufname)
               if fsize > 100 * 1024 then
-                -- skip file size greater than 100k
-                ret = false
+                ret = false -- too big to preview
               elseif bufname:match '^fugitive://' then
-                -- skip fugitive buffer
-                ret = false
+                ret = false -- fugitive buffers have no real file
               end
               return ret
             end,
@@ -137,8 +136,8 @@ return {
   -- Enhances inline diagnostics
   {
     'rachartier/tiny-inline-diagnostic.nvim',
-    event = 'VeryLazy', -- Or `LspAttach`
-    priority = 1000, -- needs to be loaded in first
+    event = 'VeryLazy', -- `LspAttach` also works
+    priority = 1000, -- must load first
     config = function()
       require('tiny-inline-diagnostic').setup {
         preset = 'modern',
@@ -152,27 +151,22 @@ return {
       }
     end,
   },
-  -- Ability to swap delimited items such as function parameters
+  -- Swap delimited items, e.g. function parameters.
   {
     'machakann/vim-swap',
   },
-  -- Enhance and improve styles of help files text rendering
+  -- Nicer rendering for help files.
   {
     'OXY2DEV/helpview.nvim',
-    lazy = false, -- Recommended
-
-    -- In case you still want to lazy load
-    -- ft = "help",
-
+    lazy = false, -- upstream's recommendation; `ft = 'help'` also works
     dependencies = {
       'nvim-treesitter/nvim-treesitter',
     },
   },
+  -- Disabled: continue.nvim.
   -- {
   --   'niba/continue.nvim',
-  --   -- remember to set lazy as false
   --   lazy = false,
-  --   -- call setup method or set config = true
   --   config = true,
   --
   --   ---@module "continue"

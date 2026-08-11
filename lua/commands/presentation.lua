@@ -1,9 +1,10 @@
--- Configure tab transitions
+-- `:PresentationMode{On,Off}` -- visual effects for screen sharing.
+-- Stub for now: the commands exist and track state, but the effect itself
+-- (fading tab switches through vimade) is not wired up yet.
+
 local tab_transition_enabled = false
 
--- Commands implementations
 local function presentation_mode_on()
-  -- Communicate tab switching by full fade transition using vimade.
   if tab_transition_enabled == false then
     -- TODO: Enable tab transitions
   end
@@ -11,14 +12,12 @@ local function presentation_mode_on()
 end
 
 local function presentation_mode_off()
-  -- Communicate tab switching by full fade transition using vimade.
   if tab_transition_enabled == true then
     -- TODO: Disable tab transitions
   end
   tab_transition_enabled = false
 end
 
--- Commands
 vim.api.nvim_create_user_command('PresentationModeOn', presentation_mode_on, {
   desc = 'Enable visual effects for visibility',
   bang = true,
@@ -31,5 +30,5 @@ vim.api.nvim_create_user_command('PresentationModeOff', presentation_mode_off, {
   nargs = '*',
 })
 
--- Default: Off
+-- Off by default.
 presentation_mode_off()

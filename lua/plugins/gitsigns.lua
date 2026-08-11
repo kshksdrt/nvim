@@ -1,9 +1,8 @@
--- Adds git related signs to the gutter, as well as utilities for managing changes
--- NOTE: gitsigns is already included in init.lua but contains only the base
--- config. This will add also the recommended keymaps.
+-- Git signs in the gutter, plus the hunk keymaps under <leader>h.
+-- This is the only gitsigns spec; init.lua does not configure it.
 
 return {
-  { -- Adds git related signs to the gutter, as well as utilities for managing changes
+  {
     'lewis6991/gitsigns.nvim',
     config = function()
       local gitsigns = require 'gitsigns'

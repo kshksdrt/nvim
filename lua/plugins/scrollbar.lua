@@ -2,8 +2,7 @@ return {
   'lewis6991/satellite.nvim',
   version = '*',
   config = function()
-    -- Create an autocommand to force the highlight color and immediately trigger the autocommand.
-    -- This runs every time you load a colorscheme to prevent it from being cleared.
+    -- Re-applied on every colorscheme load, which would otherwise clear these.
     vim.api.nvim_create_autocmd('ColorScheme', {
       pattern = '*',
       callback = function()

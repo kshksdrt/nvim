@@ -1,29 +1,22 @@
--- debug.lua
---
--- DAP setup: CodeLLDB install + Rust/Go adapters (uses utils.platform for paths).
+-- DAP: CodeLLDB install plus the Rust and Go adapters.
+-- Paths come from utils.platform, so this works on Linux and Windows.
 
 return {
-  -- NOTE: Yes, you can install new plugins here!
   'mfussenegger/nvim-dap',
-  -- NOTE: And you can specify dependencies as well
   dependencies = {
-    -- Creates a beautiful debugger UI
+    -- Debugger UI, and the async library it needs.
     'rcarriga/nvim-dap-ui',
-
-    -- Required dependency for nvim-dap-ui
     'nvim-neotest/nvim-nio',
 
-    -- Installs the debug adapters for you
+    -- Installs the debug adapters.
     'mason-org/mason.nvim',
     'jay-babu/mason-nvim-dap.nvim',
 
-    -- Add your own debuggers here
+    -- Language-specific adapters.
     'leoluz/nvim-dap-go',
   },
   keys = {
-    -- Basic debugging keymaps, feel free to change to your liking!
     {
-      -- Start or continue the debugger
       '<F5>',
       function()
         require('dap').continue()
@@ -31,23 +24,20 @@ return {
       desc = 'Debug: Start/Continue',
     },
     {
-      -- Stop the debugger
-      '<S-F5>', -- Shift+F5
+      '<S-F5>',
       function()
         require('dap').terminate()
       end,
       desc = 'Debug: Stop',
     },
     {
-      -- Restart the debugger
-      '<C-S-F5>', -- Ctrl+Shift+F5
+      '<C-S-F5>',
       function()
         require('dap').restart()
       end,
       desc = 'Debug: Restart',
     },
     {
-      -- Toggle a breakpoint on the current line
       '<F9>',
       function()
         require('dap').toggle_breakpoint()
@@ -55,7 +45,6 @@ return {
       desc = 'Debug: Toggle Breakpoint',
     },
     {
-      -- Step over the current line
       '<F10>',
       function()
         require('dap').step_over()
@@ -63,7 +52,6 @@ return {
       desc = 'Debug: Step Over',
     },
     {
-      -- Step into the function on the current line
       '<F11>',
       function()
         require('dap').step_into()
@@ -71,14 +59,13 @@ return {
       desc = 'Debug: Step Into',
     },
     {
-      -- Step out of the current function
-      '<S-F11>', -- Shift+F11
+      '<S-F11>',
       function()
         require('dap').step_out()
       end,
       desc = 'Debug: Step Out',
     },
-    -- Toggle to see last session result. Without this, you can't see session output in case of unhandled exception.
+    -- Without this the session output is lost on an unhandled exception.
     {
       '<F7>',
       function()
@@ -92,28 +79,17 @@ return {
     local dapui = require 'dapui'
 
     require('mason-nvim-dap').setup {
-      -- Makes a best effort to setup the various debuggers with
-      -- reasonable debug configurations
+      -- Sets up each installed debugger with a reasonable default config.
       automatic_installation = true,
-
-      -- You can provide additional configuration to the handlers,
-      -- see mason-nvim-dap README for more information
       handlers = {},
-
-      -- You'll need to check that you have the required things installed
-      -- online, please don't ask me how to install them :)
       ensure_installed = {
-        -- Update this to ensure that you have the debuggers for the langs you want
         'delve',
       },
     }
 
-    -- Dap UI setup
-    -- For more information, see |:help nvim-dap-ui|
+    -- See `:help nvim-dap-ui`.
     dapui.setup {
-      -- Set icons to characters that are more likely to work in every terminal.
-      --    Feel free to remove or use ones that you like more! :)
-      --    Don't feel like these are good choices.
+      -- Plain characters, likely to render in any terminal.
       icons = { expanded = '▾', collapsed = '▸', current_frame = '*' },
       controls = {
         icons = {
@@ -130,7 +106,7 @@ return {
       },
     }
 
-    -- Change breakpoint icons
+    -- Disabled: custom breakpoint icons and colors.
     -- vim.api.nvim_set_hl(0, 'DapBreak', { fg = '#e51400' })
     -- vim.api.nvim_set_hl(0, 'DapStop', { fg = '#ffcc00' })
     -- local breakpoint_icons = vim.g.have_nerd_font
@@ -149,8 +125,8 @@ return {
     local platform_utils = require 'utils.platform'
 
     local codelldb_path = platform_utils.get_home_dir() .. '/Sources/CodeLLDB'
+    -- CodeLLDB has no Mason package here, so fetch and unpack the release .vsix.
     local install_codelldb = function()
-      -- Define URLs and paths
       local codelldb_for_windows = 'https://github.com/vadimcn/codelldb/releases/download/v1.11.5/CodeLLDB-win32-x64.vsix'
       local codelldb_for_linux = 'https://github.com/vadimcn/codelldb/releases/download/v1.11.5/CodeLLDB-linux-x64.vsix'
 
@@ -182,13 +158,13 @@ return {
       end
       print '📦 Extraction complete.'
 
-      -- Step 4: Clean up the downloaded file
+      -- Step 4: nothing to clean up yet -- the downloaded .vsix is left in place.
       print '🧹 Cleanup complete.'
 
       print '\n🎉 Success! CodeLLDB installation finished.'
     end
 
-    -- Check if the CodeLLDB already installed
+    -- Install on first run, or if a previous attempt left the directory empty.
     if not platform_utils.is_dir(codelldb_path) or platform_utils.is_dir_empty(codelldb_path) then
       vim.notify('ℹ️ CodeLLDB directory ' .. codelldb_path .. ' is empty. Performing installation.')
       install_codelldb()
@@ -208,7 +184,7 @@ return {
       },
     }
 
-    -- Install golang specific config
+    -- Go adapter (delve).
     require('dap-go').setup {
       delve = {
         -- On Windows delve must be run attached or it crashes.

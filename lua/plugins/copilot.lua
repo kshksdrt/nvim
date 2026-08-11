@@ -8,16 +8,15 @@ return {
     {
       'folke/sidekick.nvim',
       opts = {
-        -- add any options here
         cli = {},
       },
       keys = {
         {
           '<tab>',
           function()
-            -- if there is a next edit, jump to it, otherwise apply it if any
+            -- Jump to the next edit suggestion, or apply the one under the cursor.
             if not require('sidekick').nes_jump_or_apply() then
-              return '<Tab>' -- fallback to normal tab
+              return '<Tab>' -- nothing pending, act as a normal Tab
             end
           end,
           expr = true,
@@ -85,7 +84,7 @@ return {
           mode = { 'n', 'x' },
           desc = 'Sidekick Select Prompt',
         },
-        -- Example of a keybinding to open Claude directly
+        -- Open Claude directly, skipping the picker.
         {
           '<leader>ac',
           function()

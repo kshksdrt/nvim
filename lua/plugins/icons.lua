@@ -3,7 +3,7 @@ return {
   version = false,
   config = function()
     require('mini.icons').setup()
-    -- This is the magic line. It makes other plugins think nvim-web-devicons is installed.
+    -- Plugins that expect nvim-web-devicons get mini.icons instead.
     require('mini.icons').mock_nvim_web_devicons()
   end,
 }

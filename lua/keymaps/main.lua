@@ -13,6 +13,12 @@ vim.keymap.set('n', '<PageUp>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', '<PageDown>', '<Nop>', { noremap = true, silent = true })
 vim.keymap.set('n', 'zs', '<Nop>', { noremap = true, silent = true })
 
+-- Sysstem clipboard
+local function paste_system_clipboard()
+  vim.api.nvim_paste(vim.fn.getreg '+', true, -1)
+end
+vim.keymap.set({ 'i', 'c', 't' }, '<C-v>', paste_system_clipboard, { silent = true, desc = 'Paste from system clipboard' })
+
 -- Custom text objects: ie/ae select the whole buffer.
 vim.api.nvim_set_keymap('x', 'ie', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('o', 'ie', ':<C-u>normal! ggVG<CR>', { noremap = true, silent = true })

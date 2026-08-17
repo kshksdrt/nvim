@@ -23,6 +23,7 @@ h1{font-size:2rem}
 h2{font-size:1.45rem;border-bottom:1px solid #f0f4f9;padding-bottom:8px}
 h3{font-size:1.2rem}
 a{color:#1a73e8;text-decoration:none;font-weight:500}
+a:visited{color:#681da8}
 a:hover{text-decoration:underline}
 code{font-family:"Iosevka Nerd Font","Roboto Mono",monospace;background-color:#282727;color:#c5c9c5;padding:3px 6px;border-radius:6px;font-size:85%}
 pre{background-color:#181616;padding:18px;border-radius:0;overflow-x:auto;border:1px solid #393836;margin:1.5rem 0}
@@ -58,7 +59,7 @@ blockquote{border-left:4px solid #1a73e8;margin:24px 0;padding:8px 20px;color:#4
 table{border-collapse:collapse;width:100%;margin:2rem 0;font-size:95%}
 th,td{border-bottom:1px solid #e0e4e9;padding:12px;text-align:left}
 th{background-color:#f8fafd;color:#1f1f1f;font-weight:500}
-@media (prefers-color-scheme:dark){html{background-color:#131314}body{color:#e3e3e3;background-color:#131314}h1,h2,h3{color:#e3e3e3}h2{border-bottom-color:#222224}a{color:#a8c7fa}blockquote{background-color:#1a1b1f;color:#c4c7c5}th{background-color:#1a1b1f;color:#e3e3e3}th,td{border-bottom-color:#2d2d2e}}]]
+@media (prefers-color-scheme:dark){html{background-color:#131314}body{color:#e3e3e3;background-color:#131314}h1,h2,h3{color:#e3e3e3}h2{border-bottom-color:#222224}a{color:#a8c7fa}a:visited{color:#c58af9}blockquote{background-color:#1a1b1f;color:#c4c7c5}th{background-color:#1a1b1f;color:#e3e3e3}th,td{border-bottom-color:#2d2d2e}}]]
   .. '</style>'
 
 vim.api.nvim_create_user_command('PandocPreview', function()

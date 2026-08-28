@@ -1,0 +1,454 @@
+{
+  "Document skeleton": {
+    "prefix": "doc",
+    "body": [
+      "#set document(title: [${1:Title}], author: \"${2:Author}\")",
+      "#set page(paper: \"${3:a4}\", margin: ${4:2cm}, numbering: \"1\")",
+      "#set text(size: ${5:11}pt, lang: \"${6:en}\")",
+      "#set par(justify: true)",
+      "#set heading(numbering: \"1.1\")",
+      "",
+      "= ${7:Introduction}",
+      "$0"
+    ],
+    "description": "Preamble + first heading for a new document"
+  },
+  "Set document metadata": {
+    "prefix": "setdoc",
+    "body": "#set document(title: [${1:Title}], author: \"${2:Author}\", date: ${3:auto})",
+    "description": "Title/author/date metadata"
+  },
+  "Set page": {
+    "prefix": "setpage",
+    "body": "#set page(paper: \"${1:a4}\", margin: ${2:2cm}, numbering: \"${3:1}\")",
+    "description": "Paper size, margins and page numbering"
+  },
+  "Set text": {
+    "prefix": "settext",
+    "body": "#set text(font: \"${1:Libertinus Serif}\", size: ${2:11}pt, lang: \"${3:en}\")",
+    "description": "Font family, size and language"
+  },
+  "Set paragraph": {
+    "prefix": "setpar",
+    "body": "#set par(justify: ${1:true}, leading: ${2:0.65em}, first-line-indent: ${3:1em})",
+    "description": "Justification, leading and first-line indent"
+  },
+  "Set heading numbering": {
+    "prefix": "sethead",
+    "body": "#set heading(numbering: \"${1:1.1}\")",
+    "description": "Number headings"
+  },
+  "Show rule": {
+    "prefix": "show",
+    "body": ["#show ${1:heading}: ${2:it} => {", "\t$0", "}"],
+    "description": "Transform every matching element"
+  },
+  "Show-set rule": {
+    "prefix": "showset",
+    "body": "#show ${1:raw}: set ${2:text}(${0})",
+    "description": "Apply a set rule only inside matching elements"
+  },
+  "Show everything (template)": {
+    "prefix": "showtpl",
+    "body": "#show: ${1:template}.with($0)",
+    "description": "Wrap the rest of the document in a template"
+  },
+  "Context expression": {
+    "prefix": "context",
+    "body": "#context ${0}",
+    "description": "Read style or location dependent state"
+  },
+  "Let binding": {
+    "prefix": "let",
+    "body": "#let ${1:name} = ${0}",
+    "description": "Bind a value"
+  },
+  "Let function": {
+    "prefix": "letfn",
+    "body": ["#let ${1:name}(${2:body}) = {", "\t$0", "}"],
+    "description": "Define a function"
+  },
+  "Let content function": {
+    "prefix": "letcfn",
+    "body": ["#let ${1:name}(${2:body}) = [", "\t$0", "]"],
+    "description": "Define a function returning content"
+  },
+  "Destructuring let": {
+    "prefix": "letd",
+    "body": "#let (${1:a}, ${2:b}) = ${0}",
+    "description": "Destructure an array or dictionary"
+  },
+  "If": {
+    "prefix": "if",
+    "body": ["#if ${1:condition} {", "\t$0", "}"],
+    "description": "Conditional"
+  },
+  "If else": {
+    "prefix": "ife",
+    "body": ["#if ${1:condition} {", "\t$2", "} else {", "\t$0", "}"],
+    "description": "Conditional with fallback"
+  },
+  "For loop": {
+    "prefix": "for",
+    "body": ["#for ${1:item} in ${2:collection} {", "\t$0", "}"],
+    "description": "Iterate over an array or dictionary"
+  },
+  "While loop": {
+    "prefix": "while",
+    "body": ["#while ${1:condition} {", "\t$0", "}"],
+    "description": "Loop while a condition holds"
+  },
+  "Import file": {
+    "prefix": "import",
+    "body": "#import \"${1:file.typ}\": ${2:*}",
+    "description": "Import from a local file"
+  },
+  "Import package": {
+    "prefix": "importp",
+    "body": "#import \"@preview/${1:cetz}:${2:0.4.2}\": ${3:*}",
+    "description": "Import a package from the preview namespace"
+  },
+  "Include file": {
+    "prefix": "include",
+    "body": "#include \"${1:file.typ}\"",
+    "description": "Splice another file's content in"
+  },
+  "Figure with image": {
+    "prefix": "fig",
+    "body": [
+      "#figure(",
+      "\timage(\"${1:image.png}\", width: ${2:80%}),",
+      "\tcaption: [${3:Caption}],",
+      ") <${4:fig:name}>"
+    ],
+    "description": "Captioned, referenceable image"
+  },
+  "Figure with table": {
+    "prefix": "figtable",
+    "body": [
+      "#figure(",
+      "\ttable(",
+      "\t\tcolumns: ${1:2},",
+      "\t\t[${2:A}], [${3:B}],",
+      "\t),",
+      "\tcaption: [${4:Caption}],",
+      ") <${5:tbl:name}>"
+    ],
+    "description": "Captioned, referenceable table"
+  },
+  "Image": {
+    "prefix": "image",
+    "body": "#image(\"${1:image.png}\", width: ${2:80%})",
+    "description": "Bare image"
+  },
+  "Table": {
+    "prefix": "table",
+    "body": ["#table(", "\tcolumns: ${1:2},", "\t[${2:A}], [${3:B}],", ")"],
+    "description": "Simple table"
+  },
+  "Table with header": {
+    "prefix": "tableh",
+    "body": [
+      "#table(",
+      "\tcolumns: (${1:auto, 1fr}),",
+      "\tstroke: ${2:0.5pt},",
+      "\ttable.header([*${3:Name}*], [*${4:Value}*]),",
+      "\t[${5:a}], [${6:1}],",
+      ")"
+    ],
+    "description": "Table with a repeating header row"
+  },
+  "Grid": {
+    "prefix": "grid",
+    "body": [
+      "#grid(",
+      "\tcolumns: (${1:1fr, 1fr}),",
+      "\tgutter: ${2:1em},",
+      "\t[${3:First}], [${4:Second}],",
+      ")"
+    ],
+    "description": "Layout grid without table styling"
+  },
+  "Bullet list": {
+    "prefix": "list",
+    "body": ["- ${1:first}", "- ${0}"],
+    "description": "Unordered list"
+  },
+  "Numbered list": {
+    "prefix": "enum",
+    "body": ["+ ${1:first}", "+ ${0}"],
+    "description": "Ordered list"
+  },
+  "Term list": {
+    "prefix": "terms",
+    "body": ["/ ${1:Term}: ${2:definition}", "/ ${0}: "],
+    "description": "Definition list"
+  },
+  "Link": {
+    "prefix": "link",
+    "body": "#link(\"${1:https://example.com}\")[${2:text}]",
+    "description": "Hyperlink"
+  },
+  "Label": {
+    "prefix": "label",
+    "body": "<${1:name}>",
+    "description": "Attach a label to the preceding element"
+  },
+  "Reference": {
+    "prefix": "ref",
+    "body": "@${1:name}",
+    "description": "Reference a label"
+  },
+  "Footnote": {
+    "prefix": "footnote",
+    "body": "#footnote[${1:text}]",
+    "description": "Footnote"
+  },
+  "Citation": {
+    "prefix": "cite",
+    "body": "#cite(<${1:key}>, form: \"${2:normal}\")",
+    "description": "Cite a bibliography entry"
+  },
+  "Bibliography": {
+    "prefix": "bib",
+    "body": "#bibliography(\"${1:refs.bib}\", style: \"${2:ieee}\")",
+    "description": "Render the bibliography"
+  },
+  "Outline": {
+    "prefix": "outline",
+    "body": "#outline(title: [${1:Contents}], depth: ${2:2})",
+    "description": "Table of contents"
+  },
+  "Page break": {
+    "prefix": "pagebreak",
+    "body": "#pagebreak(weak: ${1:true})",
+    "description": "Break to a new page"
+  },
+  "Columns": {
+    "prefix": "columns",
+    "body": ["#columns(${1:2}, gutter: ${2:1em})[", "\t$0", "]"],
+    "description": "Multi-column block"
+  },
+  "Stack": {
+    "prefix": "stack",
+    "body": ["#stack(", "\tdir: ${1:ttb},", "\tspacing: ${2:1em},", "\t$0", ")"],
+    "description": "Stack content along an axis"
+  },
+  "Block": {
+    "prefix": "block",
+    "body": [
+      "#block(",
+      "\tfill: ${1:luma(240)},",
+      "\tinset: ${2:8pt},",
+      "\tradius: ${3:4pt},",
+      ")[",
+      "\t$0",
+      "]"
+    ],
+    "description": "Boxed, breakable container"
+  },
+  "Box": {
+    "prefix": "box",
+    "body": "#box(inset: ${1:4pt})[${0}]",
+    "description": "Inline, unbreakable container"
+  },
+  "Place": {
+    "prefix": "place",
+    "body": "#place(${1:top + right}, dx: ${2:0pt}, dy: ${3:0pt})[$0]",
+    "description": "Place content out of flow"
+  },
+  "Align": {
+    "prefix": "align",
+    "body": "#align(${1:center})[$0]",
+    "description": "Align content"
+  },
+  "Quote": {
+    "prefix": "quote",
+    "body": ["#quote(block: true, attribution: [${1:Author}])[", "\t${0}", "]"],
+    "description": "Block quotation"
+  },
+  "Code block": {
+    "prefix": "code",
+    "body": ["```${1:rust}", "$0", "```"],
+    "description": "Syntax-highlighted raw block"
+  },
+  "Lorem ipsum": {
+    "prefix": "lorem",
+    "body": "#lorem(${1:50})",
+    "description": "Placeholder text"
+  },
+  "Hide": {
+    "prefix": "hide",
+    "body": "#hide[$0]",
+    "description": "Reserve space without drawing"
+  },
+  "Rotate": {
+    "prefix": "rotate",
+    "body": "#rotate(${1:45deg}, reflow: ${2:true})[$0]",
+    "description": "Rotate content"
+  },
+  "Scale": {
+    "prefix": "scale",
+    "body": "#scale(${1:80%}, reflow: ${2:true})[$0]",
+    "description": "Scale content"
+  },
+  "Rectangle": {
+    "prefix": "rect",
+    "body": "#rect(width: ${1:4cm}, height: ${2:2cm}, fill: ${3:luma(230)})[$0]",
+    "description": "Rectangle"
+  },
+  "Circle": {
+    "prefix": "circle",
+    "body": "#circle(radius: ${1:1cm}, fill: ${2:luma(230)})[$0]",
+    "description": "Circle"
+  },
+  "Line": {
+    "prefix": "line",
+    "body": "#line(length: ${1:100%}, stroke: ${2:0.5pt})",
+    "description": "Straight line"
+  },
+  "Curve": {
+    "prefix": "curve",
+    "body": [
+      "#curve(",
+      "\tfill: ${1:luma(230)},",
+      "\tstroke: ${2:0.5pt},",
+      "\tcurve.move((${3:0pt}, ${4:0pt})),",
+      "\tcurve.line((${5:2cm}, ${6:0pt})),",
+      "\tcurve.cubic(none, (${7:2cm}, ${8:2cm}), (${9:1cm}, ${10:2cm})),",
+      "\tcurve.close(),",
+      ")"
+    ],
+    "description": "Bezier path (replaces `path` since 0.13)"
+  },
+  "Polygon": {
+    "prefix": "polygon",
+    "body": "#polygon(fill: ${1:luma(230)}, (0pt, 0pt), (${2:2cm}, 0pt), (${3:1cm}, ${4:2cm}))",
+    "description": "Polygon from points"
+  },
+  "Linear gradient": {
+    "prefix": "gradient",
+    "body": "#gradient.linear(${1:red}, ${2:blue}, angle: ${3:0deg})",
+    "description": "Linear gradient fill"
+  },
+  "Tiling": {
+    "prefix": "tiling",
+    "body": "#tiling(size: (${1:10pt}, ${2:10pt}))[$0]",
+    "description": "Repeating fill (renamed from `pattern` in 0.13)"
+  },
+  "Counter step and display": {
+    "prefix": "counter",
+    "body": "#context counter(${1:heading}).display(\"${2:1.1}\")",
+    "description": "Read a counter inside a context"
+  },
+  "State": {
+    "prefix": "state",
+    "body": "#let ${1:name} = state(\"${1:name}\", ${2:none})",
+    "description": "Declare document-wide state"
+  },
+  "Numbering": {
+    "prefix": "numbering",
+    "body": "#numbering(\"${1:1.1}\", ${2:1})",
+    "description": "Apply a numbering pattern"
+  },
+  "Measure": {
+    "prefix": "measure",
+    "body": "#context measure(${1:content})",
+    "description": "Measure content's size"
+  },
+  "Layout": {
+    "prefix": "layout",
+    "body": ["#layout(size => {", "\t$0", "})"],
+    "description": "Access the available region size"
+  },
+  "HTML element": {
+    "prefix": "htmlelem",
+    "body": "#html.elem(\"${1:div}\", attrs: (class: \"${2:name}\"))[$0]",
+    "description": "Raw element for HTML export"
+  },
+  "Display equation": {
+    "prefix": "eq",
+    "body": ["\\$ ${1:x} \\$$0"],
+    "description": "Block equation"
+  },
+  "Labelled equation": {
+    "prefix": "eql",
+    "body": ["\\$ ${1:x} \\$ <${2:eq:name}>", "$0"],
+    "description": "Block equation with a label"
+  },
+  "Aligned equation": {
+    "prefix": "eqa",
+    "body": ["\\$ ${1:a} &= ${2:b} \\\\", "  ${3:c} &= ${4:d} \\$", "$0"],
+    "description": "Multi-line equation aligned on &"
+  },
+  "Fraction": {
+    "prefix": "frac",
+    "body": "frac(${1:a}, ${2:b})",
+    "description": "Math: fraction"
+  },
+  "Sum": {
+    "prefix": "sum",
+    "body": "sum_(${1:i=1})^(${2:n}) ${0}",
+    "description": "Math: summation"
+  },
+  "Product": {
+    "prefix": "prod",
+    "body": "product_(${1:i=1})^(${2:n}) ${0}",
+    "description": "Math: product"
+  },
+  "Integral": {
+    "prefix": "int",
+    "body": "integral_(${1:a})^(${2:b}) ${0}",
+    "description": "Math: integral"
+  },
+  "Limit": {
+    "prefix": "lim",
+    "body": "lim_(${1:x -> 0}) ${0}",
+    "description": "Math: limit"
+  },
+  "Square root": {
+    "prefix": "sqrt",
+    "body": "sqrt(${1:x})",
+    "description": "Math: square root"
+  },
+  "Binomial": {
+    "prefix": "binom",
+    "body": "binom(${1:n}, ${2:k})",
+    "description": "Math: binomial coefficient"
+  },
+  "Matrix": {
+    "prefix": "mat",
+    "body": ["mat(", "\t${1:1}, ${2:2};", "\t${3:3}, ${4:4},", ")"],
+    "description": "Math: matrix"
+  },
+  "Vector": {
+    "prefix": "vec",
+    "body": "vec(${1:1}, ${2:2})",
+    "description": "Math: column vector"
+  },
+  "Cases": {
+    "prefix": "cases",
+    "body": ["cases(", "\t${1:a} \"if\" ${2:x > 0},", "\t${3:b} \"otherwise\",", ")"],
+    "description": "Math: case distinction"
+  },
+  "Operator": {
+    "prefix": "op",
+    "body": "op(\"${1:argmax}\", limits: #${2:true})",
+    "description": "Math: custom upright operator"
+  },
+  "Underbrace": {
+    "prefix": "underbrace",
+    "body": "underbrace(${1:x + y}, ${2:\"label\"})",
+    "description": "Math: annotated brace below"
+  },
+  "Absolute value": {
+    "prefix": "abs",
+    "body": "abs(${1:x})",
+    "description": "Math: absolute value"
+  },
+  "Norm": {
+    "prefix": "norm",
+    "body": "norm(${1:x})",
+    "description": "Math: norm"
+  }
+}

@@ -340,6 +340,8 @@ require('lazy').setup({
           },
 
           sources = {
+            -- `snippets` reads friendly-snippets plus every `<filetype>.json`
+            -- under this config's `snippets/` directory -- no path to declare.
             default = { 'snippets', 'lsp', 'path', 'buffer' },
 
             providers = {

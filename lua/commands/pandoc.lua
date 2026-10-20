@@ -57,9 +57,10 @@ local function custom_properties(palette)
   return ':root{' .. table.concat(declarations, ';') .. '}'
 end
 
--- 'auto' follows the reader's OS preference. 'light' and 'dark' pin one
--- palette, which is what an exported file wants when it gets shared or printed.
-local modes = { 'auto', 'light', 'dark' }
+-- 'light' and 'dark' pin one palette, which is what an exported file wants
+-- when it gets shared or printed. 'auto' follows the reader's OS preference.
+local modes = { 'light', 'dark', 'auto' }
+local default_mode = 'light'
 
 local function root_block(mode)
   if mode == 'light' then
@@ -145,7 +146,7 @@ local function resolve(command, args)
     return nil
   end
 
-  local mode = args ~= '' and args or 'auto'
+  local mode = args ~= '' and args or default_mode
   if not vim.tbl_contains(modes, mode) then
     vim.notify('Pandoc: unknown mode ' .. mode .. ' (expected ' .. table.concat(modes, ', ') .. ')', vim.log.levels.ERROR)
     return nil
@@ -198,7 +199,7 @@ vim.api.nvim_create_user_command('PandocPreview', function(opts)
     vim.ui.open(output)
   end)
 end, {
-  desc = 'Render markdown to HTML and open in browser (mode: auto|light|dark)',
+  desc = 'Render markdown to HTML and open in browser (mode: light|dark|auto, default light)',
   nargs = '?',
   complete = complete_mode,
 })
@@ -216,7 +217,7 @@ vim.api.nvim_create_user_command('PandocToDoc', function(opts)
     vim.notify('Pandoc: Exported to ' .. output, vim.log.levels.INFO)
   end)
 end, {
-  desc = 'Export markdown to ~/Documents/ as HTML (mode: auto|light|dark)',
+  desc = 'Export markdown to ~/Documents/ as HTML (mode: light|dark|auto, default light)',
   nargs = '?',
   complete = complete_mode,
 })

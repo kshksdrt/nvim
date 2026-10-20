@@ -58,6 +58,43 @@ return {
       vim.api.nvim_create_user_command('CodeDiffCyclingEnable', function()
         set_cycling(true)
       end, { desc = 'Enable all CodeDiff hunk/file cycling' })
+
+      -- The working-tree side of a diff is the real file buffer, which may also be
+      -- open in other tabs. 'modifiable' is buffer-local, so it is only cleared
+      -- while the cursor sits in a CodeDiff pane, and restored on leaving it.
+      -- Revision buffers are already read-only; the conflict result pane is not an
+      -- original/modified pane, so merges stay editable.
+      local locked = {} ---@type table<integer, true>
+      local lifecycle = require 'codediff.ui.lifecycle'
+      local sync_lock = function()
+        local win = vim.api.nvim_get_current_win()
+        local buf = vim.api.nvim_win_get_buf(win)
+        local original_win, modified_win = lifecycle.get_windows(vim.api.nvim_get_current_tabpage())
+        local lock = (win == original_win or win == modified_win) and vim.bo[buf].buftype == ''
+
+        for b in pairs(locked) do
+          if b ~= buf or not lock then
+            if vim.api.nvim_buf_is_valid(b) then
+              vim.bo[b].modifiable = true
+            end
+            locked[b] = nil
+          end
+        end
+        if lock and vim.bo[buf].modifiable then
+          vim.bo[buf].modifiable = false
+          locked[buf] = true
+        end
+      end
+
+      local group = vim.api.nvim_create_augroup('codediff-readonly-files', { clear = true })
+      vim.api.nvim_create_autocmd({ 'WinEnter', 'BufEnter' }, { group = group, callback = sync_lock })
+      vim.api.nvim_create_autocmd('User', {
+        group = group,
+        pattern = { 'CodeDiffOpen', 'CodeDiffFileSelect', 'CodeDiffClose' },
+        callback = function()
+          vim.schedule(sync_lock)
+        end,
+      })
     end,
   },
   {

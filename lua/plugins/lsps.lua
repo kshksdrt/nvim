@@ -1,28 +1,18 @@
--- C# via roslyn.nvim, which configures and enables the server itself.
--- NOTE: these settings are duplicated by the `roslyn` entry in init.lua's
--- `servers` table. Change both, or drop one.
+-- C# via roslyn.nvim, which configures and enables the server itself. These are
+-- plugin options only; server settings go through `vim.lsp.config('roslyn')`,
+-- i.e. the `roslyn` entry in init.lua's `servers` table.
 return {
   {
     'seblyng/roslyn.nvim',
     ---@module 'roslyn.config'
     ---@type RoslynNvimConfig
     opts = {
-      ['csharp|formatting'] = {
-        csharp_enable_inlay_hints_for_implicit_object_creation = true,
-        csharp_enable_inlay_hints_for_implicit_variable_types = true,
-        indent_style = 'space',
-        indent_size = 4,
-        tab_width = 4,
-      },
-      ['csharp|code_style'] = {
-        formatting = {
-          indent_style = 'space',
-          indent_size = 4,
-        },
-      },
-      ['csharp|code_lens'] = {
-        dotnet_enable_references_code_lens = false,
-      },
+      -- Roslyn watches the workspace itself. This turns off Neovim's file watcher
+      -- for this client (no `didChangeWatchedFiles` dynamic registration), and the
+      -- server then uses its own in-process watcher. Neovim already does this on
+      -- Linux; setting it here makes macOS/Windows behave the same way. Check it
+      -- with `:checkhealth roslyn`.
+      filewatching = 'roslyn',
     },
   },
 }

@@ -603,7 +603,7 @@ require('lazy').setup({
       }
 
       -- Filetypes owned by whichever JS/TS server is selected. `vue` is absent on
-      -- purpose: it always belongs to `ts_ls`, never `tsgo`. The `:TsServer` toggle
+      -- purpose: it always belongs to `ts_ls`, never `tsc`. The `:TsServer` toggle
       -- at the end of this block reassigns this list, so keep it the only copy.
       local ts_filetypes = { 'javascript', 'javascriptreact', 'typescript', 'typescriptreact' }
 
@@ -641,17 +641,20 @@ require('lazy').setup({
 
         -- rust_analyzer = {},
 
-        -- TypeScript 7 (`typescript-go`), the Go port of tsserver, and the default
-        -- owner of `ts_filetypes`. Coverage is still partial and it cannot load
-        -- tsserver plugins, which is why `ts_ls` below stays around for Vue.
-        -- Defaults come from nvim-lspconfig's `lsp/tsgo.lua`.
-        tsgo = { filetypes = ts_filetypes },
+        -- TypeScript 7's native compiler (`tsc --lsp`), the default owner of
+        -- `ts_filetypes`. It replaces `tsgo`, the preview build that Mason and
+        -- nvim-lspconfig now mark deprecated. TS 7 has no plugin API, which is why
+        -- `ts_ls` below stays around for Vue.
+        -- Defaults come from nvim-lspconfig's `lsp/tsc.lua`: it uses the project's
+        -- `node_modules/.bin/tsc` only if that is 7.0+, otherwise Mason's `tsc`.
+        tsc = { filetypes = ts_filetypes },
 
         -- Always owns Vue, as the carrier of `@vue/typescript-plugin`. `vue_ls` runs
         -- in hybrid mode: it owns the template/style blocks and forwards
-        -- `tsserver/request` to the attached TS client, and only `ts_ls` can load
-        -- that plugin. The forwarding handler ships with nvim-lspconfig, so no
-        -- `on_init` here. Also takes `ts_filetypes` when `:TsServer` picks it.
+        -- `tsserver/request` to the attached TS client, and only `ts_ls` (on
+        -- TypeScript 6) can load that plugin. The forwarding handler ships with
+        -- nvim-lspconfig, so no `on_init` here. Also takes `ts_filetypes` when
+        -- `:TsServer` picks it.
         -- See https://github.com/vuejs/language-tools/wiki/Neovim
         ts_ls = {
           filetypes = { 'vue' },
@@ -686,24 +689,37 @@ require('lazy').setup({
           },
         },
 
-        -- Configured and enabled by roslyn.nvim itself; this only layers on settings.
-        -- NOTE: duplicated by the `opts` in lua/plugins/lsps.lua. Change both, or drop one.
+        -- Configured and enabled by roslyn.nvim itself (plugin options live in
+        -- lua/plugins/lsps.lua); this only layers on server settings. Roslyn pulls
+        -- each one via `workspace/configuration` as `<section>.<dotted.path>`, which
+        -- Neovim resolves against this nesting. Valid names: the `serverOption`s in
+        -- vscode-csharp's test/lsptoolshost/unitTests/configurationMiddleware.test.ts.
         roslyn = {
-          ['csharp|formatting'] = {
-            csharp_enable_inlay_hints_for_implicit_object_creation = true,
-            csharp_enable_inlay_hints_for_implicit_variable_types = true,
-            indent_style = 'space',
-            indent_size = 4,
-            tab_width = 4,
-          },
-          ['csharp|code_style'] = {
-            formatting = {
-              indent_style = 'space',
-              indent_size = 4,
+          settings = {
+            -- Shown only after `<leader>th`. `for_types` is the master switch: without
+            -- it Roslyn ignores the other two. It also turns on lambda-parameter and
+            -- collection-expression type hints, which default to on.
+            ['csharp|inlay_hints'] = {
+              csharp_enable_inlay_hints_for_types = true,
+              csharp_enable_inlay_hints_for_implicit_object_creation = true,
+              csharp_enable_inlay_hints_for_implicit_variable_types = true,
             },
-          },
-          ['csharp|code_lens'] = {
-            dotnet_enable_references_code_lens = false,
+            -- Fallback when the project has no .editorconfig (which wins). Format
+            -- requests (format-on-save goes through Roslyn, as conform has no `cs`
+            -- formatter) carry the buffer's 'shiftwidth'/'expandtab' instead, so
+            -- this covers code fixes, refactorings and generated code.
+            ['csharp|code_style'] = {
+              formatting = {
+                indentation_and_spacing = {
+                  indent_style = 'space', -- 'space' | 'tab', as in .editorconfig
+                  indent_size = 4,
+                  tab_width = 4,
+                },
+              },
+            },
+            ['csharp|code_lens'] = {
+              dotnet_enable_references_code_lens = false,
+            },
           },
         },
 
@@ -749,8 +765,8 @@ require('lazy').setup({
           'roslyn',
           'rust-analyzer',
           'tinymist',
-          'tsgo', -- TypeScript 7 / @typescript/native-preview
-          'typescript-language-server', -- `ts_ls`, Vue only
+          'tsc', -- TypeScript 7 (`typescript` npm package)
+          'typescript-language-server', -- `ts_ls`, Vue only; bundles TypeScript 6
           'vue-language-server',
           -- Formatters
           'csharpier',
@@ -769,9 +785,9 @@ require('lazy').setup({
       end
       vim.lsp.enable(vim.tbl_keys(servers))
 
-      -- `:TsServer [tsgo|ts_ls]` picks the server for `ts_filetypes`. No argument
+      -- `:TsServer [tsc|ts_ls]` picks the server for `ts_filetypes`. No argument
       -- toggles; naming the current one restarts it. Vue always stays with `ts_ls`.
-      local ts_selected = 'tsgo' -- owner of `ts_filetypes` right now
+      local ts_selected = 'tsc' -- owner of `ts_filetypes` right now
 
       local function select_ts_server(name)
         ts_selected = name
@@ -779,7 +795,7 @@ require('lazy').setup({
         -- Stop both servers' clients, remembering where they were so we can re-attach.
         local buffers, stopping = {}, {}
         for _, client in ipairs(vim.lsp.get_clients()) do
-          if client.name == 'tsgo' or client.name == 'ts_ls' then
+          if client.name == 'tsc' or client.name == 'ts_ls' then
             for buf in pairs(client.attached_buffers) do
               buffers[buf] = true
             end
@@ -788,11 +804,11 @@ require('lazy').setup({
           end
         end
 
-        if name == 'tsgo' then
+        if name == 'tsc' then
           vim.lsp.config('ts_ls', { filetypes = { 'vue' } })
-          vim.lsp.enable 'tsgo'
+          vim.lsp.enable 'tsc'
         else
-          vim.lsp.enable('tsgo', false)
+          vim.lsp.enable('tsc', false)
           vim.lsp.config('ts_ls', { filetypes = vim.list_extend({ 'vue' }, ts_filetypes) })
         end
 
@@ -820,12 +836,12 @@ require('lazy').setup({
       end
 
       vim.api.nvim_create_user_command('TsServer', function(opts)
-        select_ts_server(opts.args ~= '' and opts.args or (ts_selected == 'tsgo' and 'ts_ls' or 'tsgo'))
+        select_ts_server(opts.args ~= '' and opts.args or (ts_selected == 'tsc' and 'ts_ls' or 'tsc'))
       end, {
         nargs = '?',
-        desc = 'Switch the JS/TS language server between tsgo and ts_ls (restarts if already selected)',
+        desc = 'Switch the JS/TS language server between tsc and ts_ls (restarts if already selected)',
         complete = function()
-          return { 'tsgo', 'ts_ls' }
+          return { 'tsc', 'ts_ls' }
         end,
       })
     end,

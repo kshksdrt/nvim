@@ -1443,6 +1443,7 @@ require 'commands.cmd'
 require 'commands.markdown'
 require 'commands.pandoc'
 require 'commands.line'
+require 'commands.undo_commit'
 
 local stickies = require 'commands.sticky_notes_float'
 stickies.setup()

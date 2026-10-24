@@ -344,7 +344,11 @@ require('lazy').setup({
             -- under this config's `snippets/` directory -- no path to declare.
             default = { 'snippets', 'lsp', 'path', 'buffer' },
 
+            -- Per-provider, not global: a global minimum would also hide LSP
+            -- member completion right after `.` / `::` (keyword length 0).
             providers = {
+              buffer = { min_keyword_length = 3 },
+              snippets = { min_keyword_length = 2 },
               cmdline = {
                 min_keyword_length = function(ctx)
                   -- Only complete a bare command name once 3 characters are typed.
@@ -364,7 +368,6 @@ require('lazy').setup({
             completion = {
               menu = {
                 auto_show = true,
-                min_keyword_length = 3,
               },
             },
           },
@@ -381,9 +384,9 @@ require('lazy').setup({
             },
           },
         },
-        -- Lets other specs append to enabled_providers instead of redefining it.
+        -- Lets other specs append to sources.default instead of redefining it.
         opts_extend = {
-          'sources.completion.enabled_providers',
+          'sources.default',
         },
       },
 

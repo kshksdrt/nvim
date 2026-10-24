@@ -36,35 +36,35 @@ return {
           },
         },
       },
-      dashboard = {
-        -- Disabled: a preset that adds a "Restore Session" entry when
-        -- persistence.nvim is installed.
-        -- preset = {
-        --   keys = {
-        --     { icon = ' ', key = 's', desc = 'Restore Session', section = 'session' },
-        --   },
-        -- },
-        sections = {
-          -- { section = "header" }, -- off: hides the logo
-          {
-            section = 'keys',
-            gap = 1,
-            padding = 1,
-          },
-          {
-            pane = 2,
-            icon = ' ',
-            title = 'Recent Files',
-            section = 'recent_files',
-            indent = 2,
-            padding = 1,
-          },
-          -- { pane = 2, icon = ' ', title = 'Projects', section = 'projects', indent = 2, padding = 1 },
-          {
-            section = 'startup',
-          },
-        },
-      },
+      -- dashboard = {
+      --   -- Disabled: a preset that adds a "Restore Session" entry when
+      --   -- persistence.nvim is installed.
+      --   -- preset = {
+      --   --   keys = {
+      --   --     { icon = ' ', key = 's', desc = 'Restore Session', section = 'session' },
+      --   --   },
+      --   -- },
+      --   sections = {
+      --     -- { section = "header" }, -- off: hides the logo
+      --     {
+      --       section = 'keys',
+      --       gap = 1,
+      --       padding = 1,
+      --     },
+      --     {
+      --       pane = 2,
+      --       icon = ' ',
+      --       title = 'Recent Files',
+      --       section = 'recent_files',
+      --       indent = 2,
+      --       padding = 1,
+      --     },
+      --     -- { pane = 2, icon = ' ', title = 'Projects', section = 'projects', indent = 2, padding = 1 },
+      --     {
+      --       section = 'startup',
+      --     },
+      --   },
+      -- },
       explorer = {
         enabled = true,
         replace_netrw = true,

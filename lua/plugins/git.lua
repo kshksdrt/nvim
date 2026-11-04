@@ -1,5 +1,15 @@
 return {
   {
+    -- Not lazy: the background refresh feeds the statusline segment next to the
+    -- git branch (mini.statusline content in init.lua).
+    'kshksdrt/nvim-diffstat',
+    lazy = false,
+    opts = {},
+    keys = {
+      { '<leader>hc', '<Cmd>GitDiffStat<CR>', desc = 'git diff stat ([c]hange counts)' },
+    },
+  },
+  {
     'esmuellert/codediff.nvim',
     -- The Cycling* commands are listed so lazy loads the plugin (running config
     -- below) before dispatching to the real commands it defines.

@@ -1230,6 +1230,10 @@ require('lazy').setup({
         return string.format('%%#MiniStatuslineFilename# %s %%#MiniStatuslinePath#%s ', label, shown_path)
       end
 
+      -- nvim-diffstat is in lua/plugins/git.lua. If it fails to load, the
+      -- segment is just empty instead of erroring on every redraw.
+      local diffstat_ok, diffstat_mod = pcall(require, 'diffstat')
+
       -- 3. Statusline config
       statusline.setup {
         use_icons = vim.g.have_nerd_font,
@@ -1237,12 +1241,22 @@ require('lazy').setup({
           active = function()
             local git = MiniStatusline.section_git { trunc_width = 75, bold = false }
 
+            -- "<branch> | +12 -3 ?2": line counts of the last nvim-diffstat refresh.
+            -- Shown only beside a branch name, so they truncate with it (empty
+            -- `git`) and skip buffers outside a repo; no pipe when clean. The
+            -- plugin redraws the statusline itself when its text changes.
+            local devinfo = { git }
+            local counts = (git ~= '' and diffstat_ok) and diffstat_mod.statusline() or ''
+            if counts ~= '' then
+              vim.list_extend(devinfo, { '|', counts })
+            end
+
             local location = MiniStatusline.section_location { trunc_width = 75 }
 
             local position_group = file_path_segment()
 
             local status_line_widget_groups = {
-              { hl = 'MiniStatuslineDevinfo', strings = { git } },
+              { hl = 'MiniStatuslineDevinfo', strings = devinfo },
               position_group,
               '%=',
               { hl = 'MiniStatuslineLocation', strings = { location } },

@@ -65,8 +65,19 @@ return {
           end
 
           -- Navigation
+          -- In a CodeDiff tab the working-tree pane is this same file buffer, so
+          -- these buffer-local maps shadow CodeDiff's own ]c/[c there. Hand off to
+          -- CodeDiff: it walks the hunks of the diff on screen and honours its
+          -- cycle_* options (lua/plugins/git.lua) instead of 'wrapscan'.
+          local in_codediff = function()
+            return package.loaded['codediff'] ~= nil
+              and require('codediff.ui.lifecycle').get_session(vim.api.nvim_get_current_tabpage()) ~= nil
+          end
+
           map('n', ']c', function()
-            if vim.wo.diff then
+            if in_codediff() then
+              require('codediff').next_hunk()
+            elseif vim.wo.diff then
               vim.cmd.normal { ']c', bang = true }
             else
               gitsigns.nav_hunk 'next'
@@ -74,7 +85,9 @@ return {
           end, { desc = 'Jump to next git [c]hange' })
 
           map('n', '[c', function()
-            if vim.wo.diff then
+            if in_codediff() then
+              require('codediff').prev_hunk()
+            elseif vim.wo.diff then
               vim.cmd.normal { '[c', bang = true }
             else
               gitsigns.nav_hunk 'prev'

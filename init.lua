@@ -1241,14 +1241,18 @@ require('lazy').setup({
           active = function()
             local git = MiniStatusline.section_git { trunc_width = 75, bold = false }
 
-            -- "<branch> | +12 -3 ?2": line counts of the last nvim-diffstat refresh.
-            -- Shown only beside a branch name, so they truncate with it (empty
-            -- `git`) and skip buffers outside a repo; no pipe when clean. The
-            -- plugin redraws the statusline itself when its text changes.
+            -- "<branch> | +12 -3 ?2": line counts of the last nvim-diffstat refresh,
+            -- for the cwd's repo (see lua/plugins/git.lua). The branch is per
+            -- buffer, so with no file open only the counts show, and the pipe only
+            -- sits between the two. Same trunc width as the branch; no counts when
+            -- clean. The plugin redraws the statusline itself when its text changes.
             local devinfo = { git }
-            local counts = (git ~= '' and diffstat_ok) and diffstat_mod.statusline() or ''
+            local counts = (diffstat_ok and not MiniStatusline.is_truncated(75)) and diffstat_mod.statusline() or ''
             if counts ~= '' then
-              vim.list_extend(devinfo, { '|', counts })
+              if git ~= '' then
+                table.insert(devinfo, '|')
+              end
+              table.insert(devinfo, counts)
             end
 
             local location = MiniStatusline.section_location { trunc_width = 75 }

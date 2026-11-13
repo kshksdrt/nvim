@@ -1,10 +1,22 @@
 return {
   {
     -- Not lazy: the background refresh feeds the statusline segment next to the
-    -- git branch (mini.statusline content in init.lua).
+    -- git branch (mini.statusline content in init.lua). Counts are for the cwd's
+    -- repo, not the current buffer's, so they show with no file open too.
     'kshksdrt/nvim-diffstat',
     lazy = false,
-    opts = {},
+    opts = { dir = vim.fn.getcwd },
+    config = function(_, opts)
+      local diffstat = require 'diffstat'
+      diffstat.setup(opts)
+      -- Don't wait up to interval_ms for the new cwd's counts.
+      vim.api.nvim_create_autocmd('DirChanged', {
+        desc = 'Refresh git diff stat for the new cwd',
+        callback = function()
+          diffstat.refresh()
+        end,
+      })
+    end,
     keys = {
       { '<leader>hc', '<Cmd>GitDiffStat<CR>', desc = 'git diff stat ([c]hange counts)' },
     },

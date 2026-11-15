@@ -353,7 +353,7 @@ return {
       desc = 'Open Explorer',
     },
     {
-      '<leader>g',
+      '<leader>h',
       function(opts)
         Snacks.lazygit.open(opts)
       end,

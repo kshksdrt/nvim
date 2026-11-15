@@ -30,7 +30,7 @@ return {
   --   function Lazygit_toggle()
   --     lazygit:toggle()
   --   end
-  --   vim.api.nvim_set_keymap('n', '<leader>g', '<cmd>lua Lazygit_toggle()<CR>', { noremap = true, silent = true, desc = 'Open LazyGit' })
+  --   vim.api.nvim_set_keymap('n', '<leader>h', '<cmd>lua Lazygit_toggle()<CR>', { noremap = true, silent = true, desc = 'Open LazyGit' })
   --   -- Setup additional terminals
   --   local term1 = Terminal:new {
   --     direction = 'float',

@@ -1,3 +1,12 @@
+local function diff_commit(revision)
+  revision = vim.trim(revision)
+  if revision == '' then
+    vim.notify('No commit revision selected', vim.log.levels.WARN)
+    return
+  end
+  vim.api.nvim_cmd({ cmd = 'CodeDiffCommit', args = { revision } }, {})
+end
+
 return {
   {
     -- Not lazy: the background refresh feeds the statusline segment next to the
@@ -18,14 +27,33 @@ return {
       })
     end,
     keys = {
-      { '<leader>hc', '<Cmd>GitDiffStat<CR>', desc = 'git diff stat ([c]hange counts)' },
+      { '<leader>gc', '<Cmd>GitDiffStat<CR>', desc = 'git diff stat ([c]hange counts)' },
     },
   },
   {
     'esmuellert/codediff.nvim',
     -- The Cycling* commands are listed so lazy loads the plugin (running config
     -- below) before dispatching to the real commands it defines.
-    cmd = { 'CodeDiff', 'CodeDiffCyclingReset', 'CodeDiffCyclingEnable' },
+    cmd = { 'CodeDiff', 'CodeDiffCommit', 'CodeDiffCyclingReset', 'CodeDiffCyclingEnable' },
+    keys = {
+      {
+        '<leader>gdc',
+        function()
+          diff_commit(vim.fn.expand '<cword>')
+        end,
+        mode = 'n',
+        desc = 'Diff commit under cursor against its parent',
+      },
+      {
+        '<leader>gdc',
+        function()
+          local selection = vim.fn.getregion(vim.fn.getpos 'v', vim.fn.getpos '.', { type = vim.fn.mode() })
+          diff_commit(table.concat(selection, '\n'))
+        end,
+        mode = 'x',
+        desc = 'Diff selected commit against its parent',
+      },
+    },
     opts = {
       keymaps = {
         view = {
@@ -80,6 +108,12 @@ return {
       vim.api.nvim_create_user_command('CodeDiffCyclingEnable', function()
         set_cycling(true)
       end, { desc = 'Enable all CodeDiff hunk/file cycling' })
+      vim.api.nvim_create_user_command('CodeDiffCommit', function(args)
+        vim.api.nvim_cmd({
+          cmd = 'CodeDiff',
+          args = { args.args .. '~1', args.args },
+        }, {})
+      end, { nargs = 1, desc = 'Diff a commit against its first parent' })
 
       -- The working-tree side of a diff is the real file buffer, which may also be
       -- open in other tabs. 'modifiable' is buffer-local, so it is only cleared

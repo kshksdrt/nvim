@@ -1,4 +1,4 @@
--- `:GitUndoCommit` / `<leader>hU` -- VS Code's "Git: Undo Last Commit".
+-- `:GitUndoCommit` / `<leader>gU` -- VS Code's "Git: Undo Last Commit".
 --
 -- Mirrors `git.undoCommit` in vscode/extensions/git/src/commands.ts:
 --   * no commit at HEAD      -> warn and stop
@@ -136,4 +136,4 @@ local function undo_commit()
 end
 
 vim.api.nvim_create_user_command('GitUndoCommit', undo_commit, { desc = 'Undo the last git commit, keeping its changes staged (VS Code style)' })
-vim.keymap.set('n', '<leader>hU', undo_commit, { desc = 'git [U]ndo last commit' })
+vim.keymap.set('n', '<leader>gU', undo_commit, { desc = 'git [U]ndo last commit' })

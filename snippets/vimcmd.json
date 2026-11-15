@@ -1,0 +1,17 @@
+{
+    "Regex Substitute with Capture": {
+        "prefix": "subg",
+        "body": ["%s/\\v(${1:pattern})/${2:\\1}/gc$0"],
+        "description": "Global regex substitute with confirmation"
+    },
+    "Global Execute Normal": {
+        "prefix": "gnorm",
+        "body": ["g/${1:pattern}/normal! ${2:commands}$0"],
+        "description": "Run normal-mode macro/commands on matching lines"
+    },
+    "CodeDiff Revision": {
+        "prefix": "diffc",
+        "body": ["CodeDiff ${1:rev}~1 ${1:rev}${0}"],
+        "description": "Run CodeDiff comparing <rev>~1 and <rev>"
+    }
+}

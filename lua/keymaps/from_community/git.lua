@@ -2,10 +2,14 @@
 vim.keymap.set('v', '<leader>l', ":<c-u>exe ':term git log -L' line(\"'<\").','.line(\"'>\").':'.expand('%')<CR>", { noremap = true })
 
 -- Git log (1-line with stats)
-vim.keymap.set('n', '<leader>gl', function()
+local GIT_LOG_DEFAULT_COUNT = 100
+
+local function show_git_log(count)
   local cmd = {
     'git',
     'log',
+    '-n',
+    tostring(count),
     '--numstat',
     '--pretty=format:COMMIT_START%x09%H%x09%ai%x09%s',
   }
@@ -58,4 +62,15 @@ vim.keymap.set('n', '<leader>gl', function()
   vim.bo[buf].modifiable = false
 
   vim.keymap.set('n', 'q', '<cmd>close<CR>', { buffer = buf, silent = true })
+end
+
+vim.keymap.set('n', '<leader>gl', function()
+  vim.ui.input({ prompt = 'Number of commits (default ' .. GIT_LOG_DEFAULT_COUNT .. '): ' }, function(input)
+    -- Cancelled, empty, non-numeric, non-integer or non-positive -> default.
+    local n = tonumber(input)
+    if not n or n < 1 or n ~= math.floor(n) then
+      n = GIT_LOG_DEFAULT_COUNT
+    end
+    show_git_log(n)
+  end)
 end, { desc = 'Git log (1-line with stats)' })

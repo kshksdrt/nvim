@@ -7,6 +7,45 @@ local function diff_commit(revision)
   vim.api.nvim_cmd({ cmd = 'CodeDiffCommit', args = { revision } }, {})
 end
 
+-- `remotes/origin/main` (git branch --all) -> `origin/main`; a detached HEAD
+-- row has no branch, only its commit.
+local function branch_ref(item)
+  return item.branch and item.branch:gsub('^remotes/', '') or item.commit
+end
+
+-- Pick base then target from snacks' branch picker (remotes included) and
+-- show nvim-diffstat's base...target. Selecting two rows with <Tab> in the
+-- first picker uses them directly, in selection order.
+local function pick_compare()
+  local function pick(title, on_ref)
+    Snacks.picker.git_branches {
+      all = true,
+      title = title,
+      confirm = function(picker, item)
+        local selected = picker:selected()
+        picker:close()
+        if #selected == 2 then
+          return on_ref(branch_ref(selected[1]), branch_ref(selected[2]))
+        end
+        if item then
+          on_ref(branch_ref(item))
+        end
+      end,
+    }
+  end
+  pick('Compare: base', function(base, target)
+    if target then
+      return require('diffstat').compare(base, target)
+    end
+    -- After the first picker has closed.
+    vim.schedule(function()
+      pick('Compare ' .. base .. '...: target', function(t)
+        require('diffstat').compare(base, t)
+      end)
+    end)
+  end)
+end
+
 return {
   {
     -- Not lazy: the background refresh feeds the statusline segment next to the
@@ -28,6 +67,7 @@ return {
     end,
     keys = {
       { '<leader>gc', '<Cmd>GitDiffStat<CR>', desc = 'git diff stat ([c]hange counts)' },
+      { '<leader>gC', pick_compare, desc = 'git diff stat: [C]ompare two branches' },
     },
   },
   {

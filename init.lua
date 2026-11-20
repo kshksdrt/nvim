@@ -1239,7 +1239,17 @@ require('lazy').setup({
         use_icons = vim.g.have_nerd_font,
         content = {
           active = function()
-            local git = MiniStatusline.section_git { trunc_width = 75, bold = false }
+            -- MiniStatusline.section_git, but with the branch capped at 20
+            -- characters (19 + '…'). Same sources and icon as mini's version.
+            local git = ''
+            local head = vim.b.minigit_summary_string or vim.b.gitsigns_head
+            if head ~= nil and not MiniStatusline.is_truncated(75) then
+              head = head == '' and '-' or head
+              if vim.fn.strchars(head) > 20 then
+                head = vim.fn.strcharpart(head, 0, 19) .. '…'
+              end
+              git = (vim.g.have_nerd_font and '' or 'Git') .. ' ' .. head
+            end
 
             -- "<branch> | +12 -3 ?2": line counts of the last nvim-diffstat refresh,
             -- for the cwd's repo (see lua/plugins/git.lua). The branch is per
